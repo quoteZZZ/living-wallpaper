@@ -2,7 +2,7 @@
 
 > 版本：**v3（2026-10-12）** · 状态：设计定稿期；T0 渲染概念已验证，T0.1 面板代码已落未测
 > v3 三大变更：**① 直接发布独立 Steam 应用（放弃 WE 工坊路径）② 首版中英双语 ③ 微内核 + 全面插件化架构**
-> 仓库 github.com/quoteZZZ/solstice-wallpaper · 预览 https://quotezzz.github.io/solstice-wallpaper/
+> 仓库 github.com/quoteZZZ/solstice · 预览 https://quotezzz.github.io/solstice/
 
 ---
 
