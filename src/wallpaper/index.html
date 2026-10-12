@@ -164,14 +164,16 @@ void main(){
   col+=uLumC*exp(-gd*gd*26.)*.55*uLumA;
   col+=uLumC*smoothstep(uLum.z,uLum.z*.5,gd)*uLumA*(1.25-uNight*.8);
 
-  /* 山峦分层视差（程序化占位；正式素材模式下由深度图取代） */
+  /* 山峦分层视差（程序化占位；正式素材模式下由深度图取代）
+   * 远景山脊高（露在上方、被雾色淡化），近景山脊低（深色、占底部）——
+   * 保证四层互相可见，形成大气透视梯度 */
   if(uMode<.5){
     for(int i=0;i<4;i++){
       float fi=float(i);
       float d =.35+fi*.2166;                 // 0.35 远 .. 1.0 近
       float px=uMouse.x*uPar*.27*d;
       float py=uMouse.y*uPar*.05*d;
-      float ridge=.16+fi*.075+fbm(vec2(uv.x*(1.6+fi*1.1)-px+fi*13.1, fi*7.7))*.16+py;
+      float ridge=.44-fi*.07+fbm(vec2(uv.x*(1.2+fi*1.2)-px+fi*13.1, fi*7.7))*(.08+fi*.03)+py;
       float m=smoothstep(ridge, ridge-.012, uv.y);
       vec3 mc=mix(uFog*.85+uHor*.35, uFog*.25+vec3(.015,.02,.05), pow(d,1.3));
       col=mix(col,mc,m*.97);
@@ -256,10 +258,11 @@ function frame(now){
   requestAnimationFrame(frame);
   const dt=(now-prev)/1000; prev=now;
   if(document.hidden) return;
-  acc+=dt; fpsT+=dt; frames++;
-  if(fpsT>=1){ fpsM=frames/fpsT; frames=0; fpsT=0; }
+  acc+=dt;
   if(acc < 1/CFG.fps) return;                          // 帧率上限（功耗预算）
   acc=Math.min(acc-1/CFG.fps, .25);
+  fpsT+=dt; frames++;                                  // 只统计实际渲染帧
+  if(fpsT>=1){ fpsM=frames/fpsT; frames=0; fpsT=0; }
 
   const t=now/1000;
   /* 闲置 4 秒后自主缓漂，让画面"自己呼吸" */
