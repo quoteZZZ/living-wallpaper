@@ -1,7 +1,8 @@
 # 至日 Solstice 设计文档
 
-> 版本：**v3（2026-10-12）** · 状态：设计定稿期；T0 渲染概念已验证，T0.1 面板代码已落未测
+> 版本：**v3.1（2026-10-12）** · 状态：T0.1 面板已实测验证；**T0.2 微内核+插件化原型、场景编辑器、信息组件已落地并实测**（`src/wallpaper/js/`）
 > v3 三大变更：**① 直接发布独立 Steam 应用（放弃 WE 工坊路径）② 首版中英双语 ③ 微内核 + 全面插件化架构**
+> v3.1 增量：T0.2 按 §3 自举原则提前原型化内核；新增 §4.8 场景编辑器（直接操纵）、§4.9 信息组件
 > 仓库 github.com/quoteZZZ/solstice · 预览 https://quotezzz.github.io/solstice/
 
 ---
@@ -162,20 +163,25 @@ pack.sakura/
 
 `official-base`（天空+时辰光照调色）、`official-mountains`（T0 程序化山峦迁为声明式数据）、`official-weather`（雨雪粒子+Open-Meteo provider）、`official-pet`（宠物）、`official-presets`（三预设）。**T0 原型的 uniform 开关方案在 T1.1 重构为插件数据驱动**——概念已验证，重构是机械工作。
 
+**T0.2 已落地原型版**（`src/wallpaper/js/`）：`kernel.js`（i18n/存储/上下文总线/注册表+卡槽仲裁四服务，合成器与设置中心独立成文件）+ `plugins/base|mountains|weather|info.js`。插件以经典 `<script>` 顺序加载（零构建、双击可用），manifest 以 JS 对象内联声明；T1.1（Tauri/http 环境）迁为 `manifest.json` + fetch 加载，服务 API 不变。冲突仲裁集中在 `registry.resolveFrame()`，即 §4.2 矩阵的唯一实现。
+
 ---
 
 ## 4. 功能规格
 
 ### 4.1 分期总表
 
-**T0 — 概念验证（已基本完成）**
+**T0 — 概念验证（已完成）**
 
 | 功能 | 状态 |
 |---|---|
 | 程序化场景（天空/星/云/4 层山）+ 视差 + 闲置缓漂 | ✅ 已验证 |
 | 真实时辰光照（纬度→太阳高度角→调色板） | ✅ 已验证 |
 | 功耗预算（30fps/DPR≤1.5/hidden 跳帧） | ✅ 已验证 |
-| 卡片化设置面板 + 三态冲突 + 程序化雨（T0.1） | ⚠️ 已实现**未测试** |
+| 卡片化设置面板 + 三态冲突 + 程序化雨（T0.1） | ✅ 浏览器实测通过（2026-10-12） |
+| **微内核+官方插件重构（T0.2）**：kernel/composer/panel/editor + 4 官方插件 | ✅ 实测通过 |
+| **场景编辑器**（选中/拖拽/缩放/右键菜单，§4.8） | ✅ 实测通过 |
+| **信息组件**（时间/天气合并插件，§4.9） | ✅ 实测通过 |
 | 图片+深度图模式（代码就绪） | ⬜ 待真素材 |
 
 **T1 — Steam 独立应用 MVP（分四步，每步可用）**
@@ -228,6 +234,44 @@ pack.sakura/
 ### 4.7 性能与功耗
 
 30fps 上限（15/30/60 可调）、DPR≤1.5、hidden 跳帧、low-power 上下文；全屏时暂停合成（壳层检测）；挂机 GPU<5%；单 JS 体积红线 >3000 行引 esbuild。
+实现备注（T0.2）：fps 计数按"墙钟秒 × 实际渲染帧"统计（修复旧版丢帧高估一倍的 bug）；页面隐藏时 rAF 停摆，渲染循环降级 setTimeout 低频兜底（约 2.5fps，仅维持状态），`?nohid=1` 供自动化测试缩短间隔。
+
+### 4.8 场景编辑器（直接操纵）★ T0.2 新增
+
+来源：用户构想——"点击启用设置；选中右键可替换/修改/自定义添加素材；右键背景弹窗调整；选中太阳可拖拽调整位置和大小"。结合项目完善为以下方案：
+
+**交互语言（已实现）**
+| 操作 | 行为 |
+|---|---|
+| 左键点击卡片 | 选中，显示 Gizmo（虚线包围框；圆盘卡为圆形） |
+| 按住拖拽 | 移动卡片：太阳/月亮任意方向；云带、山峦垂直方向 |
+| 右下角手柄拖拽 | 缩放：太阳圆盘半径 / 山峦起伏幅度 |
+| 右键卡片 | 菜单：显示/隐藏 · 重置位置 · 卡片设置…（跳转设置中心对应分区） |
+| 右键背景（天空） | 菜单：场景设置… · 切换天气 · 重置全部卡片 |
+| Esc / 点空白 | 取消选中、关闭菜单 |
+
+**规则**
+- 变换持久化进 `S.cards[id].{dx,dy,scale}`，与三态偏好同层；「重置位置」恢复默认
+- 命中区域是程序化卡的近似包围盒（圆盘/水平带，优先级 日月>云带>山峦>天空）；T1 图片卡改用 manifest 锚点区（附录 B `anchors`）做精确命中
+- 编辑模式可在设置中心开关（`S.editor`），`?ui=0`（WE/Tauri 壁纸态）整体禁用编辑器与面板，只留画面
+- 跨类顺序仍由内核锁定（附录 C），拖拽不改变图层深度语义
+
+**T1/T2 演进（未实现，排期）**
+- **替换素材**：右键卡片菜单加"更换变体…"——列出该卡槽已订阅素材包的变体（声明式，零代码）；选中即换 `variant`
+- **添加卡片**：右键背景菜单加"添加卡片…"——从素材包中选择可插入当前空卡槽的卡（如前景树）
+- 多选 + 框选、对齐吸附、锚点九宫格定位；触屏长按 = 右键
+- WE/Tauri 正式版保留编辑器作为"壁纸自定义模式"入口（差异化卖点：所见即所得调壁纸）
+
+### 4.9 信息组件（official.info 插件）★ T0.2 新增
+
+来源：用户构想——"信息组件合并为一个通用插件，默认展开天气时间等基本信息，可收缩，点击设置图标进一步自定义"。
+
+- **合并**：原分散的时间/天气/调试浮层合并为一个 DOM 悬浮卡（`official.info`，type=behavior）
+- **默认展开**：大字时间（可选秒）+ 日期 + 天气行（☀/🌧/🌙 随天气与昼夜）；`?debug=1` 或设置开启"详细信息"（太阳高度角/帧率/卡片状态）
+- **可收缩**：`–` 收缩为迷你时间胶囊，`+` 展开
+- **⚙ 自定义**：打开设置中心本插件分区——展开/秒/日期/天气行/详细信息/缩放，全部持久化 `S.info.*`
+- **可拖拽**：编辑模式下拖动位置（`S.info.dx/dy`）；T1 支持四角吸附
+- WE/Tauri 壁纸态下**仍然显示**（它是壁纸内容而非编辑器 UI）
 
 ---
 
@@ -376,16 +420,22 @@ GitHub 真源 + Pages 预览 + Codespaces 可选 + 云端生图/深度图；本�
 
 ```js
 S = {
-  lang: 'zh' | 'en',
+  lang: 'zh' | 'en' | null,           // null=按 navigator.language 自动
   timeMode: 'real'|'locked', lockedHour: 0-24,
-  // 卡实例三态（按卡槽 id，示例）
-  slots: { 'luminary':'auto'|'show'|'hide', 'mountains':'auto'|'on'|'off',
-           'clouds':'auto'|'off', 'rain':'auto'|'on'|'off', 'pet': true, 'stars': true },
-  weather: 'clear'|'rain',           // T0 手动；T1 由 provider 写入
-  par: 0-2,
+  weather: 'clear'|'rain',            // T0 手动；T1 由 provider 写 ctx
+  par: 0-2, fps: 15|30|60, editor: true,
+  cards: {                            // 卡实例 = 三态偏好 + 编辑器变换（§4.8）
+    luminary : { pref:'auto'|'show'|'hide', dx, dy, scale },
+    clouds   : { pref:'auto'|'on'|'off',   dy },
+    stars    : { pref:'auto'|'show'|'hide' },
+    mountains: { pref:'auto'|'hide',       dy, scale },
+    rain     : { pref:'auto'|'on'|'off' },
+  },
+  info: { expanded, showSec, showDate, showWeather, showDebug, scale, dx, dy },
   // T1 追加：city, eyecare, preset, plugins:{id:{enabled,order,variant,settings}}
 }
 ```
+存储：全局 `lw.cfg.v1`（v1 平铺键自动迁移）+ 各插件 `lw.p.<id>.v1`（storage.ns）。
 
 ## 附录 B：插件 manifest v1 草案
 
