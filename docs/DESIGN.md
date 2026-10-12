@@ -1,8 +1,8 @@
 # 至日 Solstice 设计文档
 
-> 版本：**v4（2026-10-12）** · 状态：**定位升级为桌面游戏（3D 场景搭建+宠物伴侣），引擎选定 Godot 4 + C#，web 原型转设计基线**
-> v4 三大变更：**① 产品本质=游戏（桌面玩具游戏：搭建+伴侣）② 引擎 Godot 4 (C#)（§5.0）③ 素材=无图路线：程序化+低模 3D（§5.6），AI 图片降级为可选远景层**
-> 历史：v3.1 web 原型内核化；v3.2 UI 中枢/圆盘/文件素材包；v4 起进入引擎化开发
+> 版本：**v4.1（2026-10-12）** · 状态：**栈定稿（用户选定）：TypeScript 全栈 = Tauri 2 + Babylon.js；双画布架构；素材=CC0 低模 + 渲染器强制风格**
+> v4 三大变更：**① 产品本质=游戏（桌面玩具游戏：搭建+伴侣）② 3D 化（低模元素实时渲染）③ 素材=无图路线：程序化+低模 3D（CC0 起步），AI 图片降级为可选远景整层**
+> 引擎沿革：v4.0 曾选 Godot 4 (C#)；**v4.1 依用户语言路线（在学 TS）改选 TS 全栈**，Godot 降为备选
 > 仓库 github.com/quoteZZZ/solstice · 预览 https://quotezzz.github.io/solstice/
 
 ---
@@ -46,7 +46,7 @@
 | D11 | **国际化** | **首版中英双语**：UI 字符串表 + 插件 manifest 双语字段 + 商店页双语 | Steam 全球分发 |
 | D12 | 插件安全 | 声明式优先；代码级插件延后且必须 Worker 沙箱（§3.5） | 工坊内容不可信，防过度工程 |
 | D13 | **产品定位** | **桌面玩具游戏**（v4）：场景搭建 + 宠物伴侣，壁纸是呈现形态之一 | 游戏性（搭建/养成/成就）是核心价值 |
-| D14 | **引擎** | **Godot 4 + C#**（v4）：GLTF/骨骼动画/粒子/UI 原生，GodotSteam 接 Steam；web 原型转设计基线 | 游戏能力手搓是无底洞；详见 §5.0 |
+| D14 | **引擎** | **TS 全栈：Tauri 2 + Babylon.js**（v4.1 用户选定，语言路线=在学的 TS）；双画布架构（程序化背景 + 透明 3D 层）；Godot 4 (GDScript/C#) 降为备选 | 现有原型全复用；AI 辅助开发效率最高；学习即开发 |
 | D15 | **素材形态** | **无图路线**：程序化 + 低模 3D（CC0 起步）；AI 图片仅作可选远景整层（v4） | 风格一致性由渲染器保证；用户自由组合不分裂 |
 
 ### 1.3 三大价值支柱（对外话术）
@@ -193,7 +193,7 @@ pack.sakura/
 
 | 步骤 | 内容 | Go/No-Go |
 |---|---|---|
-| **T1.0-G Spike** | **Godot WorkerW 嵌入 + 挂机功耗 + GLTF 低模 + GodotSteam（§5.0，48-72h）** | **嵌入失败/功耗超标 → 回退路线 B** |
+| **T1.0-B Spike** | **Tauri+WorkerW 嵌入 + 挂机功耗 + Babylon 低模树 + steamworks 插件（§5.0，48-72h）** | **嵌入失败/功耗超标 → 纯程序化降级或评估 Electron** |
 | T1.1 内核化 | C# 移植：调色板/天气/卡槽三态/S 模型 + 低模树石元素 + 圆盘选择器 | — |
 | T1.2 内容 | CC0 元素库扩充 + 宠物 v0（骨骼动画）+ 场景搭建器（放置/吸附/存档） | — |
 | T1.3 上架 | GodotSteam 工坊（GLTF 场景包）+ 商店页双语 + Demo + AI 披露（仅远景层如实标注） | 愿望单达标线 §7.3 |
@@ -290,39 +290,36 @@ pack.sakura/
 
 ## 5. 技术方案
 
-### 5.0 引擎与栈 v4（D13/D14：游戏定位 → Godot 4 + C#）
+### 5.0 引擎与栈 v4.1（D14 定稿：TS 全栈 = Tauri 2 + Babylon.js）
 
-**引擎对比**（针对：游戏性 + 壁纸嵌入 + Steam + 单人/AI 协作）：
+**引擎对比结论**（对比表见 git 历史 v4.0）：自研 WebGL2 游戏能力不足；Godot 需换语言；Unity/UE 过重。**用户在学 TS → 选定 TS 全栈**，语言投入与产品开发合一。
 
-| 方案 | 游戏能力 | 壁纸嵌入 | Steam | 体积/功耗 | 判定 |
-|---|---|---|---|---|---|
-| 自研 WebGL2（web 原型现状） | 弱：骨骼/物理全手搓 | WorkerW+WebView 成熟 | steamworks-rs | 最优 | 游戏性天花板低 → 转**设计基线** |
-| three.js + Tauri | 中：渲染成熟、逻辑手搓 | 同上 | steamworks-rs | 良 | **路线 B（回退备选）** |
-| **Godot 4 + C#** | **强：GLTF/骨骼/粒子/UI/导航原生** | **需 spike**（WorkerW 嵌 Godot 窗，社区有先例） | GodotSteam 成熟 | low_processor_usage_mode 压挂机 | **✅ 选定** |
-| Unity / Unreal | 强 | 一般 | 成熟 | 重；Unity 授权风波 | 过重，否 |
-
-**栈清单（v4 锁定）**：
+**栈清单（v4.1 锁定）**：
 
 | 层 | 技术 | 备注 |
 |---|---|---|
-| 引擎 | Godot 4.3+（MIT 免费） | 单代码库双形态：壁纸模式 / 窗口搭建模式 |
-| 语言 | C# / .NET 8 | 调色板/天气/卡槽/三态模型从 web 原型平移 |
-| 3D 素材 | GLTF 低模；Quaternius/Kenney CC0 起步 | flat-shading 统一风格；季节=材质色切换 |
-| 壁纸嵌入 | WorkerW 嵌 Godot 窗口 + `low_processor_usage_mode` | **spike 首验点** |
-| Steam | GodotSteam（工坊/成就/ rich presence） | 3.x 分支对应 Godot 4 |
-| 存档 | Godot ConfigFile/JSON | 沿用附录 A 的 S 模型设计 |
-| 场景搭建 | Godot Control UI + 3D 放置（射线拾取/网格吸附） | 即"用户组合元素"的完全体 |
-| 工具链 | .NET 8 SDK；**Node 不需要**（运行时零依赖；如需打包再议 esbuild） | 回应"之后用 node 吗"：运行时不用 |
-| web 原型 | 保留于 `src/wallpaper/` | 设计基线 + 路线 B 回退 + 调色板数学参考 |
+| 语言 | **TypeScript** | 产品语言；构建 esbuild/Vite 按需 |
+| 3D | **Babylon.js**（透明画布层） | GLTF/骨骼动画/粒子/GUI 内置；flat-shading + 调色板光照 |
+| 背景 | 现有程序化渲染器（Canvas A） | 天空/山峦/雨雪保留，**不重写** |
+| 壳 | **Tauri 2**（Rust 配置层） | WebView2 窗口 → WorkerW 嵌入（原型已验证路径） |
+| Steam | steamworks-rs 插件；若工坊受阻 → Electron+greenworks 备选 | T1.3 验证 |
+| 素材 | CC0 低模库（Quaternius/Kenney）→ AI 3D（Meshy/Tripo）→ Blender 程序化 | 见 §5.6 |
+| 存档 | localStorage / Tauri fs | 沿用附录 A 的 S 模型 |
 
-**T1.0-G Spike（48-72h，Go/No-Go）**：
-1. Godot 窗口 WorkerW 嵌入 + 多显示器
-2. `low_processor_usage_mode` 30fps 挂机：GPU<5%、内存<300MB
-3. GLTF 低模树入场景 + 时辰调色光照（Directional+环境，吃调色板）
-4. GodotSteam 初始化 + 工坊读写假数据
-**No-Go 判定**：嵌入失败或功耗超标 → 回退路线 B（Tauri+three.js），设计模型不变。
+**双画布架构（D14 关键）**：Canvas A = 现有程序化场景（不重写）；Canvas B = 透明 Babylon 层，只渲染 3D 元素（树/石/宠物）；DOM 叠加合成，深度关系沿用地面锚点分层。现有成果零报废，Babylon 纯增量。
 
-**从 web 原型平移的资产**：调色板/太阳数学（§4.3）、卡槽+三态冲突模型（§4.2）、配置 S 结构（附录 A）、UI/UX 设计（单一中枢/圆盘选择器，§4.8-4.10）、场景包格式思想（§5.6）。
+**素材三要素保证（风格化/高清/灵动）**：
+- 风格化：渲染器强制——flat-shading + 统一调色板光照；第一版内容单一来源家族（全 Quaternius 或全 Kenney）
+- 高清：3D 分辨率无关——顶点色无贴图永不吃糊；FXAA/MSAA + devicePixelRatio 渲染；远景画片层 ≥2048px
+- 灵动：代码层给——风摆顶点着色器（风力参数化）、GLTF 骨骼宠物五态、粒子（萤火虫/飘叶）、时辰联动
+- 许可证红线：CC0 免署名可商用；AI 3D 免费档多为 CC-BY（需署名），商用前确认或买断
+
+**T1.0-B Spike（48-72h，Go/No-Go）**：
+1. Tauri WebView2 → WorkerW 嵌入 + 多显示器
+2. 挂机 30fps：GPU<5%、内存<300MB（双画布）
+3. Babylon 载入 GLTF 低模树 + 时辰调色光照 + 风摆
+4. steamworks 插件初始化
+**No-Go**：嵌入失败或功耗超标 → 降级为纯程序化（无 3D）或评估 Electron。
 
 ### 5.1 技术栈（v3 web 原型，存档备查）
 
