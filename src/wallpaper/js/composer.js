@@ -303,7 +303,8 @@ void main(){ vec4 c=texture(uT,vU); o=vec4(c.rgb*uTint, c.a); }`;
     gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);
   }
-  /* 素材包图片优先（K.assets.treeImages[variant]=url），无图回退程序化生成 */
+  /* 素材包图片优先（K.assets.treeImages[variant]=url），无图回退程序化生成；
+   * 同时登记缩略图（圆盘选择器用真实素材图，所见即所得） */
   function ensureTreeTexture(variant){
     const url=((K.assets&&K.assets.treeImages)||{})[variant];
     const key=url?('url:'+url):('proc:'+variant);
@@ -316,7 +317,11 @@ void main(){ vec4 c=texture(uT,vU); o=vec4(c.rgb*uTint, c.a); }`;
                        ensureTreeTexture(variant); };
       im.src=url;
     }else{
-      uploadTreeTexture(makeTreeTexture(variant));
+      const cv=makeTreeTexture(variant);
+      uploadTreeTexture(cv);
+      if(!K.assets.treeThumbs) K.assets.treeThumbs={};
+      if(!K.assets.treeThumbs[variant])
+        K.assets.treeThumbs[variant]=cv.toDataURL('image/png');
     }
   }
 

@@ -49,9 +49,12 @@
       .then(r=>r.ok?r.json():null)
       .then(m=>{
         if(!m || !Array.isArray(m.variants)) return;
-        const imgs={};
-        for(const v of m.variants) if(v.id && v.image) imgs[v.id]='assets/packs/trees/'+v.image;
-        if(Object.keys(imgs).length){ K.assets.treeImages=imgs; K.ctx.emit('cfg'); }
+        const imgs={}, thumbs={};
+        for(const v of m.variants) if(v.id && v.image){
+          imgs[v.id]='assets/packs/trees/'+v.image;
+          thumbs[v.id]='assets/packs/trees/'+v.image;   // 圆盘缩略图 = 真实素材
+        }
+        if(Object.keys(imgs).length){ K.assets.treeImages=imgs; K.assets.treeThumbs=thumbs; K.ctx.emit('cfg'); }
       })
       .catch(()=>{ /* 无文件包，程序化占位 */ });
   }

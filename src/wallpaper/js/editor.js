@@ -139,11 +139,11 @@
         fn:()=>{ S.cards[target].pref=hidden?(K.DEFAULTS.cards[target].pref||'auto'):'hide'; K.saveCfg(); } }));
       if(rec && rec.card.variants && rec.card.variants.length){
         const cur = S.cards[target].pref==='auto' ? K.ctx.seasonOf(new Date()) : S.cards[target].variant;
-        const icons={spring:'🌸',summer:'🍃',autumn:'🍂',winter:'❄'};
         menu.appendChild(menuButton({ label:t('menuVariant'), fn:ev=>{
+          const thumbs=(K.assets&&K.assets.treeThumbs)||{};
           openRadial(ev.clientX,ev.clientY,t('variant'),
-            rec.card.variants.map(v=>({ icon:icons[v.id]||'•', label:v.name[K.i18n.lang]||v.id,
-              checked:v.id===cur,
+            rec.card.variants.map(v=>({ thumb:thumbs[v.id],
+              label:v.name[K.i18n.lang]||v.id, checked:v.id===cur,
               fn:()=>{ S.cards[target].variant=v.id; S.cards[target].pref='show'; K.saveCfg(); } })));
         } }));
       }
@@ -160,17 +160,18 @@
           openRadial(ev.clientX,ev.clientY,t('menuAdd'),adds);
         } }));
       menu.appendChild(menuButton({ label:t('menuWeather'), fn:ev=>{
-        const icons={clear:'☀',cloudy:'☁',rain:'🌧',snow:'❄',fog:'🌫'};
+        const wi={clear:'sun',cloudy:'cloud',rain:'rain',snow:'snow',fog:'fog'};
         openRadial(ev.clientX,ev.clientY,t('weather'),
-          ['clear','cloudy','rain','snow','fog'].map(w=>({ icon:icons[w], label:wxLabel(w),
+          ['clear','cloudy','rain','snow','fog'].map(w=>({ icon:wi[w], label:wxLabel(w),
             checked:S.weather===w,
             fn:()=>{ S.weather=w; K.ctx.weather=w; K.saveCfg(); } })));
       } }));
       if(pPreset) menu.appendChild(menuButton({ label:t('menuPreset'), fn:ev=>{
-        const icons={minimal:'🍃',full:'🏞',night:'🌙'};
+        const pi={minimal:['leaf','#7fc98f'], full:['sun','#f5d76e'], night:['moon','#b8c8f2']};
         openRadial(ev.clientX,ev.clientY,t('preset'),
-          Object.entries(pPreset.manifest.presets).map(([id,p])=>({ icon:icons[id]||'•',
-            label:p[K.i18n.lang]||id, checked:S.preset===id, fn:()=>pPreset.impl.apply(id) })));
+          Object.entries(pPreset.manifest.presets).map(([id,p])=>({ icon:(pi[id]||['check'])[0],
+            color:(pi[id]||[0,0])[1], label:p[K.i18n.lang]||id,
+            checked:S.preset===id, fn:()=>pPreset.impl.apply(id) })));
       } }));
       menu.appendChild(menuButton({ label:t('menuResetAll'),
         fn:()=>{ for(const c of K.registry.cards()) resetCard(c.card.id); } }));
@@ -194,6 +195,8 @@
     closeRadial(); closeMenu();
     radial=document.createElement('div'); radial.id='radial';
     const R=94;
+    const ring=document.createElement('div'); ring.className='rd-ring';
+    radial.appendChild(ring);
     const center=document.createElement('div'); center.className='rd-c';
     center.textContent=title;
     center.onclick=e=>{ e.stopPropagation(); closeRadial(); };
@@ -205,11 +208,15 @@
       el.className='rd-i'+(it.checked?' on':'');
       el.style.left=Math.cos(a)*R+'px';
       el.style.top =Math.sin(a)*R+'px';
-      el.innerHTML=`<div class="rd-b">${it.icon||'•'}</div><div class="rd-l">${it.label}</div>`;
+      el.innerHTML=`<div class="rd-b"${it.color?` style="color:${it.color}"`:''}>${it.thumb?`<div class="rd-thumb" style="background-image:url('${it.thumb}')"></div>`:K.icon(it.icon||'check',22,1.9)}</div><div class="rd-l">${it.label}</div>`;
       el.onclick=e=>{ e.stopPropagation(); closeRadial(); it.fn&&it.fn(); };
+      el.onmouseenter=()=>{ center.textContent=it.label; center.classList.add('hint'); };
+      el.onmouseleave=()=>{ center.textContent=title; center.classList.remove('hint'); };
       radial.appendChild(el);
     });
     document.body.appendChild(radial);
+    ring.style.width=ring.style.height=(2*R+58)+'px';
+    ring.style.left=ring.style.top=-(R+29)+'px';
     radial.style.left=Math.min(Math.max(x,150),cssW()-150)+'px';
     radial.style.top =Math.min(Math.max(y,150),cssH()-150)+'px';
   }
@@ -219,7 +226,8 @@
     const out=[];
     for(const c of K.registry.cards()){
       if(c.card.id==='tree' && S.cards.tree.pref==='hide')
-        out.push({ icon:'🌳', label:t('tree'), fn:()=>{ S.cards.tree.pref='auto'; K.saveCfg(); } });
+        out.push({ icon:'tree', color:'#7fc98f', label:t('tree'),
+                   fn:()=>{ S.cards.tree.pref='auto'; K.saveCfg(); } });
     }
     return out;
   }

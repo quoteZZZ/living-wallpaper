@@ -27,28 +27,45 @@
             font:13px/1.5 system-ui,"Noto Sans SC",sans-serif}
   canvas{position:fixed;inset:0;width:100%;height:100%;display:block}
 
+<style>
+  :root{ --acc:#5b8dd9; }   /* 主题色实时取自时辰调色板（info.js 写入） */
+  html,body{margin:0;height:100%;overflow:hidden;background:#000;
+            font:13px/1.5 system-ui,"Noto Sans SC",sans-serif}
+  canvas{position:fixed;inset:0;width:100%;height:100%;display:block}
+
   /* ---- 信息中枢（official.info：唯一悬浮 UI 组件） ---- */
-  #infoCard{position:fixed;left:14px;top:14px;z-index:15;display:flex;align-items:flex-start;
-       gap:8px;padding:10px 14px;border-radius:14px;color:#eaf2fb;
-       background:rgba(8,13,24,.55);border:1px solid rgba(255,255,255,.14);
-       backdrop-filter:blur(10px);transform-origin:top left;user-select:none;touch-action:none}
-  #infoCard .ic-main{min-width:96px}
-  #infoCard .ic-time{font:600 26px/1.1 Consolas,monospace;letter-spacing:1px}
-  #infoCard .ic-time .ic-sec{font-size:15px;opacity:.75}
-  #infoCard .ic-sub{margin-top:3px;font-size:12px;color:#aebdd2;display:flex;gap:10px}
-  #infoCard .ic-dbg{white-space:pre;font:11px/1.55 Consolas,monospace;color:#9fb4cc;
-       border-left:1px solid rgba(255,255,255,.15);padding-left:10px;margin-left:2px}
-  #infoCard .ic-btns{display:flex;flex-direction:column;gap:4px;margin-left:auto}
-  #infoCard .ic-btn{width:24px;height:24px;border-radius:7px;border:1px solid rgba(255,255,255,.16);
-       background:rgba(16,24,40,.6);color:#cfe0f2;font-size:13px;cursor:pointer;line-height:1}
-  #infoCard .ic-btn:hover{background:rgba(36,52,84,.8)}
-  #infoCard .ic-btn.on{background:#2c4a86;border-color:#5b8dd9;color:#fff}
-  #infoCard.min{padding:7px 12px;border-radius:999px}
-  #infoCard.min .ic-time{font-size:15px}
+  #infoCard{position:fixed;left:16px;top:16px;z-index:15;display:flex;align-items:stretch;
+       gap:12px;padding:12px 14px 12px 18px;border-radius:18px;color:#eef4fb;
+       background:rgba(9,14,24,.52);border:1px solid color-mix(in srgb,var(--acc) 32%,rgba(255,255,255,.12));
+       backdrop-filter:blur(14px) saturate(1.15);transform-origin:top left;
+       user-select:none;touch-action:none;
+       box-shadow:0 4px 24px rgba(0,0,0,.25)}
+  #infoCard .ic-left{display:flex;flex-direction:column;justify-content:center;min-width:104px}
+  #infoCard .ic-time{font:300 31px/1 "Segoe UI",system-ui,sans-serif;
+       font-variant-numeric:tabular-nums;letter-spacing:1px;color:#f4f8fd}
+  #infoCard .ic-time .ic-sec{font-size:14px;font-weight:300;opacity:.55;margin-left:2px}
+  #infoCard .ic-sub{margin-top:5px;font-size:12px;color:#b9c8dc;display:flex;
+       align-items:center;gap:6px;letter-spacing:.3px}
+  #infoCard .ic-wxico{display:flex;color:var(--acc)}
+  #infoCard .ic-dot{font-style:normal;opacity:.45}
+  #infoCard .ic-dbg{white-space:pre;font:10.5px/1.6 Consolas,monospace;color:#7e93aa;
+       border-left:1px solid rgba(255,255,255,.1);padding-left:12px;align-self:center;
+       max-width:300px;overflow:hidden}
+  #infoCard .ic-btns{display:flex;flex-direction:column;justify-content:center;gap:5px}
+  #infoCard .ic-btn{width:28px;height:28px;border-radius:9px;
+       border:1px solid rgba(255,255,255,.13);background:rgba(16,24,40,.35);
+       color:#cfe0f2;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}
+  #infoCard .ic-btn svg{display:block}
+  #infoCard .ic-btn:hover{border-color:color-mix(in srgb,var(--acc) 65%,rgba(255,255,255,.2));
+       background:color-mix(in srgb,var(--acc) 16%,rgba(16,24,40,.5))}
+  #infoCard .ic-btn.on{color:var(--acc);border-color:var(--acc);
+       background:color-mix(in srgb,var(--acc) 18%,rgba(16,24,40,.4))}
+  #infoCard.min{padding:8px 12px 8px 16px;border-radius:999px;gap:10px}
+  #infoCard.min .ic-time{font-size:16px}
   #infoCard.min .ic-sub,#infoCard.min .ic-dbg{display:none}
-  #infoCard.min .ic-main{min-width:0}
-  #infoCard.min .ic-btns{flex-direction:row;margin-left:2px}
-  #infoCard.min .ic-btn{width:20px;height:20px;font-size:11px}
+  #infoCard.min .ic-left{min-width:0}
+  #infoCard.min .ic-btns{flex-direction:row}
+  #infoCard.min .ic-btn{width:22px;height:22px;border-radius:50%}
 
   /* ---- 设置中心（panel.js，由信息中枢 ⚙ 呼出） ---- */
   #panel{position:fixed;right:14px;top:14px;z-index:20;width:238px;max-height:calc(100vh - 28px);
@@ -60,14 +77,15 @@
   #panel .row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:7px 0}
   #panel select{background:#16213a;color:#dfe8f4;border:1px solid #2c3a55;
                 border-radius:6px;padding:2px 4px;font:12px system-ui}
-  #panel input[type=range]{width:112px;accent-color:#5b8dd9}
-  #panel input[type=checkbox]{accent-color:#5b8dd9}
+  #panel input[type=range]{width:112px;accent-color:var(--acc)}
+  #panel input[type=checkbox]{accent-color:var(--acc)}
   #panel hr{border:none;border-top:1px solid rgba(255,255,255,.1);margin:9px 0}
   #panel .hint{color:#5c6b84;font-size:11px;line-height:1.5;margin-top:8px}
   #panel .prow{display:flex;gap:6px;margin:2px 0 4px}
-  #panel .pbtn{background:#16213a;color:#dfe8f4;border:1px solid #2c3a55;border-radius:6px;
-               padding:3px 8px;font:12px system-ui;cursor:pointer}
-  #panel .pbtn:hover{background:#24345c;border-color:#4a5f8c}
+  #panel .pbtn{background:rgba(16,24,40,.4);color:#dfe8f4;border:1px solid rgba(255,255,255,.14);
+               border-radius:8px;padding:3px 8px;font:12px system-ui;cursor:pointer}
+  #panel .pbtn:hover{border-color:var(--acc);
+               background:color-mix(in srgb,var(--acc) 16%,rgba(16,24,40,.4))}
   #panel .pbtn.wide{flex:1}
   #panel .sec-h{display:flex;justify-content:space-between;align-items:center;cursor:pointer;
                 color:#aebdd2;font-weight:600;font-size:12.5px;margin:2px 0;padding:2px 0;
@@ -85,33 +103,42 @@
   #gzHandle{position:absolute;right:-7px;bottom:-7px;width:14px;height:14px;display:none;
          border-radius:3px;background:#7cf;border:2px solid #fff;cursor:nwse-resize;
          pointer-events:auto;box-shadow:0 1px 4px rgba(0,0,0,.5)}
-  #ctxMenu{position:fixed;z-index:30;display:none;min-width:150px;padding:5px;
-         border-radius:10px;background:rgba(10,15,26,.92);border:1px solid rgba(255,255,255,.16);
-         backdrop-filter:blur(8px)}
-  #ctxMenu button{display:block;width:100%;text-align:left;padding:7px 10px;margin:1px 0;
-         border:none;border-radius:7px;background:transparent;color:#dfe8f4;
-         font:13px system-ui,"Noto Sans SC",sans-serif;cursor:pointer}
-  #ctxMenu button:hover{background:rgba(70,110,180,.35)}
+  #ctxMenu{position:fixed;z-index:30;display:none;min-width:152px;padding:6px;
+         border-radius:12px;background:rgba(10,15,26,.9);border:1px solid rgba(255,255,255,.14);
+         backdrop-filter:blur(10px);box-shadow:0 6px 24px rgba(0,0,0,.35)}
+  #ctxMenu button{display:block;width:100%;text-align:left;padding:7px 11px;margin:1px 0;
+         border:none;border-radius:8px;background:transparent;color:#dfe8f4;
+         font:12.5px system-ui,"Noto Sans SC",sans-serif;letter-spacing:.2px;cursor:pointer}
+  #ctxMenu button:hover{background:color-mix(in srgb,var(--acc) 24%,transparent)}
   #ctxMenu button.back{color:#8fa0ba;border-bottom:1px solid rgba(255,255,255,.1);
          border-radius:0;margin-bottom:3px}
 
   /* ---- 圆盘放射菜单（素材/变体/天气/预设选择器） ---- */
-  #radial{position:fixed;z-index:40;width:0;height:0}
-  #radial .rd-c{position:absolute;left:-34px;top:-34px;width:68px;height:68px;border-radius:50%;
+  #radial{position:fixed;z-index:40;width:0;height:0;animation:rdIn .18s ease-out}
+  @keyframes rdIn{from{transform:scale(.72);opacity:0}}
+  #radial .rd-ring{position:absolute;border:1px dashed rgba(255,255,255,.16);
+         border-radius:50%;pointer-events:none}
+  #radial .rd-c{position:absolute;left:-28px;top:-28px;width:56px;height:56px;border-radius:50%;
          display:flex;align-items:center;justify-content:center;text-align:center;
-         background:rgba(10,15,26,.9);border:1px solid rgba(255,255,255,.2);color:#cfe0f2;
-         font:12px system-ui,"Noto Sans SC",sans-serif;cursor:pointer;padding:6px;
-         backdrop-filter:blur(8px);box-shadow:0 2px 14px rgba(0,0,0,.45)}
-  #radial .rd-i{position:absolute;width:64px;margin-left:-32px;margin-top:-34px;
-         display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer}
+         background:rgba(10,15,26,.92);border:1px solid rgba(255,255,255,.22);color:#cfe0f2;
+         font:12px/1.25 system-ui,"Noto Sans SC",sans-serif;letter-spacing:1px;cursor:pointer;
+         padding:6px;backdrop-filter:blur(10px);box-shadow:0 2px 16px rgba(0,0,0,.45)}
+  #radial .rd-c.hint{color:var(--acc);border-color:var(--acc)}
+  #radial .rd-i{position:absolute;width:64px;margin-left:-32px;margin-top:-36px;
+         display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer}
   #radial .rd-b{width:46px;height:46px;border-radius:50%;display:flex;align-items:center;
-         justify-content:center;font-size:21px;background:rgba(14,22,38,.9);
-         border:1.5px solid rgba(255,255,255,.2);backdrop-filter:blur(8px);
-         box-shadow:0 2px 10px rgba(0,0,0,.4);transition:transform .12s, border-color .12s}
-  #radial .rd-i:hover .rd-b{transform:scale(1.14);border-color:#7cb2e8}
-  #radial .rd-i.on .rd-b{border-color:#5b8dd9;box-shadow:0 0 0 2px rgba(91,141,217,.55)}
-  #radial .rd-l{font:11px system-ui,"Noto Sans SC",sans-serif;color:#dfe8f4;
-         background:rgba(8,13,24,.7);padding:1px 7px;border-radius:8px;white-space:nowrap}
+         justify-content:center;color:inherit;background:rgba(12,18,32,.9);
+         border:1.5px solid rgba(255,255,255,.18);backdrop-filter:blur(10px);
+         box-shadow:0 2px 12px rgba(0,0,0,.4);transition:transform .12s, border-color .12s}
+  #radial .rd-i:hover .rd-b{transform:scale(1.13);border-color:var(--acc)}
+  #radial .rd-i.on .rd-b{border-color:var(--acc);
+         box-shadow:0 0 0 2px color-mix(in srgb,var(--acc) 45%,transparent)}
+  #radial .rd-thumb{width:38px;height:38px;border-radius:9px;
+         background-color:rgba(232,238,246,.92);
+         background-size:cover;background-position:center bottom;
+         box-shadow:inset 0 0 0 1px rgba(0,0,0,.15)}
+  #radial .rd-l{font:11px system-ui,"Noto Sans SC",sans-serif;color:rgba(235,243,252,.92);
+         text-shadow:0 1px 3px rgba(0,0,0,.9);letter-spacing:.5px;white-space:nowrap}
 </style>
 </head>
 <body>
@@ -119,16 +146,17 @@
 <div id="infoHost"></div>
 <div id="panel"></div>
 
-<script src="js/kernel.js?v=0.4"></script>
-<script src="js/composer.js?v=0.4"></script>
-<script src="js/panel.js?v=0.4"></script>
-<script src="js/editor.js?v=0.4"></script>
-<script src="js/plugins/base.js?v=0.4"></script>
-<script src="js/plugins/mountains.js?v=0.4"></script>
-<script src="js/plugins/weather.js?v=0.4"></script>
-<script src="js/plugins/trees.js?v=0.4"></script>
-<script src="js/plugins/presets.js?v=0.4"></script>
-<script src="js/plugins/info.js?v=0.4"></script>
-<script src="js/main.js?v=0.4"></script>
+<script src="js/kernel.js?v=0.4.1"></script>
+<script src="js/icons.js?v=0.4.1"></script>
+<script src="js/composer.js?v=0.4.1"></script>
+<script src="js/panel.js?v=0.4.1"></script>
+<script src="js/editor.js?v=0.4.1"></script>
+<script src="js/plugins/base.js?v=0.4.1"></script>
+<script src="js/plugins/mountains.js?v=0.4.1"></script>
+<script src="js/plugins/weather.js?v=0.4.1"></script>
+<script src="js/plugins/trees.js?v=0.4.1"></script>
+<script src="js/plugins/presets.js?v=0.4.1"></script>
+<script src="js/plugins/info.js?v=0.4.1"></script>
+<script src="js/main.js?v=0.4.1"></script>
 </body>
 </html>

@@ -1,0 +1,26 @@
+{
+  "id": "pack.trees",
+  "api": 1,
+  "name": {
+    "zh": "前景树 · 四季",
+    "en": "Trees · Seasons"
+  },
+  "variants": [
+    {
+      "id": "spring",
+      "image": "summer.png"
+    },
+    {
+      "id": "summer",
+      "image": "summer.png"
+    },
+    {
+      "id": "autumn",
+      "image": "summer.png"
+    },
+    {
+      "id": "winter",
+      "image": "summer.png"
+    }
+  ]
+}
