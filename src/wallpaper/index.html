@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>Living Wallpaper — T0 Prototype</title>
+<!--
+  Living Wallpaper T0：深度视差 + 真实时辰光照（程序化占位场景）
+  ---------------------------------------------------------------
+  运行：直接双击本文件即可；或 python -m http.server 后浏览器访问。
+  若 assets/scene.png 与 assets/depth.png 存在则自动切换为
+  "图片 + 深度图" 视差模式，否则使用程序化占位场景。
+
+  URL 参数（调试 / 截图用）：
+    ?hour=21.5   强制时辰（0-24，绕过系统时钟）
+    ?lat=39.9    纬度（决定日出日落时刻与光照曲线）
+    ?debug=1     显示调试面板（时间 / 太阳高度角 / 帧率 / 模式）
+    ?fps=60      帧率上限（默认 30 —— 壁纸功耗预算）
+    ?par=100     视差强度百分比（默认 100）
+
+  Wallpaper Engine：T1 上传时在 project.json 中暴露 par / fps
+  两个属性，本文件已内置 wallpaperPropertyListener 桥接
+  （在普通浏览器中无副作用）。详见 docs/DESIGN.md 第 10 节。
+-->
+<style>
+  html,body{margin:0;height:100%;overflow:hidden;background:#000}
+  canvas{position:fixed;inset:0;width:100%;height:100%;display:block}
+  #dbg{position:fixed;left:10px;top:10px;font:12px/1.6 Consolas,monospace;
+       color:#cfe;background:rgba(0,10,20,.55);padding:6px 10px;
+       border-radius:8px;display:none;white-space:pre;z-index:9}
+</style>
+</head>
+<body>
+<canvas id="gl"></canvas>
+<div id="dbg"></div>
+<script>
+"use strict";
+
+/* ================= 参数 ================= */
+const Q   = new URLSearchParams(location.search);
+const CFG = {
+  lat : parseFloat(Q.get('lat') ?? '39.9'),                 // 纬度
+  hour: Q.has('hour') ? parseFloat(Q.get('hour')) : null,   // 强制时辰
+  fps : Math.max(10, parseFloat(Q.get('fps') ?? '30')),     // 帧率上限
+  par : Math.max(0, parseFloat(Q.get('par') ?? '100'))/100, // 视差强度
+  dbg : Q.get('debug') === '1',
+};
+
+/* ============ 太阳 / 月亮状态 ============ */
+function sunState(date){
+  const doy  = Math.floor((date - new Date(date.getFullYear(),0,0)) / 864e5);
+  const decl = 23.44*Math.PI/180 * Math.sin(2*Math.PI*(284+doy)/365); // 太阳赤纬
+  const h    = CFG.hour ?? (date.getHours()+date.getMinutes()/60+date.getSeconds()/3600);
+  const H    = Math.PI*(h-12)/12;                                     // 时角
+  const phi  = CFG.lat*Math.PI/180;
+  const elev = Math.asin(Math.sin(phi)*Math.sin(decl)+Math.cos(phi)*Math.cos(decl)*Math.cos(H));
+  return { h, H, elev };
+}
+
+/* ============ 时辰调色板（按太阳高度角插值） ============ */
+const STOPS = [ // e: 太阳高度角（度），升序
+  { e:-90, top:'#050810', hor:'#0d1230', lum:'#ccd6ff', fog:'#0b1020', star:1.0, night:1.0, amb:[.55,.60,.85] },
+  { e:-12, top:'#070b1a', hor:'#232a55', lum:'#b8c2f2', fog:'#151a33', star:.75, night:.90, amb:[.66,.70,.92] },
+  { e:  0, top:'#2b3a6b', hor:'#ff9d5c', lum:'#ffd9a6', fog:'#7a6488', star:.12, night:.35, amb:[.96,.84,.80] },
+  { e:  8, top:'#4a74b8', hor:'#ffc98c', lum:'#fff0c8', fog:'#9aa0b8', star:0,   night:.08, amb:[1.00,.94,.86] },
+  { e: 25, top:'#3d7fd6', hor:'#c3ddf2', lum:'#ffffff', fog:'#c8daea', star:0,   night:0,   amb:[1.02,1.00,.98] },
+  { e: 60, top:'#2f74d0', hor:'#d0e4f4', lum:'#ffffff', fog:'#d4e2f0', star:0,   night:0,   amb:[1.04,1.02,1.00] },
+];
+function hex2rgb(hx){ const n=parseInt(hx.slice(1),16); return [(n>>16&255)/255,(n>>8&255)/255,(n&255)/255]; }
+function palette(elevDeg){
+  let a=STOPS[0], b=STOPS[STOPS.length-1];
+  for(let i=0;i<STOPS.length-1;i++)
+    if(elevDeg>=STOPS[i].e && elevDeg<=STOPS[i+1].e){ a=STOPS[i]; b=STOPS[i+1]; break; }
+  if(elevDeg<=STOPS[0].e){ a=b=STOPS[0]; }
+  if(elevDeg>=STOPS[STOPS.length-1].e){ a=b=STOPS[STOPS.length-1]; }
+  const t    = a===b ? 0 : (elevDeg-a.e)/(b.e-a.e);
+  const mix  = (x,y)=>x+(y-x)*t;
+  const mixv = (x,y)=>x.map((v,i)=>mix(v,y[i]));
+  const mixh = (x,y)=>mixv(hex2rgb(x),hex2rgb(y));
+  return { top:mixh(a.top,b.top), hor:mixh(a.hor,b.hor), lum:mixh(a.lum,b.lum),
+           fog:mixh(a.fog,b.fog), star:mix(a.star,b.star), night:mix(a.night,b.night),
+           amb:mixv(a.amb,b.amb) };
+}
+
+/* ============ 日/月屏幕位置与强度 ============ */
+function luminary(s, aspect){
+  if(s.elev > 0){ // 白天：太阳
+    return { x:-Math.sin(s.H)*aspect*0.42, y:-0.30+(s.elev/1.35)*0.72, r:0.050, a:1.0 };
+  }
+  // 夜晚：月亮（反日点近似）
+  const mh = Math.PI*(((s.h+12)%24)-12)/12;
+  const me = -s.elev;
+  return { x:-Math.sin(mh)*aspect*0.42, y:-0.30+Math.max(me,0)/1.35*0.72,
+           r:0.034, a:Math.min(1, -s.elev/0.20) };
+}
+
+/* ================= WebGL2 ================= */
+const canvas = document.getElementById('gl');
+const gl = canvas.getContext('webgl2', { antialias:false, alpha:false, powerPreference:'low-power' });
+const dbgEl = document.getElementById('dbg');
+if(!gl){ dbgEl.style.display='block'; dbgEl.textContent='此环境不支持 WebGL2'; throw new Error('no webgl2'); }
+
+const VS = `#version 300 es
+in vec2 aPos; out vec2 vUv;
+void main(){ vUv = aPos*.5+.5; gl_Position = vec4(aPos,0.,1.); }`;
+
+const FS = `#version 300 es
+precision highp float;
+in vec2 vUv; out vec4 outColor;
+uniform vec2  uRes;
+uniform float uTime;
+uniform vec2  uMouse;   // -1..1，已平滑
+uniform float uPar;     // 视差强度
+uniform vec3  uTop, uHor, uLumC, uFog, uAmb;
+uniform float uStar, uNight;
+uniform vec3  uLum;     // xy: 日/月屏幕位置(纵横比校正)，z: 半径
+uniform float uLumA;    // 日/月可见度
+uniform float uMode;    // 0 程序化占位 / 1 图片+深度图
+uniform sampler2D uScene, uDepth;
+
+float hash21(vec2 p){ p=fract(p*vec2(123.34,456.21)); p+=dot(p,p+45.32); return fract(p.x*p.y); }
+float vnoise(vec2 p){
+  vec2 i=floor(p), f=fract(p), u=f*f*(3.-2.*f);
+  return mix(mix(hash21(i),hash21(i+vec2(1,0)),u.x),
+             mix(hash21(i+vec2(0,1)),hash21(i+vec2(1,1)),u.x),u.y);
+}
+float fbm(vec2 p){ float v=0.,a=.5;
+  for(int i=0;i<5;i++){ v+=a*vnoise(p); p=p*2.03+vec2(19.7,7.3); a*=.5; } return v; }
+float stars(vec2 uv,float t){
+  vec2 g=uv*90.; vec2 id=floor(g); float h=hash21(id);
+  if(h<.93) return 0.;
+  vec2 c=fract(g)-.5-(vec2(hash21(id+7.1),hash21(id+3.7))-.5)*.6;
+  float tw=.55+.45*sin(t*(1.+h*3.)+h*40.);
+  return smoothstep(.09,0.,length(c))*tw;
+}
+
+void main(){
+  float aspect=uRes.x/uRes.y;
+  vec2 uv=vUv;
+  vec2 suv=vec2((uv.x-.5)*aspect, uv.y-.5);
+  vec3 col;
+
+  if(uMode>.5){
+    /* ---- 图片模式：深度视差（UV 位移）---- */
+    vec2 tuv=(uv-.5)*.94+.5;                 // 轻微放大，避免位移露边
+    float d=texture(uDepth,tuv).r;           // 深度：1 近 / 0 远
+    vec2 off=uMouse*uPar*.055*d;
+    vec2 puv=clamp(tuv-off*vec2(1.,.6), .001,.999);
+    col=texture(uScene,puv).rgb;
+    /* 时辰分级：夜间压暗 + 环境色偏移 */
+    col=mix(col*(1.+.05*(1.-uNight)), col*uAmb+uTop*.10, uNight*.6);
+  }else{
+    /* ---- 程序化占位场景 ---- */
+    float h=clamp(uv.y,0.,1.);
+    col=mix(uHor,uTop,pow(h,.8));                        // 天空渐变
+    col+=vec3(stars(uv,uTime)*uStar*smoothstep(.18,.55,h)); // 星空
+    float cl=fbm(vec2(uv.x*2.6+uTime*.004, uv.y*5.));    // 云
+    float band=smoothstep(.42,.6,h)*smoothstep(.97,.8,h);
+    col=mix(col, mix(vec3(1.), uTop*.55+uFog*.45, uNight),
+            smoothstep(.58,.78,cl)*band*.65);
+  }
+
+  /* 日/月光晕与圆盘（两种模式都叠加） */
+  float gd=length(suv-uLum.xy);
+  col+=uLumC*exp(-gd*gd*26.)*.55*uLumA;
+  col+=uLumC*smoothstep(uLum.z,uLum.z*.5,gd)*uLumA*(1.25-uNight*.8);
+
+  /* 山峦分层视差（程序化占位；正式素材模式下由深度图取代） */
+  if(uMode<.5){
+    for(int i=0;i<4;i++){
+      float fi=float(i);
+      float d =.35+fi*.2166;                 // 0.35 远 .. 1.0 近
+      float px=uMouse.x*uPar*.27*d;
+      float py=uMouse.y*uPar*.05*d;
+      float ridge=.16+fi*.075+fbm(vec2(uv.x*(1.6+fi*1.1)-px+fi*13.1, fi*7.7))*.16+py;
+      float m=smoothstep(ridge, ridge-.012, uv.y);
+      vec3 mc=mix(uFog*.85+uHor*.35, uFog*.25+vec3(.015,.02,.05), pow(d,1.3));
+      col=mix(col,mc,m*.97);
+    }
+  }
+
+  /* 暗角 + 细颗粒（去色带） */
+  col*=1.-.32*dot(suv,suv);
+  col+=(hash21(uv*uRes+fract(uTime)*61.7)-.5)*.02;
+  outColor=vec4(max(col,vec3(0.)),1.);
+}`;
+
+function sh(type,src){
+  const s=gl.createShader(type); gl.shaderSource(s,src); gl.compileShader(s);
+  if(!gl.getShaderParameter(s,gl.COMPILE_STATUS)){
+    console.error(gl.getShaderInfoLog(s)); throw new Error('shader compile'); }
+  return s;
+}
+const prog=gl.createProgram();
+gl.attachShader(prog,sh(gl.VERTEX_SHADER,VS));
+gl.attachShader(prog,sh(gl.FRAGMENT_SHADER,FS));
+gl.linkProgram(prog);
+if(!gl.getProgramParameter(prog,gl.LINK_STATUS)){
+  console.error(gl.getProgramInfoLog(prog)); throw new Error('program link'); }
+gl.useProgram(prog);
+
+/* 全屏大三角形 */
+const buf=gl.createBuffer();
+gl.bindBuffer(gl.ARRAY_BUFFER,buf);
+gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1, 3,-1, -1,3]),gl.STATIC_DRAW);
+const aPos=gl.getAttribLocation(prog,'aPos');
+gl.enableVertexAttribArray(aPos);
+gl.vertexAttribPointer(aPos,2,gl.FLOAT,false,0,0);
+
+const U={};
+for(const n of ['uRes','uTime','uMouse','uPar','uTop','uHor','uLumC','uFog','uAmb',
+                'uStar','uNight','uLum','uLumA','uMode','uScene','uDepth'])
+  U[n]=gl.getUniformLocation(prog,n);
+
+/* ---------- 可选：正式素材（存在则自动启用图片模式） ---------- */
+let mode=0;
+function makeTex(img,unit,uni){
+  gl.activeTexture(gl.TEXTURE0+unit);
+  const t=gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D,t);
+  gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,img);
+  gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);
+  gl.uniform1i(U[uni],unit);
+}
+function loadImg(src){ return new Promise((res,rej)=>{
+  const i=new Image(); i.onload=()=>res(i); i.onerror=rej; i.src=src; }); }
+(async()=>{
+  try{
+    const [img,dep]=await Promise.all([loadImg('assets/scene.png'),loadImg('assets/depth.png')]);
+    makeTex(img,0,'uScene'); makeTex(dep,1,'uDepth'); mode=1;
+  }catch(e){ /* 无素材，保持程序化占位场景 */ }
+})();
+
+/* ================= 渲染循环 ================= */
+let W=0, Hh=0;
+function resize(){
+  const dpr=Math.min(devicePixelRatio||1, 1.5);        // 功耗预算：限制渲染分辨率
+  W=canvas.width =Math.floor(innerWidth *dpr);
+  Hh=canvas.height=Math.floor(innerHeight*dpr);
+  gl.viewport(0,0,W,Hh);
+}
+addEventListener('resize',resize); resize();
+
+const M={x:0,y:0,tx:0,ty:0,last:0};
+addEventListener('pointermove',e=>{
+  M.tx=(e.clientX/innerWidth)*2-1;
+  M.ty=-((e.clientY/innerHeight)*2-1);
+  M.last=performance.now();
+});
+
+if(CFG.dbg) dbgEl.style.display='block';
+let prev=performance.now(), acc=0, fpsM=0, frames=0, fpsT=0;
+
+function frame(now){
+  requestAnimationFrame(frame);
+  const dt=(now-prev)/1000; prev=now;
+  if(document.hidden) return;
+  acc+=dt; fpsT+=dt; frames++;
+  if(fpsT>=1){ fpsM=frames/fpsT; frames=0; fpsT=0; }
+  if(acc < 1/CFG.fps) return;                          // 帧率上限（功耗预算）
+  acc=Math.min(acc-1/CFG.fps, .25);
+
+  const t=now/1000;
+  /* 闲置 4 秒后自主缓漂，让画面"自己呼吸" */
+  if(now-M.last>4000){ M.tx=Math.sin(t*.07)*.5; M.ty=Math.cos(t*.052)*.35; }
+  const k=Math.min(1,dt*3.5);
+  M.x+=(M.tx-M.x)*k; M.y+=(M.ty-M.y)*k;
+
+  const d=new Date();
+  const s=sunState(d);
+  const p=palette(s.elev*180/Math.PI);
+  const L=luminary(s, innerWidth/innerHeight);
+
+  gl.uniform2f(U.uRes,W,Hh);
+  gl.uniform1f(U.uTime,t);
+  gl.uniform2f(U.uMouse,M.x,M.y);
+  gl.uniform1f(U.uPar,CFG.par);
+  gl.uniform3fv(U.uTop,p.top);  gl.uniform3fv(U.uHor,p.hor);
+  gl.uniform3fv(U.uLumC,p.lum); gl.uniform3fv(U.uFog,p.fog); gl.uniform3fv(U.uAmb,p.amb);
+  gl.uniform1f(U.uStar,p.star); gl.uniform1f(U.uNight,p.night);
+  gl.uniform3f(U.uLum,L.x,L.y,L.r); gl.uniform1f(U.uLumA,L.a);
+  gl.uniform1f(U.uMode,mode);
+  gl.drawArrays(gl.TRIANGLES,0,3);
+
+  if(CFG.dbg) dbgEl.textContent=
+    `本地时间 ${d.toLocaleTimeString()}    时辰覆盖 ${CFG.hour ?? '-'}\n`+
+    `太阳高度角 ${(s.elev*180/Math.PI).toFixed(1)}°    夜晚系数 ${p.night.toFixed(2)}\n`+
+    `模式 ${mode?'图片+深度视差':'程序化占位'}    帧率 ${fpsM.toFixed(0)} / 上限 ${CFG.fps}\n`+
+    `分辨率 ${W}×${Hh}    视差 ${(CFG.par*100)|0}%`;
+}
+requestAnimationFrame(frame);
+
+/* ============ Wallpaper Engine 属性桥 ============
+ * 正常浏览器中不会被调用，无副作用。
+ * T1 上传工坊时在 project.json 暴露同名属性即可。 */
+window.wallpaperPropertyListener={
+  applyUserProperties(p){
+    if(p.par) CFG.par=Math.max(0,parseFloat(p.par.value)||0)/100;
+    if(p.fps) CFG.fps=Math.max(10,parseFloat(p.fps.value)||30);
+  }
+};
+</script>
+</body>
+</html>
