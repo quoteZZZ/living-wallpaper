@@ -2,24 +2,26 @@
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
-<title>Living Wallpaper — T0 Prototype</title>
+<title>Living Wallpaper — T0.1 卡片化图层原型</title>
 <!--
-  Living Wallpaper T0：深度视差 + 真实时辰光照（程序化占位场景）
+  Living Wallpaper T0.1：卡片化图层 + 三态偏好 + 程序化雨
   ---------------------------------------------------------------
-  运行：直接双击本文件即可；或 python -m http.server 后浏览器访问。
-  若 assets/scene.png 与 assets/depth.png 存在则自动切换为
-  "图片 + 深度图" 视差模式，否则使用程序化占位场景。
+  设计要点（详见 docs/DESIGN.md §4.2）：
+  · 元素卡（用户决定"有什么"）：太阳/月亮、云、星空、山峦、雨
+  · 系统层（世界决定"什么样"）：真实时辰光照永远按太阳高度角运转，
+    隐藏太阳圆盘不影响正午天亮——光照是世界属性，不是元素属性
+  · 三态偏好：跟随真实(auto) / 强制(show/on) / 关闭(hide/off)
 
-  URL 参数（调试 / 截图用）：
-    ?hour=21.5   强制时辰（0-24，绕过系统时钟）
-    ?lat=39.9    纬度（决定日出日落时刻与光照曲线）
-    ?debug=1     显示调试面板（时间 / 太阳高度角 / 帧率 / 模式）
-    ?fps=60      帧率上限（默认 30 —— 壁纸功耗预算）
-    ?par=100     视差强度百分比（默认 100）
-
-  Wallpaper Engine：T1 上传时在 project.json 中暴露 par / fps
-  两个属性，本文件已内置 wallpaperPropertyListener 桥接
-  （在普通浏览器中无副作用）。详见 docs/DESIGN.md 第 10 节。
+  运行：直接双击本文件，或任意静态服务器。
+  URL 参数：
+    ?hour=21.5   强制时辰（调试用，优先级高于面板锁定）
+    ?lat=39.9    纬度
+    ?debug=1     调试面板（并自动展开设置面板）
+    ?fps=60      帧率上限（默认 30）
+    ?par=150     初始视差强度 %
+    ?ui=0        隐藏设置面板（WE 工坊版使用；正式版由
+                 project.json properties 驱动同一套配置）
+  配置持久化：localStorage "lw.cfg.v1"
 -->
 <style>
   html,body{margin:0;height:100%;overflow:hidden;background:#000}
@@ -27,37 +29,60 @@
   #dbg{position:fixed;left:10px;top:10px;font:12px/1.6 Consolas,monospace;
        color:#cfe;background:rgba(0,10,20,.55);padding:6px 10px;
        border-radius:8px;display:none;white-space:pre;z-index:9}
+  #gear{position:fixed;right:14px;top:14px;z-index:20;width:38px;height:38px;
+        border-radius:50%;border:1px solid rgba(255,255,255,.18);
+        background:rgba(10,16,28,.55);color:#cfe;font-size:17px;cursor:pointer;
+        backdrop-filter:blur(6px)}
+  #gear:hover{background:rgba(20,30,50,.75)}
+  #panel{position:fixed;right:14px;top:60px;z-index:20;width:238px;padding:12px 14px;
+         border-radius:12px;background:rgba(8,13,24,.78);
+         border:1px solid rgba(255,255,255,.12);color:#dfe8f4;
+         font:13px/1.5 system-ui,"Noto Sans SC",sans-serif;
+         backdrop-filter:blur(10px);display:none}
+  #panel.open{display:block}
+  #panel .cap{color:#8fa0ba;font-size:12px;font-weight:600;margin:4px 0 2px}
+  #panel .row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:7px 0}
+  #panel select{background:#16213a;color:#dfe8f4;border:1px solid #2c3a55;
+                border-radius:6px;padding:2px 4px;font:12px system-ui}
+  #panel input[type=range]{width:112px;accent-color:#5b8dd9}
+  #panel input[type=checkbox]{accent-color:#5b8dd9}
+  #panel hr{border:none;border-top:1px solid rgba(255,255,255,.1);margin:9px 0}
+  #panel .hint{color:#5c6b84;font-size:11px;line-height:1.5;margin-top:8px}
 </style>
 </head>
 <body>
 <canvas id="gl"></canvas>
 <div id="dbg"></div>
+<button id="gear" title="场景设置">⚙</button>
+<div id="panel"></div>
 <script>
 "use strict";
 
-/* ================= 参数 ================= */
+/* ================= 启动参数 ================= */
 const Q   = new URLSearchParams(location.search);
 const CFG = {
-  lat : parseFloat(Q.get('lat') ?? '39.9'),                 // 纬度
-  hour: Q.has('hour') ? parseFloat(Q.get('hour')) : null,   // 强制时辰
-  fps : Math.max(10, parseFloat(Q.get('fps') ?? '30')),     // 帧率上限
-  par : Math.max(0, parseFloat(Q.get('par') ?? '100'))/100, // 视差强度
+  lat : parseFloat(Q.get('lat') ?? '39.9'),
+  hour: Q.has('hour') ? parseFloat(Q.get('hour')) : null,  // 调试覆盖（最高优先级）
+  fps : Math.max(10, parseFloat(Q.get('fps') ?? '30')),
+  par : Math.max(0, parseFloat(Q.get('par') ?? '100'))/100,
   dbg : Q.get('debug') === '1',
+  ui  : Q.get('ui') !== '0',
 };
 
 /* ============ 太阳 / 月亮状态 ============ */
 function sunState(date){
   const doy  = Math.floor((date - new Date(date.getFullYear(),0,0)) / 864e5);
-  const decl = 23.44*Math.PI/180 * Math.sin(2*Math.PI*(284+doy)/365); // 太阳赤纬
-  const h    = CFG.hour ?? (date.getHours()+date.getMinutes()/60+date.getSeconds()/3600);
-  const H    = Math.PI*(h-12)/12;                                     // 时角
+  const decl = 23.44*Math.PI/180 * Math.sin(2*Math.PI*(284+doy)/365);
+  const real = date.getHours()+date.getMinutes()/60+date.getSeconds()/3600;
+  const h    = CFG.hour ?? (S.timeMode==='locked' ? S.lockedHour : real);
+  const H    = Math.PI*(h-12)/12;
   const phi  = CFG.lat*Math.PI/180;
   const elev = Math.asin(Math.sin(phi)*Math.sin(decl)+Math.cos(phi)*Math.cos(decl)*Math.cos(H));
   return { h, H, elev };
 }
 
 /* ============ 时辰调色板（按太阳高度角插值） ============ */
-const STOPS = [ // e: 太阳高度角（度），升序
+const STOPS = [
   { e:-90, top:'#050810', hor:'#0d1230', lum:'#ccd6ff', fog:'#0b1020', star:1.0, night:1.0, amb:[.55,.60,.85] },
   { e:-12, top:'#070b1a', hor:'#232a55', lum:'#b8c2f2', fog:'#151a33', star:.75, night:.90, amb:[.66,.70,.92] },
   { e:  0, top:'#2b3a6b', hor:'#ff9d5c', lum:'#ffd9a6', fog:'#7a6488', star:.12, night:.35, amb:[.96,.84,.80] },
@@ -66,6 +91,7 @@ const STOPS = [ // e: 太阳高度角（度），升序
   { e: 60, top:'#2f74d0', hor:'#d0e4f4', lum:'#ffffff', fog:'#d4e2f0', star:0,   night:0,   amb:[1.04,1.02,1.00] },
 ];
 function hex2rgb(hx){ const n=parseInt(hx.slice(1),16); return [(n>>16&255)/255,(n>>8&255)/255,(n&255)/255]; }
+const mix3=(a,b,t)=>[a[0]+(b[0]-a[0])*t, a[1]+(b[1]-a[1])*t, a[2]+(b[2]-a[2])*t];
 function palette(elevDeg){
   let a=STOPS[0], b=STOPS[STOPS.length-1];
   for(let i=0;i<STOPS.length-1;i++)
@@ -83,15 +109,30 @@ function palette(elevDeg){
 
 /* ============ 日/月屏幕位置与强度 ============ */
 function luminary(s, aspect){
-  if(s.elev > 0){ // 白天：太阳
+  if(s.elev > 0){
     return { x:-Math.sin(s.H)*aspect*0.42, y:-0.30+(s.elev/1.35)*0.72, r:0.050, a:1.0 };
   }
-  // 夜晚：月亮（反日点近似）
   const mh = Math.PI*(((s.h+12)%24)-12)/12;
   const me = -s.elev;
   return { x:-Math.sin(mh)*aspect*0.42, y:-0.30+Math.max(me,0)/1.35*0.72,
            r:0.034, a:Math.min(1, -s.elev/0.20) };
 }
+
+/* ================= 场景配置（卡片化 + 三态偏好） =================
+ * 元素卡：用户决定"画面里有什么"（auto=跟随真实 / show,on=强制 / hide,off=关闭）
+ * 系统层：时辰光照永远跟随真实太阳高度角（timeMode=locked 为自由模式的例外） */
+const S = Object.assign({
+  timeMode  : 'real',   // real 跟随真实 | locked 锁定时段（自由模式）
+  lockedHour: 12,
+  luminary  : 'auto',   // auto 跟随时间(雨天自动隐去) | show 强制显示 | hide 隐藏
+  clouds    : 'auto',   // auto 跟随天气 | off 隐藏
+  stars     : true,
+  mountains : true,
+  rain      : 'auto',   // auto 跟随天气 | on 强制 | off 关闭
+  weather   : 'clear',  // T0 手动演示；T1 由 Open-Meteo 驱动
+  par       : CFG.par,
+}, (()=>{ try{ return JSON.parse(localStorage.getItem('lw.cfg.v1')) || {}; }catch(e){ return {}; } })());
+function saveCfg(){ try{ localStorage.setItem('lw.cfg.v1', JSON.stringify(S)); }catch(e){} }
 
 /* ================= WebGL2 ================= */
 const canvas = document.getElementById('gl');
@@ -108,13 +149,14 @@ precision highp float;
 in vec2 vUv; out vec4 outColor;
 uniform vec2  uRes;
 uniform float uTime;
-uniform vec2  uMouse;   // -1..1，已平滑
-uniform float uPar;     // 视差强度
+uniform vec2  uMouse;
+uniform float uPar;
 uniform vec3  uTop, uHor, uLumC, uFog, uAmb;
 uniform float uStar, uNight;
-uniform vec3  uLum;     // xy: 日/月屏幕位置(纵横比校正)，z: 半径
-uniform float uLumA;    // 日/月可见度
-uniform float uMode;    // 0 程序化占位 / 1 图片+深度图
+uniform vec3  uLum;                     // xy 屏幕位置, z 半径
+uniform float uLumA;                    // 日/月可见度（隐藏=0）
+uniform float uMode;                    // 0 程序化 / 1 图片+深度
+uniform float uHasStars, uHasMountains, uCloud, uRain;
 uniform sampler2D uScene, uDepth;
 
 float hash21(vec2 p){ p=fract(p*vec2(123.34,456.21)); p+=dot(p,p+45.32); return fract(p.x*p.y); }
@@ -132,6 +174,16 @@ float stars(vec2 uv,float t){
   float tw=.55+.45*sin(t*(1.+h*3.)+h*40.);
   return smoothstep(.09,0.,length(c))*tw;
 }
+/* 雨条带：按行错位的稀疏竖条，两层不同速度尺度 */
+float rainLayer(vec2 uv,float t,float sc){
+  vec2 p=vec2(uv.x*(34.*sc), uv.y*(2.4*sc)-t*(2.8*sc));
+  p.x+=floor(p.y)*7.13;
+  vec2 id=floor(p);
+  float h=hash21(id);
+  if(h<.80) return 0.;
+  vec2 f=fract(p)-vec2(0.,.45);
+  return smoothstep(.03,.006,abs(f.x))*smoothstep(.40,.03,abs(f.y))*.9;
+}
 
 void main(){
   float aspect=uRes.x/uRes.y;
@@ -140,37 +192,34 @@ void main(){
   vec3 col;
 
   if(uMode>.5){
-    /* ---- 图片模式：深度视差（UV 位移）---- */
-    vec2 tuv=(uv-.5)*.94+.5;                 // 轻微放大，避免位移露边
-    float d=texture(uDepth,tuv).r;           // 深度：1 近 / 0 远
+    /* 图片模式：深度视差 */
+    vec2 tuv=(uv-.5)*.94+.5;
+    float d=texture(uDepth,tuv).r;
     vec2 off=uMouse*uPar*.055*d;
-    vec2 puv=clamp(tuv-off*vec2(1.,.6), .001,.999);
+    vec2 puv=clamp(tuv-off*vec2(1.,.6),.001,.999);
     col=texture(uScene,puv).rgb;
-    /* 时辰分级：夜间压暗 + 环境色偏移 */
     col=mix(col*(1.+.05*(1.-uNight)), col*uAmb+uTop*.10, uNight*.6);
   }else{
-    /* ---- 程序化占位场景 ---- */
+    /* 程序化占位：天空 / 星空 / 云 */
     float h=clamp(uv.y,0.,1.);
-    col=mix(uHor,uTop,pow(h,.8));                        // 天空渐变
-    col+=vec3(stars(uv,uTime)*uStar*smoothstep(.18,.55,h)); // 星空
-    float cl=fbm(vec2(uv.x*2.6+uTime*.004, uv.y*5.));    // 云
+    col=mix(uHor,uTop,pow(h,.8));
+    col+=vec3(stars(uv,uTime)*uStar*uHasStars*smoothstep(.18,.55,h));
+    float cl=fbm(vec2(uv.x*2.6+uTime*.004, uv.y*5.));
     float band=smoothstep(.42,.6,h)*smoothstep(.97,.8,h);
     col=mix(col, mix(vec3(1.), uTop*.55+uFog*.45, uNight),
-            smoothstep(.58,.78,cl)*band*.65);
+            smoothstep(.58,.78,cl)*band*.65*uCloud);
   }
 
-  /* 日/月光晕与圆盘（两种模式都叠加） */
+  /* 日/月（uLumA=0 即元素卡"隐藏"，光照不受影响） */
   float gd=length(suv-uLum.xy);
   col+=uLumC*exp(-gd*gd*26.)*.55*uLumA;
   col+=uLumC*smoothstep(uLum.z,uLum.z*.5,gd)*uLumA*(1.25-uNight*.8);
 
-  /* 山峦分层视差（程序化占位；正式素材模式下由深度图取代）
-   * 远景山脊高（露在上方、被雾色淡化），近景山脊低（深色、占底部）——
-   * 保证四层互相可见，形成大气透视梯度 */
-  if(uMode<.5){
+  /* 山峦分层视差 */
+  if(uMode<.5 && uHasMountains>.5){
     for(int i=0;i<4;i++){
       float fi=float(i);
-      float d =.35+fi*.2166;                 // 0.35 远 .. 1.0 近
+      float d =.35+fi*.2166;
       float px=uMouse.x*uPar*.27*d;
       float py=uMouse.y*uPar*.05*d;
       float ridge=.44-fi*.07+fbm(vec2(uv.x*(1.2+fi*1.2)-px+fi*13.1, fi*7.7))*(.08+fi*.03)+py;
@@ -180,7 +229,15 @@ void main(){
     }
   }
 
-  /* 暗角 + 细颗粒（去色带） */
+  /* 雨粒子层（系统层：属于天气，不属于装饰云卡片） */
+  if(uRain>.001){
+    float r1=rainLayer(uv,uTime,1.);
+    float r2=rainLayer(uv+vec2(3.1,1.7),uTime*1.4,1.5);
+    float rr=clamp((r1+r2)*uRain,0.,1.);
+    col=mix(col, vec3(.72,.78,.88)*(1.-uNight*.82), rr*.5);
+    col*=1.-.10*uRain;
+  }
+
   col*=1.-.32*dot(suv,suv);
   col+=(hash21(uv*uRes+fract(uTime)*61.7)-.5)*.02;
   outColor=vec4(max(col,vec3(0.)),1.);
@@ -200,7 +257,6 @@ if(!gl.getProgramParameter(prog,gl.LINK_STATUS)){
   console.error(gl.getProgramInfoLog(prog)); throw new Error('program link'); }
 gl.useProgram(prog);
 
-/* 全屏大三角形 */
 const buf=gl.createBuffer();
 gl.bindBuffer(gl.ARRAY_BUFFER,buf);
 gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1, 3,-1, -1,3]),gl.STATIC_DRAW);
@@ -210,10 +266,11 @@ gl.vertexAttribPointer(aPos,2,gl.FLOAT,false,0,0);
 
 const U={};
 for(const n of ['uRes','uTime','uMouse','uPar','uTop','uHor','uLumC','uFog','uAmb',
-                'uStar','uNight','uLum','uLumA','uMode','uScene','uDepth'])
+                'uStar','uNight','uLum','uLumA','uMode',
+                'uHasStars','uHasMountains','uCloud','uRain','uScene','uDepth'])
   U[n]=gl.getUniformLocation(prog,n);
 
-/* ---------- 可选：正式素材（存在则自动启用图片模式） ---------- */
+/* ---------- 可选正式素材 ---------- */
 let mode=0;
 function makeTex(img,unit,uni){
   gl.activeTexture(gl.TEXTURE0+unit);
@@ -231,13 +288,80 @@ function loadImg(src){ return new Promise((res,rej)=>{
   try{
     const [img,dep]=await Promise.all([loadImg('assets/scene.png'),loadImg('assets/depth.png')]);
     makeTex(img,0,'uScene'); makeTex(dep,1,'uDepth'); mode=1;
-  }catch(e){ /* 无素材，保持程序化占位场景 */ }
+  }catch(e){ /* 无素材，保持程序化占位 */ }
 })();
+
+/* ================= 设置面板（由图层注册表生成） =================
+ * 正式版（T1）此面板由 Wallpaper Engine project.json properties 取代，
+ * 两端驱动同一个 S 配置对象。?ui=0 隐藏（工坊版）。 */
+const LAYERS = [
+  { key:'luminary',  name:'太阳 / 月亮', type:'mode',
+    opts:[['auto','跟随时间'],['show','强制显示'],['hide','隐藏']],
+    tip:'隐藏圆盘不影响真实光照' },
+  { key:'clouds',    name:'云',         type:'mode',
+    opts:[['auto','跟随天气'],['off','隐藏']] },
+  { key:'rain',      name:'雨',         type:'mode',
+    opts:[['auto','跟随天气'],['on','强制'],['off','关闭']] },
+  { key:'stars',     name:'星空',       type:'bool' },
+  { key:'mountains', name:'山峦',       type:'bool' },
+];
+const panel=document.getElementById('panel');
+const gear=document.getElementById('gear');
+if(CFG.ui){
+  let html='<div class="cap">时间</div>';
+  html+='<div class="row"><select id="pTimeMode"><option value="real">跟随真实</option><option value="locked">锁定时段</option></select></div>';
+  html+='<div class="row" id="rowHour" style="display:none"><input id="pHour" type="range" min="0" max="24" step="0.1"></div>';
+  html+='<hr><div class="cap">元素卡片</div>';
+  for(const L of LAYERS){
+    html+=`<div class="row"><span title="${L.tip||''}">${L.name}</span>`;
+    if(L.type==='mode'){
+      html+=`<select id="p_${L.key}">${L.opts.map(o=>`<option value="${o[0]}">${o[1]}</option>`).join('')}</select>`;
+    }else{
+      html+=`<input type="checkbox" id="p_${L.key}">`;
+    }
+    html+='</div>';
+  }
+  html+='<div class="cap">天气 <span style="font-weight:400">(T0 手动 · T1 接真实)</span></div>';
+  html+='<div class="row"><select id="pWeather"><option value="clear">晴</option><option value="rain">雨</option></select></div>';
+  html+='<hr><div class="row"><span>视差</span><input id="pPar" type="range" min="0" max="200" step="5"></div>';
+  html+='<div class="row"><span>帧率上限</span><select id="pFps"><option>15</option><option>30</option><option>60</option></select></div>';
+  html+='<div class="hint">设置自动保存（localStorage）。<br>「隐藏太阳」只隐藏圆盘，<br>天空仍按真实时辰变亮变暗。</div>';
+  panel.innerHTML=html;
+
+  const $=id=>document.getElementById(id);
+  function syncUI(){
+    $('pTimeMode').value=S.timeMode; $('pHour').value=S.lockedHour;
+    $('rowHour').style.display = S.timeMode==='locked' ? 'flex':'none';
+    for(const L of LAYERS){
+      const el=$('p_'+L.key);
+      if(L.type==='mode') el.value=S[L.key]; else el.checked=!!S[L.key];
+    }
+    $('pWeather').value=S.weather;
+    $('pPar').value=Math.round(S.par*100);
+    $('pFps').value=String(CFG.fps);
+  }
+  function bind(){
+    $('pTimeMode').onchange=e=>{ S.timeMode=e.target.value; saveCfg(); syncUI(); };
+    $('pHour').oninput=e=>{ S.lockedHour=parseFloat(e.target.value); saveCfg(); };
+    for(const L of LAYERS){
+      const el=$('p_'+L.key);
+      el.onchange=()=>{ S[L.key] = L.type==='mode' ? el.value : el.checked; saveCfg(); };
+    }
+    $('pWeather').onchange=e=>{ S.weather=e.target.value; saveCfg(); };
+    $('pPar').oninput=e=>{ S.par=parseInt(e.target.value,10)/100; saveCfg(); };
+    $('pFps').onchange=e=>{ CFG.fps=parseInt(e.target.value,10); saveCfg(); };
+  }
+  gear.onclick=()=>panel.classList.toggle('open');
+  if(CFG.dbg) panel.classList.add('open');
+  syncUI(); bind();
+}else{
+  gear.style.display='none';
+}
 
 /* ================= 渲染循环 ================= */
 let W=0, Hh=0;
 function resize(){
-  const dpr=Math.min(devicePixelRatio||1, 1.5);        // 功耗预算：限制渲染分辨率
+  const dpr=Math.min(devicePixelRatio||1, 1.5);
   W=canvas.width =Math.floor(innerWidth *dpr);
   Hh=canvas.height=Math.floor(innerHeight*dpr);
   gl.viewport(0,0,W,Hh);
@@ -259,13 +383,12 @@ function frame(now){
   const dt=(now-prev)/1000; prev=now;
   if(document.hidden) return;
   acc+=dt;
-  if(acc < 1/CFG.fps) return;                          // 帧率上限（功耗预算）
+  if(acc < 1/CFG.fps) return;
   acc=Math.min(acc-1/CFG.fps, .25);
-  fpsT+=dt; frames++;                                  // 只统计实际渲染帧
+  fpsT+=dt; frames++;
   if(fpsT>=1){ fpsM=frames/fpsT; frames=0; fpsT=0; }
 
   const t=now/1000;
-  /* 闲置 4 秒后自主缓漂，让画面"自己呼吸" */
   if(now-M.last>4000){ M.tx=Math.sin(t*.07)*.5; M.ty=Math.cos(t*.052)*.35; }
   const k=Math.min(1,dt*3.5);
   M.x+=(M.tx-M.x)*k; M.y+=(M.ty-M.y)*k;
@@ -273,34 +396,56 @@ function frame(now){
   const d=new Date();
   const s=sunState(d);
   const p=palette(s.elev*180/Math.PI);
+
+  /* 天气 → 调色板 / 云量 / 雨量 / 日月可见度 */
+  const raining=(S.rain==='auto' && S.weather==='rain') || S.rain==='on';
+  const rainI=raining?0.75:0;
+  if(raining){
+    p.top=mix3(p.top,[.42,.47,.55],.5);  p.hor=mix3(p.hor,[.50,.56,.64],.5);
+    p.fog=mix3(p.fog,[.58,.63,.70],.35); p.night=Math.min(1,p.night+.15);
+  }
   const L=luminary(s, innerWidth/innerHeight);
+  if(S.luminary==='hide') L.a=0;
+  else if(raining && S.luminary==='auto') L.a*=.12;   // 雨天日月自动隐去
+  const cloud = S.clouds==='off' ? 0 : (raining?0.95:0.4);
 
   gl.uniform2f(U.uRes,W,Hh);
   gl.uniform1f(U.uTime,t);
   gl.uniform2f(U.uMouse,M.x,M.y);
-  gl.uniform1f(U.uPar,CFG.par);
+  gl.uniform1f(U.uPar,S.par);
   gl.uniform3fv(U.uTop,p.top);  gl.uniform3fv(U.uHor,p.hor);
   gl.uniform3fv(U.uLumC,p.lum); gl.uniform3fv(U.uFog,p.fog); gl.uniform3fv(U.uAmb,p.amb);
   gl.uniform1f(U.uStar,p.star); gl.uniform1f(U.uNight,p.night);
   gl.uniform3f(U.uLum,L.x,L.y,L.r); gl.uniform1f(U.uLumA,L.a);
   gl.uniform1f(U.uMode,mode);
+  gl.uniform1f(U.uHasStars,S.stars?1:0);
+  gl.uniform1f(U.uHasMountains,S.mountains?1:0);
+  gl.uniform1f(U.uCloud,cloud);
+  gl.uniform1f(U.uRain,rainI);
   gl.drawArrays(gl.TRIANGLES,0,3);
 
   if(CFG.dbg) dbgEl.textContent=
-    `本地时间 ${d.toLocaleTimeString()}    时辰覆盖 ${CFG.hour ?? '-'}\n`+
-    `太阳高度角 ${(s.elev*180/Math.PI).toFixed(1)}°    夜晚系数 ${p.night.toFixed(2)}\n`+
-    `模式 ${mode?'图片+深度视差':'程序化占位'}    帧率 ${fpsM.toFixed(0)} / 上限 ${CFG.fps}\n`+
-    `分辨率 ${W}×${Hh}    视差 ${(CFG.par*100)|0}%`;
+    `本地时间 ${d.toLocaleTimeString()}    时辰 ${CFG.hour??(S.timeMode==='locked'?S.lockedHour.toFixed(1):'真实')}\n`+
+    `太阳高度角 ${(s.elev*180/Math.PI).toFixed(1)}°    夜晚系数 ${p.night.toFixed(2)}    天气 ${S.weather==='rain'?'雨':'晴'}\n`+
+    `模式 ${mode?'图片+深度':'程序化'}    帧率 ${fpsM.toFixed(0)} / ${CFG.fps}\n`+
+    `太阳卡 ${S.luminary}    云卡 ${S.clouds}    雨卡 ${S.rain}    视差 ${(S.par*100)|0}%`;
 }
 requestAnimationFrame(frame);
 
-/* ============ Wallpaper Engine 属性桥 ============
- * 正常浏览器中不会被调用，无副作用。
- * T1 上传工坊时在 project.json 暴露同名属性即可。 */
+/* ============ Wallpaper Engine 属性桥（与面板驱动同一配置） ============ */
 window.wallpaperPropertyListener={
   applyUserProperties(p){
-    if(p.par) CFG.par=Math.max(0,parseFloat(p.par.value)||0)/100;
-    if(p.fps) CFG.fps=Math.max(10,parseFloat(p.fps.value)||30);
+    const num=k=>parseFloat(p[k]&&p[k].value);
+    if(p.par)      S.par=Math.max(0,num('par')||0)/100;
+    if(p.fps)      CFG.fps=Math.max(10,num('fps')||30);
+    if(p.luminary) S.luminary=String(p.luminary.value);
+    if(p.clouds)   S.clouds=String(p.clouds.value);
+    if(p.rain)     S.rain=String(p.rain.value);
+    if(p.weather)  S.weather=String(p.weather.value);
+    if(p.timemode) S.timeMode=String(p.timemode.value);
+    if(p.lockedhour) S.lockedHour=num('lockedhour')||12;
+    if(p.stars)     S.stars=!!p.stars.value;
+    if(p.mountains) S.mountains=!!p.mountains.value;
   }
 };
 </script>
