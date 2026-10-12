@@ -8,7 +8,9 @@ AI 仅用于离线生成素材，运行时零 AI 调用。
 
 ## 运行 T0 原型
 
-直接双击 `src/wallpaper/index.html` 即可（无需构建、无依赖）。
+**在线预览（GitHub Pages）**：https://quoteZZZ.github.io/living-wallpaper/ —— 任何电脑的浏览器直接打开，无需本地环境。
+
+本地运行：直接双击 `src/wallpaper/index.html`，或 `python -m http.server` 后访问。
 
 调试参数（加到 URL 后）：
 

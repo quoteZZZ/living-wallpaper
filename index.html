@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Living Wallpaper — 会活着的环境感知壁纸</title>
+<style>
+  body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;
+       background:#070b16;color:#dbe4f0;font:16px/1.9 system-ui,"Noto Sans SC",sans-serif}
+  main{max-width:660px;padding:48px 32px}
+  h1{font-size:30px;margin:0 0 10px}
+  p.lead{color:#9fb0c8;margin-top:0}
+  .links{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px}
+  a.btn{display:inline-block;padding:10px 18px;border:1px solid #2c3a55;border-radius:10px;
+        color:#8fc2ff;text-decoration:none}
+  a.btn:hover{border-color:#8fc2ff;background:#0d1526}
+  small{color:#5c6b84;display:block;margin-top:34px;line-height:1.8}
+</style>
+</head>
+<body>
+<main>
+  <h1>Living Wallpaper</h1>
+  <p class="lead">
+    会"活着"的环境感知动态壁纸：真实时辰光照（按你的纬度计算日出日落）·
+    深度视差 · 精灵宠物（开发中）。AI 仅用于离线生成素材，运行时零 AI 调用。
+    当前为 T0 程序化占位场景，正式素材接入后自动切换"图片 + 深度图"视差模式。
+  </p>
+  <div class="links">
+    <a class="btn" href="src/wallpaper/index.html">打开原型（跟随系统时间）</a>
+    <a class="btn" href="src/wallpaper/index.html?hour=12">正午</a>
+    <a class="btn" href="src/wallpaper/index.html?hour=21">夜晚</a>
+    <a class="btn" href="src/wallpaper/index.html?hour=6.2">黎明</a>
+    <a class="btn" href="docs/DESIGN.md">设计文档</a>
+  </div>
+  <small>
+    移动鼠标体验深度视差；闲置 4 秒场景自主缓漂。<br>
+    URL 参数：?hour=0-24 强制时辰 · ?debug=1 调试面板 · ?fps=60 解锁帧率 · ?par=150 视差强度 · ?lat=39.9 纬度
+  </small>
+</main>
+</body>
+</html>
