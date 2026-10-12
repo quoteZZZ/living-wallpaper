@@ -1,10 +1,22 @@
 # Solstice 素材制作指南（PACKS_GUIDE）
 
-> 目标：用你最顺手的 AI 生图工具（LiblibAI / 即梦 / Midjourney 等）产出高质量素材，
-> 按本指南放进 `assets/packs/` 即被引擎自动加载——**零代码**。
-> 这套包格式与未来 Steam 创意工坊包**完全一致**（DESIGN.md §3.3 / §5.6），现在做的素材以后直接上架。
+> **官方 v1 素材来源（定稿）：[Quaternius](https://quaternius.com) CC0 低模包**
+> - 《Ultimate Nature Pack》：200+ 树/石/草 GLB —— 场景元素
+> - 《Ultimate Animated Animals GLB》：自带骨骼动画（idle/走/跑/吃）—— 宠物 v0
+> - CC0：免署名、可商用、上 Steam 零法律风险；下载后把 LICENSE 文件留档进仓库
+> - 单源红线：v1 全部内容只用 Quaternius 家族，不混其他作者，风格由渲染器+单一来源双保证
+>
+> 其余路线（AI 3D / Blender 程序化 / 付费包）见文末梯子，v1 结束前不启用。
 
 ---
+
+## 0. 接入步骤（Quaternius → 引擎）
+
+1. quaternius.com 下载上述两包（zip）
+2. 解压出 `.glb`，按用途挑入 `src/wallpaper/assets/models/`（重命名为语义名：`oak_a.glb`、`cat.glb`…）
+3. Babylon `SceneLoader.ImportMeshAsync` 载入；flat-shading 材质工厂 + 调色板光照统一染色
+4. 风摆：植被挂风顶点着色器；宠物：AnimationGroup 播状态机
+5. 许可：把两包的 LICENSE/README 复制到 `assets/models/LICENSE-quaternius.txt` 留档
 
 ## 1. 目录结构（一个素材包 = 一个文件夹）
 
