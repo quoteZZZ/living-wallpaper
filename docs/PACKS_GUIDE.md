@@ -1,12 +1,17 @@
 # Solstice 素材制作指南（PACKS_GUIDE）
 
-> **官方 v1 素材来源（定稿）：[Quaternius](https://quaternius.com) CC0 低模包**
-> - 《Ultimate Nature Pack》：200+ 树/石/草 GLB —— 场景元素
-> - 《Ultimate Animated Animals GLB》：自带骨骼动画（idle/走/跑/吃）—— 宠物 v0
-> - CC0：免署名、可商用、上 Steam 零法律风险；下载后把 LICENSE 文件留档进仓库
-> - 单源红线：v1 全部内容只用 Quaternius 家族，不混其他作者，风格由渲染器+单一来源双保证
+> **官方素材双源（定稿，全 CC0）：[Quaternius](https://quaternius.com) + [Kenney](https://kenney.nl)**
 >
-> 其余路线（AI 3D / Blender 程序化 / 付费包）见文末梯子，v1 结束前不启用。
+> | 源 | 负责 | 关键包 |
+> |---|---|---|
+> | **Quaternius** | 3D 元素 + 骨骼动画（宠物 v0） | Ultimate Nature Pack（200+ 树石草）、Ultimate Animated Animals GLB |
+> | **Kenney** | 2D/UI/粒子（矢量与像素两族风格） | UI Pack（界面）、Particle Pack（雨雪粒子贴图）、Nature 系（2D 备用） |
+>
+> 多风格不在素材层解决：**StyleSystem 渲染器换装**（卡通/简笔/水彩=后处理+材质预设，DESIGN §5.6）；高清由 3D/矢量分辨率无关 + AA/DPR 保证。
+> 两家均 CC0：免署名、可商用、上 Steam 零法律风险；下载后 LICENSE 文件留档进仓库。
+> 单源红线：v1 元素内容只用这两家，不混其他作者。
+
+> 其余路线（AI 3D / Blender 程序化 / 付费包 / 图生3D）见文末梯子，v1 结束前不启用。
 
 ---
 
