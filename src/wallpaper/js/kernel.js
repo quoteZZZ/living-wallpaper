@@ -39,43 +39,65 @@ window.Solstice = (function(){
       title:'Solstice 场景设置',
       time:'时间', followReal:'跟随真实', lock:'锁定时段', lockedHour:'锁定时刻',
       cards:'元素卡片',
-      luminary:'太阳 / 月亮', clouds:'云', rain:'雨', stars:'星空', mountains:'山峦',
+      luminary:'太阳 / 月亮', clouds:'云', rain:'雨 / 雪', stars:'星空', mountains:'山峦', tree:'前景树',
       lumAuto:'跟随时间', lumShow:'强制显示', lumHide:'隐藏',
       clAuto:'跟随天气',   clOff:'隐藏',
       rainAuto:'跟随天气', rainOn:'强制', rainOff:'关闭',
       stAuto:'夜晚显示',   stShow:'常显', stHide:'隐藏',
       mAuto:'显示',        mHide:'隐藏',
-      weather:'天气', weatherHint:'T0 手动 · T1 接真实', clear:'晴', rainy:'雨',
+      tAuto:'跟随季节',    tShow:'自选变体', tHide:'隐藏',
+      variant:'变体', spring:'春 · 花', summer:'夏 · 绿', autumn:'秋 · 橙', winter:'冬 · 雪',
+      anchor:'位置', left:'左', center:'中', right:'右', sway:'摇曳',
+      weather:'天气', weatherHint:'T0 手动 · T1 接真实', clear:'晴', cloudy:'多云',
+      rainy:'雨', snowy:'雪', foggy:'雾', intensity:'强度',
+      preset:'预设', pMin:'极简', pFull:'完整', pNight:'深夜护眼', dim:'整体亮度',
       parallax:'视差', fpsCap:'帧率上限',
-      ui:'界面', lang:'语言', editMode:'编辑模式（拖拽 / 右键）',
+      ui:'界面', lang:'语言', editMode:'编辑模式（拖拽 / 右键）', resetDefs:'恢复全部默认',
       hint1:'设置自动保存（localStorage）。',
       hint2:'「隐藏太阳」只隐藏圆盘，天空仍按真实时辰变亮变暗。',
       infoTitle:'信息组件', showSec:'显示秒', showDate:'显示日期',
       showWeather:'显示天气', showDebug:'详细信息（调试）', infoScale:'缩放',
       menuHide:'隐藏卡片', menuShow:'显示卡片', menuReset:'重置位置',
       menuSettings:'卡片设置…', menuScene:'场景设置…',
-      menuWeather:'切换天气', menuResetAll:'重置全部卡片',
+      menuWeather:'天气', menuPreset:'预设', menuResetAll:'重置全部卡片',
+      menuVariant:'更换变体', menuTreeAdd:'添加前景树', menuTreeDel:'移除前景树',
+      menuAdd:'添加素材', radialBack:'关闭',
+      tipEdit:'编辑模式', tipReset:'重置全部卡片', tipPanel:'场景设置',
+      hubEdit:'编辑模式', hubReset:'重置全部卡片', hubPanel:'场景设置',
+      hintBar:'提示：右键卡片 / 天空可编辑，拖拽太阳调位置大小，双击卡片重置。',
+      gotIt:'知道了',
     },
     en: {
       title:'Solstice Scene Settings',
       time:'Time', followReal:'Real time', lock:'Locked period', lockedHour:'Hour',
       cards:'Element cards',
-      luminary:'Sun / Moon', clouds:'Clouds', rain:'Rain', stars:'Stars', mountains:'Mountains',
+      luminary:'Sun / Moon', clouds:'Clouds', rain:'Rain / Snow', stars:'Stars', mountains:'Mountains', tree:'Foreground tree',
       lumAuto:'Follow time', lumShow:'Always show', lumHide:'Hide',
       clAuto:'Follow weather', clOff:'Hide',
       rainAuto:'Follow weather', rainOn:'Force on', rainOff:'Off',
       stAuto:'Night only', stShow:'Always show', stHide:'Hide',
       mAuto:'Show', mHide:'Hide',
-      weather:'Weather', weatherHint:'T0 manual · live in T1', clear:'Clear', rainy:'Rain',
+      tAuto:'Follow season', tShow:'Pick variant', tHide:'Hide',
+      variant:'Variant', spring:'Spring', summer:'Summer', autumn:'Autumn', winter:'Winter',
+      anchor:'Position', left:'Left', center:'Center', right:'Right', sway:'Sway',
+      weather:'Weather', weatherHint:'T0 manual · live in T1', clear:'Clear', cloudy:'Cloudy',
+      rainy:'Rain', snowy:'Snow', foggy:'Fog', intensity:'Intensity',
+      preset:'Preset', pMin:'Minimal', pFull:'Full', pNight:'Night care', dim:'Brightness',
       parallax:'Parallax', fpsCap:'FPS cap',
-      ui:'Interface', lang:'Language', editMode:'Edit mode (drag / right-click)',
+      ui:'Interface', lang:'Language', editMode:'Edit mode (drag / right-click)', resetDefs:'Restore defaults',
       hint1:'Settings persist automatically (localStorage).',
       hint2:'Hiding the sun only removes the disc; the sky still follows real daylight.',
       infoTitle:'Info widget', showSec:'Seconds', showDate:'Date',
       showWeather:'Weather line', showDebug:'Details (debug)', infoScale:'Scale',
       menuHide:'Hide card', menuShow:'Show card', menuReset:'Reset transform',
       menuSettings:'Card settings…', menuScene:'Scene settings…',
-      menuWeather:'Toggle weather', menuResetAll:'Reset all cards',
+      menuWeather:'Weather', menuPreset:'Preset', menuResetAll:'Reset all cards',
+      menuVariant:'Change variant', menuTreeAdd:'Add tree', menuTreeDel:'Remove tree',
+      menuAdd:'Add asset', radialBack:'Close',
+      tipEdit:'Edit mode', tipReset:'Reset all cards', tipPanel:'Scene settings',
+      hubEdit:'Edit mode', hubReset:'Reset all cards', hubPanel:'Scene settings',
+      hintBar:'Tip: right-click a card or the sky to edit; drag the sun to move/resize; double-click resets.',
+      gotIt:'Got it',
     },
   };
   const i18n = {
@@ -102,14 +124,16 @@ window.Solstice = (function(){
   const DEFAULTS = {
     lang:null,
     timeMode:'real', lockedHour:12,
-    weather:'clear',                          // T0 手动；T1 provider 写 ctx.weather
-    par:1, fps:30, editor:true,
+    weather:'clear', weatherI:1,              // T0 手动；T1 provider 写 ctx.weather
+    par:1, fps:30, editor:true, dim:1, preset:null,
     cards:{                                   // 卡实例：三态偏好 + 位置/缩放变换
       luminary:{pref:'auto', dx:0, dy:0, scale:1},
       clouds  :{pref:'auto', dy:0},
       stars   :{pref:'auto'},
       mountains:{pref:'auto', dy:0, scale:1},
       rain    :{pref:'auto'},
+      tree    :{pref:'auto', dx:0, dy:0, scale:1, anchor:'left', sway:.4,
+                variant:'summer'},          // variant 在 pref=show 时生效；auto=跟随季节
     },
     info:{ expanded:true, showSec:true, showDate:true, showWeather:true,
            showDebug:false, scale:1, dx:0, dy:0 },
@@ -117,15 +141,16 @@ window.Solstice = (function(){
   function loadCfg(){
     const raw = storage.get('lw.cfg.v1', {}) || {};
     const S = JSON.parse(JSON.stringify(DEFAULTS));
-    const card = (id)=>{                        // v1 平铺键 → cards.<id>.pref 迁移
-      const o={pref:'auto',dx:0,dy:0,scale:1};
+    const card = (id,def)=>{                    // v1 平铺键 → cards.<id> 迁移 + 深合并
+      const o=Object.assign({pref:'auto',dx:0,dy:0,scale:1},def||{});
       if(typeof raw[id]==='string') o.pref=raw[id];
       else if(typeof raw[id]==='boolean') o.pref=raw[id]?'auto':'hide';
-      return o;
+      return Object.assign(o,(raw.cards&&raw.cards[id])||{});
     };
-    for(const id of ['luminary','clouds','stars','mountains','rain'])
-      S.cards[id]=Object.assign(card(id), (raw.cards&&raw.cards[id])||{});
-    for(const k of ['timeMode','lockedHour','weather','par']) if(k in raw) S[k]=raw[k];
+    for(const id of Object.keys(DEFAULTS.cards))
+      S.cards[id]=card(id, DEFAULTS.cards[id]);
+    for(const k of ['timeMode','lockedHour','weather','par','dim','preset','weatherI'])
+      if(k in raw) S[k]=raw[k];
     if('fps' in raw) S.fps=raw.fps;
     if('editor' in raw) S.editor=raw.editor;
     S.info=Object.assign(S.info,(raw.info)||{});
@@ -135,6 +160,12 @@ window.Solstice = (function(){
   }
   const S = loadCfg();
   function saveCfg(){ storage.set('lw.cfg.v1', S); ctx.emit('cfg',S); }
+  function resetCfg(){                          // 恢复默认（保留在原对象上改，引用不变）
+    const d=JSON.parse(JSON.stringify(DEFAULTS));
+    for(const k of Object.keys(d)) S[k]=d[k];
+    ctx.weather=S.weather;
+    saveCfg();
+  }
 
   /* ---------- ② 上下文总线：太阳数学 / 调色板（§4.3，纯数学无网络） ---------- */
   const STOPS = [
@@ -179,13 +210,18 @@ window.Solstice = (function(){
     return { x:-Math.sin(mh)*aspect*0.42, y:-0.30+Math.max(me,0)/1.35*0.72,
              r:0.034, a:Math.min(1, -s.elev/0.20) };
   }
+  /* 真实季节（北半球近似）→ 树变体；"跟随季节"= 与真实世界同步的产品支柱 */
+  function seasonOf(date){
+    const m=(date||new Date()).getMonth();                  // 0-11
+    return m>=2&&m<=4?'spring' : m>=5&&m<=7?'summer' : m>=8&&m<=10?'autumn' : 'winter';
+  }
 
   const listeners = new Map();
   const ctx = {
     weather:'clear',                            // provider 插件写入；消费方只读/订阅
     on(evt,fn){ (listeners.get(evt)??listeners.set(evt,[]).get(evt)).push(fn); },
     emit(evt,data){ (listeners.get(evt)||[]).forEach(f=>{ try{f(data);}catch(e){console.error(e);} }); },
-    sunState, palette, luminary,
+    sunState, palette, luminary, seasonOf,
   };
 
   /* ---------- ③ 插件注册表 + 卡槽仲裁（§3.4 / §4.2） ---------- */
@@ -207,56 +243,79 @@ window.Solstice = (function(){
         }
       return out;
     },
-    /* 冲突仲裁：元素卡决定"有没有"，世界决定"什么样"（§4.2 矩阵） */
+    /* 冲突仲裁：元素卡决定"有没有"，世界决定"什么样"（§4.2 矩阵 + §4.4 五种天气） */
     resolveFrame(env){
-      const C=S.cards, w=ctx.weather;
-      const st={ pal:env.pal };
+      const C=S.cards, w=ctx.weather, I=S.weatherI??1;
+      const st={ pal:env.pal, weather:w };
 
-      /* 雨（效果层）：先算雨，雨是"世界状态"的输入 */
+      /* 降水/效果强度：雨雪共用一张"雨/雪"效果卡（auto 跟随天气型） */
       const rp=C.rain.pref;
-      st.rainI = rp==='off'?0 : rp==='on'?0.75 : (w==='rain'?0.75:0);
-      const raining = st.rainI>0;
+      const gate = rp==='off'?0 : rp==='on'?I : (w==='rain'||w==='snow')?I:0;
+      st.rainI = w==='rain'?0.75*gate:0;
+      st.snowI = w==='snow'?0.9 *gate:0;
+      st.fogI  = w==='fog'?0.8 *I  :0;
+      const overcast = w==='rain'||w==='snow'||w==='cloudy'||w==='fog';
 
-      /* 世界的调色：下雨则整体压暗偏灰（与雨卡是否显示无关？——不，
-       * T0 将调色绑定 rainI（雨粒子）；auto 下两者一致，off 时用户
-       * 明确不要雨的氛围。DESIGN §4.2 行2"雨=跟随"即此语义。 */
-      if(raining){
-        st.pal = Object.assign({}, env.pal, {
-          top : util.mix3(env.pal.top,[.42,.47,.55],.5),
-          hor : util.mix3(env.pal.hor,[.50,.56,.64],.5),
-          fog : util.mix3(env.pal.fog,[.58,.63,.70],.35),
-          night:Math.min(1,env.pal.night+.15),
-        });
+      /* 世界的调色：各种天气对"世界外观"的偏移（§4.4） */
+      let pal=env.pal;
+      if(w==='rain'){
+        pal=Object.assign({},pal,{ top:util.mix3(pal.top,[.42,.47,.55],.5),
+          hor:util.mix3(pal.hor,[.50,.56,.64],.5), fog:util.mix3(pal.fog,[.58,.63,.70],.35),
+          night:Math.min(1,pal.night+.15) });
+      }else if(w==='snow'){
+        pal=Object.assign({},pal,{ top:util.mix3(pal.top,[.72,.78,.88],.45),
+          hor:util.mix3(pal.hor,[.80,.85,.92],.45), fog:util.mix3(pal.fog,[.85,.89,.95],.4),
+          night:Math.min(1,pal.night+.10) });
+      }else if(w==='cloudy'){
+        const g=(c)=>{ const l=(c[0]+c[1]+c[2])/3; return util.mix3(c,[l,l,l*1.04],.38); };
+        pal=Object.assign({},pal,{ top:g(pal.top), hor:g(pal.hor), fog:util.mix3(pal.fog,[.62,.65,.70],.3),
+          night:Math.min(1,pal.night+.06), star:0 });
+      }else if(w==='fog'){
+        pal=Object.assign({},pal,{ hor:util.mix3(pal.hor,[.75,.79,.85],.4),
+          fog:util.mix3(pal.fog,[.80,.84,.90],.45), star:0 });
       }
+      st.pal=pal; st.night=pal.night;
 
-      /* 日/月：hide=0；show 强制（压过雨天隐去）；auto 雨天自动隐去 */
+      /* 日/月：hide=0；show 强制（压过天气隐去）；auto 按天气自动衰减 */
       const L = ctx.luminary(env.sun, env.aspect);
       const lm = C.luminary;
       if(lm.pref==='hide') L.a=0;
       else if(lm.pref==='show') L.a=1;
-      else if(raining) L.a*=.12;
-      L.x+=lm.dx; L.y+=lm.dy; L.r*=lm.scale;    // 编辑器拖拽/缩放变换
+      else{
+        const dim = w==='rain'?.12 : w==='snow'?.5 : w==='cloudy'?.45 : w==='fog'?.25 : 1;
+        L.a*=dim;
+      }
+      L.x+=lm.dx; L.y+=lm.dy; L.r*=lm.scale;
       st.lum=L;
 
-      /* 云：auto 跟天气云量；off 隐藏装饰云但雨照下（粒子属天气系统层） */
-      let ci = raining?0.95:0.4;
+      /* 云：auto 跟天气云量；off 隐藏装饰云但降水照下（粒子属天气系统层） */
+      let ci = w==='clear'?.4 : w==='fog'?.55 : .95;
       if(C.clouds.pref==='off') ci=0;
-      else if(C.clouds.pref==='on') ci=Math.max(ci,0.7);
+      else if(C.clouds.pref==='on') ci=Math.max(ci,.7);
       st.cloudI=ci; st.cloudDy=C.clouds.dy;
 
       /* 星空 / 山峦 */
       const sp=C.stars.pref;
-      st.starI = sp==='hide'?0 : sp==='show'?Math.max(env.pal.star,0.85) : env.pal.star;
+      st.starI = sp==='hide'?0 : sp==='show'?Math.max(pal.star,overcast?0:0.85) : pal.star;
       st.mtnOn = C.mountains.pref!=='hide';
       st.mtnDy=C.mountains.dy; st.mtnScale=C.mountains.scale;
 
-      st.night=st.pal.night;
-      st.raining=raining;
+      /* 前景树：auto=跟随真实季节；show=自选变体 */
+      const t=C.tree;
+      st.treeOn = t.pref!=='hide';
+      st.treeVariant = t.pref==='auto' ? seasonOf(env.date) : t.variant;
+      st.treeDx=t.dx; st.treeDy=t.dy; st.treeScale=t.scale;
+      st.treeAnchor=t.anchor; st.treeSway=t.sway;
+
+      st.raining = st.rainI>0 || st.snowI>0;
       return st;
     },
   };
 
   i18n.init();
 
-  return { version:'0.2', Q, CFG, S, DEFAULTS, saveCfg, util, i18n, storage, ctx, registry };
+  /* ---------- 素材包运行时注册（文件包加载器写入，见 assets/packs/） ---------- */
+  const assets = { treeImages:null };         // {variantId: imageUrl}
+
+  return { version:'0.4', Q, CFG, S, DEFAULTS, saveCfg, resetCfg, util, i18n, storage, ctx, registry, assets };
 })();

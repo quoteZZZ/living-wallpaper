@@ -5,7 +5,8 @@ AI 仅用于离线生成素材，运行时零 AI 调用。
 
 - **设计文档（必读）**：[docs/DESIGN.md](docs/DESIGN.md)
 - 路线：T0 原型验证（已完成）→ T1 Steam 独立应用（Tauri + 创意工坊）→ T2 生态（代码插件沙箱）
-- 当前状态：**T0.2 微内核 + 官方插件 + 场景编辑器 + 信息组件**（见 DESIGN.md §3.6 / §4.8 / §4.9）
+- 当前状态：**T0.4 单一 UI 中枢 + 圆盘选择器 + 文件素材包管线**（见 DESIGN.md §4.8/§4.10/§5.6）
+- **自制素材**：按 [docs/PACKS_GUIDE.md](docs/PACKS_GUIDE.md) 出图，放进 `src/wallpaper/assets/packs/` 即生效——该格式即 Steam 工坊包格式
 
 ## 运行 T0 原型
 
@@ -25,7 +26,7 @@ AI 仅用于离线生成素材，运行时零 AI 调用。
 | `?ui=0` | 壁纸模式：隐藏面板/编辑器，仅保留画面与信息卡 | 开 |
 | `?nohid=1` | 缩短隐藏页降级渲染间隔（自动化测试用） | 关 |
 
-交互：右上 ⚙ 打开设置中心（按插件分区，中英双语）；开启"编辑模式"后可**点击选中卡片、拖拽移动、右下角手柄缩放、右键卡片/背景呼出菜单**（详见 DESIGN.md §4.8）。
+交互：左上信息中枢是唯一悬浮组件——`⚙` 打开设置中心（按插件分区，中英双语），`✥` 开启编辑模式后可**点击选中卡片、拖拽移动、右下角手柄缩放、双击重置、右键卡片/天空呼出菜单**；更换变体/天气/预设/添加素材均为**圆盘选择器**（DESIGN.md §4.8/§4.10）。
 
 若 `src/wallpaper/assets/scene.png` 与 `depth.png` 存在，自动切换为"图片+深度图"视差模式；否则显示程序化占位场景。
 
@@ -34,19 +35,22 @@ AI 仅用于离线生成素材，运行时零 AI 调用。
 ```
 solstice/
 ├─ docs/DESIGN.md                 # 完整设计文档
+├─ docs/PACKS_GUIDE.md            # 素材制作指南（提示词模板/规格/深度图）
 ├─ index.html                     # GitHub Pages 落地页
 └─ src/wallpaper/                 # 壁纸本体（零构建，经典 <script> 加载）
    ├─ index.html                  # 入口：样式 + DOM 宿主 + 脚本装配
    ├─ js/kernel.js                # 微内核：i18n / 存储 / 上下文总线 / 注册表+卡槽仲裁
-   ├─ js/composer.js              # 合成器：WebGL2 渲染循环 + 性能治理
+   ├─ js/composer.js              # 合成器：双通道（全屏程序化 + 前景精灵贴图）
    ├─ js/panel.js                 # 设置中心：由插件 settingsGroups 自动生成（双语）
-   ├─ js/editor.js                # 场景编辑器：选中/拖拽/缩放/右键菜单
+   ├─ js/editor.js                # 场景编辑器：选中/拖拽/缩放/右键/圆盘选择器
    ├─ js/main.js                  # 启动装配 + WE/Tauri 属性桥
    ├─ js/plugins/base.js          # official.base      天空光照 + 日月/星空卡 + 界面
    ├─ js/plugins/mountains.js     # official.mountains 山峦卡（程序化→声明式）
-   ├─ js/plugins/weather.js       # official.weather   云/雨效果 + T0 手动天气
-   ├─ js/plugins/info.js          # official.info      信息组件（时间/天气，可收缩）
-   └─ assets/                     # 素材（scene.png / depth.png，见 DESIGN.md §5）
+   ├─ js/plugins/weather.js       # official.weather   晴/多云/雨/雪/雾 + 手动天气
+   ├─ js/plugins/trees.js         # pack.trees         前景树素材包（四季变体）
+   ├─ js/plugins/presets.js       # official.presets   预设（极简/完整/深夜护眼）
+   ├─ js/plugins/info.js          # official.info      信息中枢（唯一悬浮 UI）
+   └─ assets/packs/               # 素材包目录（manifest.json + PNG，见 PACKS_GUIDE）
 ```
 
 ## 开发环境与协作约定

@@ -13,7 +13,7 @@
   const K = window.Solstice, S = K.S;
   const save = ()=>K.saveCfg();
 
-  let el, timeEl, secEl, dateEl, wxEl, dbgEl, minBtn, collapsedBox;
+  let el, timeEl, secEl, dateEl, wxEl, dbgEl, minBtn;
 
   function build(){
     el=document.createElement('div');
@@ -25,22 +25,31 @@
       </div>
       <div class="ic-dbg"></div>
       <div class="ic-btns">
-        <button class="ic-btn" data-a="min" title="-">–</button>
-        <button class="ic-btn" data-a="cfg" title="⚙">⚙</button>
+        <button class="ic-btn" data-a="min">–</button>
+        <button class="ic-btn ic-edit" data-a="edit">✥</button>
+        <button class="ic-btn" data-a="reset">↺</button>
+        <button class="ic-btn" data-a="cfg">⚙</button>
       </div>`;
     document.getElementById('infoHost').appendChild(el);
     timeEl=el.querySelector('.ic-hm'); secEl=el.querySelector('.ic-sec');
     dateEl=el.querySelector('.ic-date'); wxEl=el.querySelector('.ic-wx');
     dbgEl=el.querySelector('.ic-dbg');
     minBtn=el.querySelector('[data-a=min]');
+    const editBtn=el.querySelector('[data-a=edit]');
 
-    el.querySelector('[data-a=cfg]').onclick=e=>{ e.stopPropagation(); K.panel.open('official.info'); };
+    /* 唯一 UI 中枢：信息 + 收缩 + 编辑 + 重置 + 设置（其余悬浮件已删除） */
+    el.querySelector('[data-a=cfg]').onclick=e=>{ e.stopPropagation(); K.panel.open(); };
+    el.querySelector('[data-a=edit]').onclick=e=>{
+      e.stopPropagation(); K.editor && K.editor.toggle(); };
+    el.querySelector('[data-a=reset]').onclick=e=>{
+      e.stopPropagation(); K.editor && K.editor.resetAll(); };
     minBtn.onclick=e=>{
       e.stopPropagation();
       S.info.expanded=!S.info.expanded; apply(); save();
     };
+    K.ctx.on('cfg',()=>{ if(editBtn) editBtn.classList.toggle('on',!!S.editor&&!!(K.editor&&K.editor.enabled())); });
 
-    /* 编辑模式拖拽（DOM 卡）：按钮/链接不触发 */
+    /* 编辑模式拖拽（DOM 卡）：按钮不触发 */
     let drag=null;
     el.addEventListener('pointerdown',e=>{
       if(e.target.closest('.ic-btn')) return;
@@ -63,10 +72,14 @@
   function apply(){
     el.classList.toggle('min', !S.info.expanded);
     minBtn.textContent=S.info.expanded?'–':'+';
-    minBtn.title=S.info.expanded?'+':'-';
     const i=S.info;
     el.style.transform=`translate(${i.dx}px,${i.dy}px) scale(${i.scale})`;
-    el.style.display=(K.CFG.ui||true)?'flex':'none';   // WE 版也显示（是壁纸内容）
+    el.style.display='flex';                          // WE 版也显示（是壁纸内容）
+    const ui=!!K.CFG.ui;
+    for(const b of el.querySelectorAll('[data-a=edit],[data-a=reset],[data-a=cfg]'))
+      b.style.display=ui?'':'none';                   // 编辑/设置仅限开发与 Tauri 窗口态
+    const eb=el.querySelector('[data-a=edit]');
+    if(eb) eb.classList.toggle('on', ui && !!(K.editor&&K.editor.enabled()));
     dateEl.style.display =i.showDate?'':'none';
     wxEl.style.display   =i.showWeather?'':'none';
     secEl.style.display  =i.showSec?'':'none';
@@ -81,14 +94,17 @@
     timeEl.textContent=`${pad(d.getHours())}:${pad(d.getMinutes())}`;
     secEl.textContent=S.info.showSec?`:${pad(d.getSeconds())}`:'';
     dateEl.textContent=d.toLocaleDateString(tag,{month:'long',day:'numeric',weekday:'short'});
-    const icon=S.weather==='rain'?'🌧':(st&&st.night>0.5?'🌙':'☀');
-    wxEl.textContent=icon+' '+K.i18n.t(S.weather==='rain'?'rainy':'clear');
+    const w=S.weather, night=st&&st.night>0.5;
+    const icon = w==='rain'?'🌧' : w==='snow'?'❄' : w==='fog'?'🌫' : w==='cloudy'?'☁' : (night?'🌙':'☀');
+    wxEl.textContent=icon+' '+K.i18n.t(w==='rain'?'rainy':w==='snow'?'snowy':w==='fog'?'foggy':w==='cloudy'?'cloudy':'clear');
 
     if(S.info.showDebug){
       const C=S.cards, sun=K.ctx.sunState(d);
+      const w=S.weather;
+      const wLabel=K.i18n.t(w==='rain'?'rainy':w==='snow'?'snowy':w==='fog'?'foggy':w==='cloudy'?'cloudy':'clear');
       dbgEl.textContent=
         `${K.i18n.t('time')} ${d.toLocaleTimeString()}  ·  ${K.i18n.t('fpsCap')} ${K.composer.fps.toFixed(0)}/${S.fps}\n`+
-        `☉ ${(sun.elev*180/Math.PI).toFixed(1)}°  ·  ${K.i18n.t('weather')} ${K.i18n.t(S.weather==='rain'?'rainy':'clear')}\n`+
+        `☉ ${(sun.elev*180/Math.PI).toFixed(1)}°  ·  ${K.i18n.t('weather')} ${wLabel}\n`+
         `${K.i18n.t('luminary')} ${C.luminary.pref} · ${K.i18n.t('clouds')} ${C.clouds.pref} · `+
         `${K.i18n.t('rain')} ${C.rain.pref} · ${K.i18n.t('parallax')} ${(S.par*100)|0}%`+
         (K.composer.mode?'\n[img+depth]':'');
