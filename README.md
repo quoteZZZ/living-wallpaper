@@ -35,3 +35,22 @@ solstice/
 ├─ src/wallpaper/assets/     # 素材（scene.png / depth.png，见 DESIGN.md §5）
 └─ assets/                   # 预留：风格包库
 ```
+
+## 开发环境与协作约定
+
+本项目**零构建**：没有 `package.json`、没有打包器、没有后端，本地只需要一个支持 WebGL2 的浏览器。
+
+- **AI 协作规则**：`.codebuddy/rules/`
+  - `solstice-core`（`alwaysApply`）——每次会话必读：技术栈锁定、微内核架构红线、性能功耗预算、非目标清单。
+  - `solstice-workflow`（按需加载）——路线图、风险优先级、资产管线与验收指标。
+  - 改动代码前请先读 `docs/DESIGN.md`；**设计与实现冲突时以设计文档为准**，并在同一次改动中回写文档。
+- **本地预览**（三种任选）
+  1. 双击 `src/wallpaper/index.html`（`file://` 直开，最快）
+  2. 编辑器里用 Live Server 打开（默认 `127.0.0.1:5500`，带热重载）
+  3. `npx -y http-server . -p 8000`
+- **远程开发（可选）**：主力机可运行 CodeBuddy Web 工作台
+  `codebuddy --serve --port 9000 --base-path /solstice --agent cli`
+  再用出站隧道（cloudflared）暴露给另一台机器用浏览器接入；**所有任务、文件与终端都执行在主力机上**。
+  链接与访问口令属于私密凭据，**不要提交进仓库**。
+- **提交信息**：英文、简短祈使句。
+- **不要引入依赖**：仓库当前没有 `package.json`，不要新增它，也不要新增 npm 依赖。
