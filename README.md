@@ -1,4 +1,4 @@
-# Living Wallpaper（工作代号）
+# 至日 Solstice
 
 会"活着"的 Windows 动态壁纸：深度视差 + 真实时辰光照 + 天气同步 + 精灵宠物。
 AI 仅用于离线生成素材，运行时零 AI 调用。
@@ -8,7 +8,7 @@ AI 仅用于离线生成素材，运行时零 AI 调用。
 
 ## 运行 T0 原型
 
-**在线预览（GitHub Pages）**：https://quoteZZZ.github.io/living-wallpaper/ —— 任何电脑的浏览器直接打开，无需本地环境。
+**在线预览（GitHub Pages）**：https://quoteZZZ.github.io/solstice-wallpaper/ —— 任何电脑的浏览器直接打开，无需本地环境。
 
 本地运行：直接双击 `src/wallpaper/index.html`，或 `python -m http.server` 后访问。
 
@@ -29,7 +29,7 @@ AI 仅用于离线生成素材，运行时零 AI 调用。
 ## 目录结构
 
 ```
-living-wallpaper/
+solstice-wallpaper/
 ├─ docs/DESIGN.md            # 完整设计文档
 ├─ src/wallpaper/index.html  # 壁纸本体（单文件 WebGL2）
 ├─ src/wallpaper/assets/     # 素材（scene.png / depth.png，见 DESIGN.md §5）
