@@ -55,6 +55,9 @@ D:\ComfyUI\python_embeded\python.exe studio\tools\seamless.py `
 
 ## 4. 候选清单（本目录 = 通过自检，可挑）
 
+评审图（每张候选按 2×2 平铺并排，挑图先看这个）：
+`SET-01-review-<材质id>.png` ×5 —— 由本目录的入库候选直接生成，命令见 §2 第 ③ 步。
+
 | 材质 | 候选 | 接缝比 L\|R / T\|B | 平光 dY | 内容自检 |
 |---|---|---|---|---|
 | `rock-cliff` | `mat-rock-cliff_v1.png` | 0.6 / 0.8 | +0.14 | ✅ 板状层理岩壁（偏深灰） |
