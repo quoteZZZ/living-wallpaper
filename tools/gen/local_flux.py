@@ -27,9 +27,14 @@ Usage (PowerShell), with ComfyUI already listening:
 
 Batch file (JSON list, each entry = kwargs for one render):
   python tools/gen/local_flux.py --batch tools/gen/jobs/example.json
+
+Upscale an existing image to the SET-00 spec (1920x1080 -> >=4K):
+  python tools/gen/local_flux.py --from tmp/probe/a.png --to tools/prompts/selected/S1.png `
+    --max-edge 3840
 """
 import argparse
 import json
+import struct
 import sys
 import time
 import urllib.error
@@ -42,11 +47,18 @@ DEFAULT_SERVER = "http://127.0.0.1:8188"
 DEFAULT_MODEL = "flux-2-klein-4b-fp8.safetensors"
 DEFAULT_CLIP = "qwen_3_4b.safetensors"
 DEFAULT_VAE = "flux2-vae.safetensors"
+DEFAULT_UPSCALE = "RealESRGAN_x2plus.pth"
+
+
+def snap16(value):
+    """FLUX.2 patchifies 2x on a /8 latent, so frames land on a /16 grid."""
+    return max(16, int(round(value / 16)) * 16)
 
 
 def build_graph(prompt, negative, model, clip, vae, width, height, steps, seed, cfg,
                 filename_prefix):
     """Return the ComfyUI API-format prompt graph."""
+    lw, lh = snap16(width), snap16(height)
     graph = {
         "70": {"class_type": "UNETLoader",
                "inputs": {"unet_name": model, "weight_dtype": "default"}},
@@ -54,14 +66,12 @@ def build_graph(prompt, negative, model, clip, vae, width, height, steps, seed, 
                "inputs": {"clip_name": clip, "type": "flux2"}},
         "72": {"class_type": "VAELoader", "inputs": {"vae_name": vae}},
         "66": {"class_type": "EmptyFlux2LatentImage",
-               "inputs": {"width": width, "height": height, "batch_size": 1}},
+               "inputs": {"width": lw, "height": lh, "batch_size": 1}},
         "62": {"class_type": "Flux2Scheduler",
-               "inputs": {"steps": steps, "width": width, "height": height}},
+               "inputs": {"steps": steps, "width": lw, "height": lh}},
         "61": {"class_type": "KSamplerSelect", "inputs": {"sampler_name": "euler"}},
         "73": {"class_type": "RandomNoise", "inputs": {"noise_seed": seed}},
         "65": {"class_type": "VAEDecode", "inputs": {"samples": ["64", 0], "vae": ["72", 0]}},
-        "9": {"class_type": "SaveImage",
-              "inputs": {"images": ["65", 0], "filename_prefix": filename_prefix}},
     }
 
     graph["74"] = {"class_type": "CLIPTextEncode",
@@ -90,6 +100,17 @@ def build_graph(prompt, negative, model, clip, vae, width, height, steps, seed, 
                    "inputs": {"noise": ["73", 0], "guider": ["63", 0],
                               "sampler": ["61", 0], "sigmas": ["62", 0],
                               "latent_image": ["66", 0]}}
+
+    images = ["65", 0]
+    if (lw, lh) != (width, height):
+        # the /16 grid ate a few pixels; hand back the exact requested frame
+        graph["67"] = {"class_type": "ImageScale",
+                       "inputs": {"image": images, "upscale_method": "lanczos",
+                                  "width": width, "height": height,
+                                  "crop": "disabled"}}
+        images = ["67", 0]
+    graph["9"] = {"class_type": "SaveImage",
+                  "inputs": {"images": images, "filename_prefix": filename_prefix}}
     return graph
 
 
@@ -112,20 +133,15 @@ def server_stats(server):
     return dev
 
 
-def render(server, prompt, out, negative="", model=DEFAULT_MODEL, clip=DEFAULT_CLIP,
-           vae=DEFAULT_VAE, width=1024, height=1024, steps=4, seed=42, cfg=1,
-           timeout=900, quiet=False):
-    """Run one generation; returns the saved Path."""
-    prefix = Path(out).stem
-    graph = build_graph(prompt, negative, model, clip, vae, width, height, steps,
-                        seed, cfg, prefix)
+def run_graph(server, graph, out, timeout=900, quiet=False, note=""):
+    """Submit an API graph, wait for it, download the first image to `out`."""
     client_id = str(uuid.uuid4())
     started = time.time()
     res = post_json(server.rstrip("/") + "/prompt",
                     {"prompt": graph, "client_id": client_id})
     job = res["prompt_id"]
     if not quiet:
-        print(f"[..] queued {job} ({width}x{height}, steps={steps}, seed={seed})")
+        print(f"[..] queued {job}{(' ' + note) if note else ''}")
 
     history = None
     deadline = started + timeout
@@ -141,6 +157,8 @@ def render(server, prompt, out, negative="", model=DEFAULT_MODEL, clip=DEFAULT_C
         raise TimeoutError(f"no output after {timeout}s for job {job}")
 
     outputs = history[job]["outputs"]
+    if history[job].get("status", {}).get("status_str") == "error":
+        raise RuntimeError(f"job {job} failed: {history[job]['status']}")
     images = [im for node in outputs.values() for im in node.get("images", [])]
     if not images:
         raise RuntimeError(f"job {job} produced no images: {outputs}")
@@ -151,12 +169,91 @@ def render(server, prompt, out, negative="", model=DEFAULT_MODEL, clip=DEFAULT_C
                                 "type": im.get("type", "output")})
     out_path = Path(out)
     out_path.parent.mkdir(parents=True, exist_ok=True)
-    with urllib.request.urlopen(f"{server.rstrip('/')}/view?{q}", timeout=120) as resp:
+    with urllib.request.urlopen(f"{server.rstrip('/')}/view?{q}", timeout=300) as resp:
         out_path.write_bytes(resp.read())
 
     elapsed = time.time() - started
     if not quiet:
         print(f"[ok] {out_path}  ({elapsed:.1f}s)")
+    return out_path
+
+
+def render(server, prompt, out, negative="", model=DEFAULT_MODEL, clip=DEFAULT_CLIP,
+           vae=DEFAULT_VAE, width=1024, height=1024, steps=4, seed=42, cfg=1,
+           timeout=900, quiet=False):
+    """Run one generation; returns the saved Path."""
+    graph = build_graph(prompt, negative, model, clip, vae, width, height, steps,
+                        seed, cfg, Path(out).stem)
+    return run_graph(server, graph, out, timeout=timeout, quiet=quiet,
+                     note=f"({width}x{height}, steps={steps}, seed={seed})")
+
+
+def png_size(path):
+    """Return (width, height) of a PNG via its IHDR chunk."""
+    with Path(path).open("rb") as f:
+        head = f.read(24)
+    if head[:8] != b"\x89PNG\r\n\x1a\n" or head[12:16] != b"IHDR":
+        raise ValueError(f"not a valid PNG: {path}")
+    return struct.unpack(">II", head[16:24])
+
+
+def upload_image(server, path):
+    """Push a local PNG into ComfyUI's input folder; returns the stored name."""
+    boundary = "----solstice" + uuid.uuid4().hex
+    name = Path(path).name
+    body = b"".join([
+        f'--{boundary}\r\nContent-Disposition: form-data; name="image"; '
+        f'filename="{name}"\r\nContent-Type: image/png\r\n\r\n'.encode("utf-8"),
+        Path(path).read_bytes(),
+        f'\r\n--{boundary}\r\nContent-Disposition: form-data; name="overwrite"'
+        f'\r\n\r\ntrue\r\n--{boundary}--\r\n'.encode("utf-8"),
+    ])
+    req = urllib.request.Request(
+        server.rstrip("/") + "/upload/image", data=body,
+        headers={"Content-Type": f"multipart/form-data; boundary={boundary}"})
+    with urllib.request.urlopen(req, timeout=300) as resp:
+        meta = json.loads(resp.read().decode("utf-8"))
+    sub = meta.get("subfolder") or ""
+    return f"{sub}/{meta['name']}" if sub else meta["name"]
+
+
+def build_upscale_graph(image_name, model, size, filename_prefix):
+    """API graph: LoadImage -> ESRGAN -> (optional) Lanczos resize -> SaveImage."""
+    graph = {
+        "10": {"class_type": "LoadImage", "inputs": {"image": image_name}},
+        "11": {"class_type": "UpscaleModelLoader", "inputs": {"model_name": model}},
+        "12": {"class_type": "ImageUpscaleWithModel",
+               "inputs": {"upscale_model": ["11", 0], "image": ["10", 0]}},
+    }
+    src = ["12", 0]
+    if size:
+        graph["13"] = {"class_type": "ImageScale",
+                       "inputs": {"image": src, "upscale_method": "lanczos",
+                                  "width": size[0], "height": size[1],
+                                  "crop": "disabled"}}
+        src = ["13", 0]
+    graph["9"] = {"class_type": "SaveImage",
+                  "inputs": {"images": src, "filename_prefix": filename_prefix}}
+    return graph
+
+
+def upscale(server, src, out, model=DEFAULT_UPSCALE, scale=2, max_edge=3840,
+            timeout=1800, quiet=False):
+    """Upscale a local PNG; returns the saved Path.
+
+    `scale` is the model's own factor (RealESRGAN_x2plus = 2).  The result is
+    resized down to `max_edge` on the long side when it overshoots.
+    """
+    w, h = png_size(src)
+    up = (w * scale, h * scale)
+    size = up
+    if max_edge and max(up) > max_edge:
+        k = max_edge / max(up)
+        size = (int(round(up[0] * k / 8) * 8), int(round(up[1] * k / 8) * 8))
+    name = upload_image(server, src)
+    graph = build_upscale_graph(name, model, size, Path(out).stem)
+    out_path = run_graph(server, graph, out, timeout=timeout, quiet=quiet,
+                         note=f"({model} {w}x{h} -> {size[0]}x{size[1]})")
     return out_path
 
 
@@ -187,6 +284,14 @@ def main() -> int:
     ap.add_argument("--cfg", type=float, default=1.0)
     ap.add_argument("--timeout", type=int, default=900, help="seconds to wait for one image")
     ap.add_argument("--batch", help="JSON file: list of render() kwargs incl. out")
+    ap.add_argument("--from", dest="src", help="upscale mode: source PNG")
+    ap.add_argument("--to", dest="dst", help="upscale mode: output PNG")
+    ap.add_argument("--upscale-model", default=DEFAULT_UPSCALE,
+                    help="model file in models/upscale_models")
+    ap.add_argument("--scale", type=int, default=2,
+                    help="the upscale model's own factor (x2plus = 2)")
+    ap.add_argument("--max-edge", type=int, default=3840,
+                    help="downscale the result to this long edge (0 = keep)")
     ap.add_argument("--check", action="store_true", help="print GPU/VRAM and exit")
     args = ap.parse_args()
 
@@ -199,6 +304,17 @@ def main() -> int:
         print(f"[ok] {dev['name']}")
         print(f"     vram_free {dev['vram_free'] / 1024**2:.0f} MB / "
               f"{dev['vram_total'] / 1024**2:.0f} MB")
+        return 0
+
+    if args.src or args.dst:
+        if not (args.src and args.dst):
+            ap.error("upscale mode needs both --from and --to")
+        try:
+            upscale(args.server, args.src, args.dst, model=args.upscale_model,
+                    scale=args.scale, max_edge=args.max_edge, timeout=args.timeout)
+        except Exception as exc:  # noqa: BLE001 - single failure should exit non-zero
+            print(f"[err] {exc}")
+            return 1
         return 0
 
     if args.batch:
