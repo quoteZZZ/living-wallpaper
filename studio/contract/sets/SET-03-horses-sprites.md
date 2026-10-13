@@ -1,6 +1,6 @@
 # SET-03 · 马群 sprite（优美线 Actor，pack.horses）
 
-> **前置**：SET-00 已完成（TF01 锁定）。**可后置**：在 SET-01/02 完成后再做。
+> **前置**：SET-00 已完成（S1 锁定）。**可后置**：在 SET-01/02 完成后再做。
 > **为什么需要**：当前马群是简笔画程序化绘制（`app/js/plugins/horses.js`），叠在写实/动漫底图上会违和；优美线需要真 sprite。引擎侧动画（位移/翻转/浮动）由代码机负责，**本任务书只管静态素材**。
 > **产出**：`app/assets/packs/horses/` 透明 PNG ×3 毛色。
 
@@ -15,7 +15,7 @@
 
 ## 2. 执行步骤
 
-1. 垫 TF01 / IP-Adapter 文生图「基准马」（棕色，侧面站姿）→ 用户裁决。
+1. 垫 S1 / IP-Adapter 文生图「基准马」（棕色，侧面站姿）→ 用户裁决。
 2. 以基准马 img2img（同 seed，denoise 0.35–0.5）出另外两种毛色，**姿态/轮廓不变**只换毛色：
    - 深棕（基准）· 黑 · 白
 3. 每张过 **BiRefNet** 抠图 → 透明 PNG。
@@ -24,7 +24,7 @@
 ## 3. 提示词模板
 
 ```
-breathtaking anime film background art element, [风格段 S? 对应风格，与 TF01 一致],
+breathtaking anime film background art element, [风格段 S? 对应风格，与 S1 一致],
 a single horse standing in full profile, entire body in frame, side view facing left,
 soft brown coat, black mane and tail, relaxed standing pose, all four legs visible,
 neutral top-down daylight from upper left, clean plain light-grey background,
@@ -63,7 +63,7 @@ git push
 - [ ] 三张轮廓一致（同姿态同体型，只差毛色）
 - [ ] 侧面同一朝向、四蹄完整、无畸形（重点查四肢与关节）
 - [ ] 光照统一左上 45°，无自带时辰氛围
-- [ ] 与 TF01 风格一致
+- [ ] 与 S1 风格一致
 - [ ] 无人脸/文字/水印；无骑手/鞍具
 - [ ] credits.txt 留档完整
 

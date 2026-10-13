@@ -8,10 +8,12 @@
 
 | SET | 内容 | 前置 | 产出包 | 状态 |
 |---|---|---|---|---|
-| [SET-00](SET-00-target-frames.md) | 目标帧 11 张（3 风格 + 8 关键帧） | 无 | `studio/frames/selected/` + `studio/frames/golden/` | **Phase 1 ✅ S1 锁定**（2026-10-13，垫图 = `selected/S1.png`）；Phase 2 TF01–08 待生成 → 裁决 |
-| [SET-01](SET-01-scene-background.md) | 远景主视觉整图 + 深度图 | TF01 锁定 | `app/assets/packs/mountains/` | 待前置 |
-| [SET-02](SET-02-trees-seasons.md) | 前景树 · 四季 sprite | TF01 锁定 | `app/assets/packs/trees/`（替换占位） | 待前置 |
-| [SET-03](SET-03-horses-sprites.md) | 马群 sprite（优美线 Actor） | TF01 锁定 | `app/assets/packs/horses/` | 待前置（可后置） |
+| [SET-00](SET-00-target-frames.md) | 目标帧（风格基准/黄金帧） | 无 | `studio/frames/selected/` + `studio/frames/golden/` | **Phase 1 ✅ S1 锁定**（2026-10-13）；Phase 2 TF01–08 降级为风格基准帧，仍出、逐张裁决 |
+| [SET-01](SET-01-materials.md) | 地形无接缝材质包 ×5（v5.4 参数化地形） | S1 锁定 | `studio/frames/materials/` → schema v2 后入 `app/assets/packs/` | **可开工**（前置已满足） |
+| [SET-02](SET-02-trees-seasons.md) | 前景树 · 四季 sprite | S1 锁定 | `app/assets/packs/trees/`（替换占位） | 可开工 |
+| [SET-03](SET-03-horses-sprites.md) | 马群 sprite（优美线 Actor） | S1 锁定 | `app/assets/packs/horses/` | 可开工（可后置） |
+
+> **v5.4 注**：整图方案已废除（DESIGN §2.9 参数化地形）；原 SET-01"远景整图+深度图"被地形材质包取代。
 
 **一次只做一个 SET**；做完 → 自检验收清单 → 提交 git → 等代码侧打包验收通过，再开下一个。
 
@@ -20,7 +22,7 @@
 1. **raw 不入库**：生成候选图（每步多出的 2–4 张备选）留在本机，只提交最终选中与成包文件。
 2. **PNG 提交前压缩**：单图 > 15MB 先过无损级压缩（pngquant / tinypng）再提交。
 3. **留档**：每个包的 credits 必须含 `模型名 | prompt 出处 | 日期`（Steam AI 披露审查用）。
-4. **git 提交约定**：素材单独提交，英文祈使句，如 `assets: SET-01 background pack (TF01 style)`。
+4. **git 提交约定**：素材单独提交，英文祈使句，如 `studio: SET-01 terrain materials (S1 style)`。
 5. **光照统一左上 45° 中性顶光**；时辰/天气氛围一律由引擎 LUT 调色，素材本身不带夕阳/夜景感。
 6. **负面词通用**（每张都带）：见 `../target-frames.md` 第 0 节。
 

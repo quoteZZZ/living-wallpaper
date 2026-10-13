@@ -1,6 +1,6 @@
 # SET-02 · 前景树 · 四季 sprite（pack.trees）
 
-> **前置**：SET-00 已完成（TF01 锁定）。所有生成**必须垫 TF01 / IP-Adapter** 锁风格。
+> **前置**：SET-00 已完成（S1 锁定）。所有生成**必须垫 S1 / IP-Adapter** 锁风格。
 > **产出**：`app/assets/packs/trees/` 的 spring/summer/autumn/winter 四张透明 PNG（**替换现有占位图**——当前四季全指向同一张 summer 占位）。
 
 ## 1. 机器与模型
@@ -29,7 +29,7 @@
 **基准树（summer）**：
 
 ```
-breathtaking anime film background art element, [风格段 S? 对应风格，与 TF01 一致],
+breathtaking anime film background art element, [风格段 S? 对应风格，与 S1 一致],
 a single majestic oak tree in full green leaf, centered, whole tree in frame,
 standing on a small grass mound, neutral top-down daylight from upper left,
 soft even lighting, clean plain light-grey background, crisp silhouette,
@@ -68,6 +68,6 @@ git push
 - [ ] 四张透明 PNG，长边 ≥2048，透明通道干净（无白边/背景残留）
 - [ ] 四季构图一致（叠图比对树冠/主干不漂移）
 - [ ] 光照统一左上 45°，无自带时辰氛围
-- [ ] 与 TF01 风格一致（同一画面里树与底图不违和）
+- [ ] 与 S1 风格一致（同一画面里树与底图不违和）
 - [ ] 无人脸/文字/水印；树形无畸形（断枝/歪干）
 - [ ] credits.txt 留档完整
