@@ -1,0 +1,42 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Solstice card game · combo definitions",
+  "description": "卡桌组合定义唯一真源：卡牌集合 → 词条/事件/装饰特效。与 card.schema.json 配套，随内容包分发。",
+  "type": "object",
+  "required": ["combos"],
+  "additionalProperties": false,
+  "properties": {
+    "combos": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "cards", "effect"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string", "pattern": "^combo\\.[a-z0-9-]+$" },
+          "name": { "$ref": "#/definitions/i18n" },
+          "cards": { "type": "array", "minItems": 2, "items": { "type": "string" }, "description": "触发的卡牌 id 集合（须同时摆上卡桌）" },
+          "season": { "enum": ["spring", "summer", "autumn", "winter", "all"], "description": "限定季节（缺省 all）" },
+          "effect": {
+            "type": "object",
+            "required": ["kind"],
+            "additionalProperties": false,
+            "properties": {
+              "kind": { "enum": ["yield", "event", "deco"], "description": "yield=墨料产出加成 | event=触发事件 | deco=纯装饰特效" },
+              "value": { "type": "number", "description": "yield 加成系数（如 0.10 = +10%）" },
+              "text": { "$ref": "#/definitions/i18n", "description": "词条文案（卡桌气泡/图鉴展示）" },
+              "eventId": { "type": "string", "description": "kind=event 时的事件 id" }
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "i18n": {
+      "type": "object",
+      "required": ["zh", "en"],
+      "properties": { "zh": { "type": "string" }, "en": { "type": "string" } }
+    }
+  }
+}
