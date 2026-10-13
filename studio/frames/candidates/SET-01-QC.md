@@ -99,3 +99,18 @@ Copy-Item studio\frames\candidates\S1\mat-snow_v1.png studio\frames\materials\sn
   （`pack.py` 位于素材机域内，若要素材机补，下一轮可做）。
 - 素材入库内容：`studio/frames/candidates/S1/*.png`（12 张） + `studio/jobs/set-01-materials.json`
   + `studio/tools/{gen,seamless,finish}.py` + `studio/tools/README.md`。
+
+## 7. ⚠️ 上游变更提示（本轮收尾时发现，不影响本轮产出）
+
+本轮生产期间，代码机推送了方向转换提交 `867cec9`：仓库转向**卡牌游戏**，
+`README.md` 顶部已加提示，Solstice 场景引擎归档到分支 `archive/solstice-scene-engine`，
+文档移入 `docs/archive/`（`DESIGN-solstice-v5.4.md`、`PACKS_GUIDE-solstice.md`、
+`STRUCTURE-solstice.md`），`docs/DESIGN.md` 改写为卡牌游戏 v0.1 骨架。
+
+现状与影响：
+
+- `studio/contract/**`（含 SET-00…03 与本任务书）**仍留在 main 上**，未随文档归档 →
+  本报告与这批地形材质按仍生效的任务书产出，可用，但**是否继续跑素材机需用户裁决**；
+- 素材机的域边界原本以 `docs/STRUCTURE.md` §5 为准，该文件现已被归档改名，
+  **规则指向失效**：需要代码机在卡牌主线重建一份结构约定，或明确素材机停跑；
+- 本轮未新建任何任务书、未改 `docs/**`、`shared/**`、`app/js/**`，不越域。
