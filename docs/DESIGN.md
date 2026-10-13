@@ -1,6 +1,6 @@
 # Solstice 设计文档
 
-> 版本：**v5（2026-10-12）** · 状态：**需求基线 + 技术方案定稿**；M1 简笔画场景开发中
+> 版本：**v5.2（2026-10-13）** · 状态：**需求基线 + 技术方案定稿**；M1 简笔画场景开发中；素材生产 = 混合分层路线（§2.5）；UI 游戏化 + Actor 协议落地（§2.8）
 > 定位一句话：**桌面 3D 场景搭建游戏**——玩家用风格统一的元素组合出随昼夜/天气/季节变化的"活场景"，内含壁纸模式与图片素材库等功能模块
 > 技术栈（锁定）：**TypeScript 全栈 = Tauri 2 壳 + Babylon.js 3D + 程序化 2D/着色器背景**；素材 = 程序化 + CC0 双源 + 图片素材库
 > 仓库 github.com/quoteZZZ/solstice
@@ -22,9 +22,10 @@
 | 标准 | 保证手段 |
 |---|---|
 | 风格化 | StyleSystem：渲染器强制一致；多风格预设（简笔画/卡通/水彩/写实）一键切换 |
-| 高清 | 3D/矢量分辨率无关；顶点色无贴图；AA + DPR 渲染 |
+| 高清 | 3D/矢量分辨率无关；顶点色无贴图；AA + DPR 渲染；图片素材源图 ≥2048px |
+| **优美** | **混合分层素材线（§2.5）**：云端顶级模型整图直出远景 + 目标帧合同锁美术基准 + 渲染氛围层（LUT/雾/辉光） |
 | 灵动 | 代码层：风摆着色器、骨骼动画、粒子、时辰联动 |
-| 免费快速 | 程序化 + CC0 双源（Quaternius/Kenney）+ 图片素材库 |
+| 快速起量 | 程序化 + CC0 双源（**v5.1 降级为开发期占位资产**）+ 图片素材库 |
 
 ### 0.4 功能模块总表
 | # | 模块 | 里程碑 | 说明 |
@@ -67,21 +68,27 @@
 - 昼夜：内核夜晚系数驱动纸色/墨色切换 + 星月 + 全局压暗
 - 一切元素**程序化 2D 绘制，无图片**
 
-### 1.3 交互规格（操作组件清单——不可缺失）
-| 组件 | 状态 |
-|---|---|
-| 信息中枢（唯一悬浮件：时间/天气/–✎↺⚙） | ✅ |
-| 元素选中 Gizmo / 拖拽 / 缩放手柄 | ✅（M1 补湖泊/马群命中区） |
-| 右键菜单 + 圆盘选择器（变体/天气/预设/添加素材） | ✅ |
-| 设置中心（插件 settingsGroups 生成，双语） | ✅ |
-| 卡片三态（湖泊/马群/星空… 跟随/强制/隐藏） | M1 内实现 |
+### 1.3 交互规格（操作组件清单——不可缺失，v5.2 游戏化定稿）
+| 组件 | 归属 | 状态 |
+|---|---|---|
+| **底部游戏 Dock**（玩法动词：天气/时间/搭建/伙伴/场景/编辑/设置；按钮注册制，插件可贡献） | ui/hud.js | ✅ |
+| Dock 纸签弹出面板（天气五态+强度 / 时辰模式+拨盘 / 元素架 / 场景簿） | ui/hud.js | ✅ |
+| **元素架**（物品栏骨架：自然/草木分组，树四季缩略图；M3 拖放放置的入口） | ui/hud.js | ✅ 骨架 |
+| 伙伴面板（马群显隐+数量；M4 宠物入口占位） | ui/hud.js | ✅ |
+| 场景簿（3 槽保存/读取快照：环境+全部卡片与 Actor 状态） | kernel.scenes | ✅ |
+| 信息纸签（时间/日期/天气，右下角小纸签，可收缩；不再承担控制职能） | plugins/info.js | ✅ 降级 |
+| 设置中心**拆两层**：玩家层（语言/亮度/编辑/壁纸/恢复）+ 开发者层（视差/FPS，仅 `?debug=1`） | ui/panel.js | ✅ |
+| 元素选中 Gizmo / 拖拽 / 缩放手柄 / 右键菜单 / 圆盘选择器 | ui/editor.js | ✅（马群可点击，不拖拽） |
+| **Actor 互动**：点击马群 → respond 行为（跳跃嘶鸣），`ctx.emit('actor:click')` 协议 | editor+plugin | ✅ |
+| 卡片/Actor 三态（湖泊/马群/星空… 跟随/强制/隐藏） | kernel | ✅（湖泊元素待实现） |
+| **纸墨主题**：UI 浮层统一纸底/墨线/印章红令牌，随场景昼夜切换（body.night） | index.html 令牌 | ✅ |
 
 ### 1.4 验收清单
-- [ ] 六元素齐备且为简笔画风格
+- [ ] 六元素齐备且为简笔画风格（缺：**湖泊、草原**）
 - [ ] 昼夜循环全场景联动
-- [ ] 马群奔跑动画 + 巡游
-- [ ] 湖泊/马群卡片可三态切换
-- [ ] 中枢/圆盘/菜单/设置中心全部可用
+- [x] 马群奔跑动画 + 巡游（wander/gallop 状态机 ✅；**马侧影第一版偏简，待按 §1.1 规格[身/颈/鬃/尾/四腿]重画**）
+- [ ] 湖泊/马群卡片可三态切换（马群 ✅，湖泊元素未实现）
+- [x] Dock/圆盘/菜单/设置中心全部可用
 - [ ] 挂机功耗达标（30fps 门控）
 
 ---
@@ -92,8 +99,9 @@
 ```
 ┌─ 壳（T1）：Tauri 2 —— 窗口/托盘/Steam（壁纸模式=F4 嵌入能力）─┐
 │                                                                │
-│  ui/      信息中枢 · 设置中心 · 场景编辑器（圆盘/Gizmo/菜单）    │
-│  plugins/ base · mountains · weather · trees · meadow · presets │
+│  ui/      游戏 HUD（Dock+纸签面板） · 设置中心（玩家/开发者两层） │
+│           · 场景编辑器（圆盘/Gizmo/菜单） · 信息纸签              │
+│  plugins/ base · mountains · weather · trees · horses · presets │
 │           · info · （图片素材库 F5 → 元素提供方之一）            │
 │  core/    composer（WebGL 程序化后端）                          │
 │           sketch（简笔画 2D 后端）                               │
@@ -109,24 +117,25 @@
 - 后端契约：`init() / frame(st, t)`，吃同一份 st（太阳/卡片/天气/夜晚系数），编辑器命中区由后端暴露几何（lakeBox/horseBand）
 - 新风格 = 新后端或后端内的预设分支，**元素与交互零改动**
 
-### 2.3 目录规范（红线：新文件必须归位）
+### 2.3 目录规范（红线：新文件必须归位；2026-10-13 已重组为 app/）
 ```
-src/wallpaper/
-├─ index.html            # 入口：样式 + 画布宿主 + 脚本装配
+app/
+├─ index.html            # 入口：纸墨主题令牌 + 画布宿主 + 脚本装配
 ├─ js/
-│  ├─ kernel.js          # 微内核：i18n/存储/上下文总线/注册表+仲裁/配置S
+│  ├─ kernel.js          # 微内核：i18n/存储/上下文总线/注册表(cards+actors)/场景簿/配置S
 │  ├─ icons.js           # Lucide 图标（ISC）
 │  ├─ core/              # 渲染后端
 │  │  ├─ composer.js     # WebGL 程序化后端 + 主循环指挥
 │  │  └─ sketch.js       # 简笔画 2D 后端（M1）
 │  ├─ ui/                # 交互组件
-│  │  ├─ panel.js        # 设置中心
+│  │  ├─ hud.js          # 游戏 HUD：底部 Dock（注册制）+ 纸签弹出面板
+│  │  ├─ panel.js        # 设置中心（玩家层/开发者层）
 │  │  └─ editor.js       # 场景编辑器（圆盘/Gizmo/菜单/工具）
 │  ├─ plugins/           # 内容插件（官方自举）
-│  │  ├─ base.js mountains.js weather.js trees.js meadow.js presets.js info.js
+│  │  ├─ base.js mountains.js weather.js trees.js horses.js presets.js info.js
 │  └─ main.js            # 装配启动
 └─ assets/               # 模型/图片素材库（F5）
-tools/                   # 资产脚本（make_assets / make_tree_gl / spike_workerw）
+tools/                   # 资产脚本（pack_builder / target-frames / spike_workerw）
 docs/                    # DESIGN / PACKS_GUIDE
 ```
 
@@ -134,18 +143,27 @@ docs/                    # DESIGN / PACKS_GUIDE
 ```
 S = { lang, style:'default'|'sketch', timeMode, lockedHour, weather, weatherI,
       par, fps, dim, preset, editor,
-      cards: { luminary, clouds, stars, mountains, rain, tree, lake, horses, … },
-      info: {…中枢}, }
+      cards: { luminary, clouds, stars, mountains, rain, tree, horses{pref,count}, … },
+      info: {…纸签}, }
+K.scenes = { slots:3, snapshot(), save(i), load(i), del(i), list() }   # 场景簿：环境+全部卡片/Actor 快照 → lw.scene.v1.<i>
 存储 lw.cfg.v1（v1 键自动迁移）+ 插件 ns
 ```
 
-### 2.5 素材体系（三类并存，F5 落地）
-| 类型 | 来源 | 风格统一手段 |
+### 2.5 素材体系（混合分层路线，v5.1 定稿）
+> **裁决记录**：2026-10-13 用户确认"CC0 双源 + 元素级 AI 生图产出简陋难看"，素材生产切换为**混合分层路线**（方案 A）。M1 简笔画线不受影响（程序化，独立风格线）。
+
+| 层 | 生产方式 | 风格统一手段 |
 |---|---|---|
-| 程序化 | 代码绘制（sky/mtn/sketch 全场景） | 渲染器即风格 |
-| 3D 低模 | CC0 双源 → AI 3D → 工坊 | flat-shading + 调色光照 |
-| **图片** | AI 生成（Pollinations 已打通）/ 用户导入 | **风格化滤镜后处理**（StyleSystem 后端）+ 远景整层用法 |
-图片元素入素材库时登记：来源/许可/适用风格；写实类图片仅入"写实风格"分类。
+| **远景/主视觉** | 云端顶级模型（Nano Banana 2 / Seedream 5.0 Pro / LiblibAI）**整图直出** 16:9 ≥4K → 深度带拆层（3–5 层）+ Depth Anything 深度图 | 目标帧合同 + 参考图锁风格 |
+| **前景/交互元素** | 本地 FLUX klein 4B（5060 8GB fp8 可跑）sprite 化：单图生成 → BiRefNet 抠图 → 透明 PNG | TF01 参考图（垫图/IP-Adapter）+ 统一中性顶光 + 运行期令牌 LUT 调色 |
+| **天气/昼夜** | **不重绘素材**：色彩分级 LUT + 光照叠加层 + 程序化粒子 | 渲染器即风格 |
+| 程序化 | 代码绘制（简笔画线/占位） | 渲染器即风格 |
+| 3D 低模 | CC0 双源（Quaternius/Kenney）——**降级为开发期占位与工具资产** | flat-shading + 调色光照 |
+
+**公共环节（红线）**：
+1. **目标帧合同**：优美线素材开工前必须先有经用户裁决锁定的目标帧（8 张关键帧，`tools/prompts/target-frames.md`）；成图与目标帧显著偏离 = 退回。TF01 兼作黄金帧基准。
+2. **渲染氛围层**：色彩分级 LUT、雾、太阳光辉、辉光进正式管线——素材只负责造型，氛围由渲染承担。
+3. 图片元素入素材库登记来源/许可/适用风格；素材留档 prompt+来源，备 Steam AI 披露审查。
 
 ### 2.6 壁纸模式（F4）实现要点
 - 机制已验证（tools/spike_workerw.ps1）：WebView2 窗口 → WS_CHILD → SetParent
@@ -162,12 +180,31 @@ S = { lang, style:'default'|'sketch', timeMode, lockedHour, weather, weatherI,
 | WorkerW 嵌入机制（PowerShell 复现） | ✅ 机制验证通过（含 Win11 Progman 回退）；Tauri 集成待 F4 阶段 |
 | steamworks 插件 | ⏳ F4/T1.3 |
 
+### 2.8 Actor 协议与游戏 HUD（v5.2 定稿，2026-10-13）
+> **裁决背景**：用户多次纠偏"本质游戏不是壁纸"，且后续要扩展可操作、可动的桌面宠物类功能。图层卡片模型撑不起交互实体，故升级协议；**游戏窗口为主形态，壁纸 = 场景的一种输出形态**（WorkerW 机制不变）。
+
+**Actor 协议**（实体 = 卡片的演进超集，向后兼容）：
+- 插件 manifest 声明 `actors:[{ id, interactive, behaviors:['wander','gallop','respond',…] }]`
+- 状态同存 `S.cards[id]`（pref 三态/参数），`registry.cards()` 合并两者 → 编辑器右键/显隐/设置中心**对 Actor 一视同仁**；`registry.actors()` 为专视图
+- 交互事件总线：`ctx.emit('actor:click', {id, index})` —— 点击回应由插件自己实现行为；宠物 M4、蝴蝶、鸟全部走同一协议，**这就是功能扩展的插槽**
+- 首个参考实现：`plugins/horses.js`（wander 漫步 / gallop 奔跑 / respond 被点击跳跃；2D canvas 叠加渲染，命中矩形写 `st.horsesRects` 供编辑器）
+
+**游戏 HUD**（ui/hud.js，壁纸态 `?ui=0` 整体不渲染）：
+- 底部 Dock 按钮**注册制** `K.hud.add({id, icon, labelKey, pop|fn, order})`，默认七键：天气/时间/搭建/伙伴/场景/编辑/设置；插件可贡献按钮（宠物插件注册"伙伴"键的占位已留）
+- 弹出面板 = 纸签 popover（单例、点外关闭）；元素架 = 物品栏骨架（分类分组 + 缩略图），M3 拖放放置的入口
+- 场景簿 `K.scenes`：场景 = 环境(天气/时辰/亮度/预设) + 全部卡片与 Actor 状态，3 槽快照存 `lw.scene.v1.<i>` —— 核心循环②"保存自己的场景"的一级落地，也是工坊 UGC 的单元
+
+**纸墨主题**（与 M1 简笔画场景同一视觉语言）：
+- CSS 令牌：纸 `--paper`（昼 `#fbf6ea`/夜 `#1e263a`）、墨 `--ink`（昼 `#3a342c`/夜 `#dee8f5`）、印章红 `--seal:#b5432f`、点缀 `--acc` 随天空顶色
+- 全部浮层（Dock/纸签/面板/圆盘/菜单/Gizmo）统一令牌 + 衬线标题；`body.night` 由信息纸签每帧按 `st.night` 切换，0.8s 过渡
+- 设置中心拆两层：玩家层常显；`dev:true` 的工程参数（视差/FPS）仅 `?debug=1` 渲染
+
 ---
 
 ## 3. 里程碑
 | 里程碑 | 内容 | 状态 |
 |---|---|---|
-| **M1** | 简笔画场景（§1）+ 交互组件全量 | 🔄 进行中 |
+| **M1** | 简笔画场景（§1）+ 交互组件全量 | 🔄 进行中——交互层 ✅；剩余：**湖泊/草原元素**、**马侧影重画**（§1.4） |
 | M2 | TS 工程化（esbuild/Vite）+ Babylon 元素入正式管线 + 图片素材库 F5 v0 | 待 M1 验收 |
 | M3 | 场景搭建器（放置/吸附/存档） | — |
 | M4 | 宠物伴侣 | — |
@@ -185,4 +222,6 @@ S = { lang, style:'default'|'sketch', timeMode, lockedHour, weather, weatherI,
 - v3：web 壁纸原型（微内核+插件、三态冲突、双画布）——现役代码
 - v4.0：Godot 4 + C# 方案——经引擎对比后否决（用户语言路线）
 - v4.1：TS 全栈定稿；简笔画场景包"AI 整图拆层"管线存档（路线 B / 照片级远景时启用）
+- v5.1（2026-10-13）：素材生产定稿**混合分层路线**（远景整图分层 + 前景 sprite + 目标帧合同 + 渲染氛围层）；CC0 双源降级为占位资产。见 §2.5、`tools/prompts/target-frames.md`、`tools/pack_builder.py`
+- v5.2（2026-10-13）：**UI 游戏化 + Actor 协议**——游戏为主壁纸为输出；Dock/纸签面板/元素架/场景簿落地；马群成为首个交互 Actor（点击回应）；纸墨主题令牌；设置中心拆玩家/开发者两层。见 §1.3、§2.8
 - WorkerW / Pollinations / 图片包管线脚本：`tools/`
