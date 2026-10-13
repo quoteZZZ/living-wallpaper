@@ -25,7 +25,14 @@ Usage (PowerShell), with ComfyUI already listening (see studio/tools/README.md):
   python studio/tools/gen.py --prompt "..." --negative "blurry, lowres" `
     --out studio/work/oak.png --model flux-2-klein-base-4b-fp8.safetensors --cfg 5 --steps 20
 
-Batch file (JSON list, each entry = kwargs for one render):
+Reference / style-lock mode (FLUX.2 edit branch: the ref is VAE-encoded and
+chained into the conditioning via ReferenceLatent, matching the official
+`image_flux2_klein_image_edit_4b_distilled` template):
+  python studio/tools/gen.py --prompt "..." --out studio/work/rock.png `
+    --ref studio/frames/selected/S1.png --ref-crop 240,480,640,640
+
+Batch file (JSON list, each entry = kwargs for one render, `ref`/`ref_crop`
+included):
   python studio/tools/gen.py --batch studio/jobs/target-frames.json
 
 Upscale an existing image to the frame spec (1920x1080 -> 3840x2160):
@@ -114,6 +121,79 @@ def build_graph(prompt, negative, model, clip, vae, width, height, steps, seed, 
     return graph
 
 
+def parse_crop(text):
+    """'x,y,w,h' -> (x, y, w, h)."""
+    if text is None:
+        return None
+    if isinstance(text, (list, tuple)):
+        return tuple(int(v) for v in text)
+    parts = [p.strip() for p in str(text).split(",")]
+    if len(parts) != 4:
+        raise ValueError(f"--ref-crop must be x,y,w,h, got {text!r}")
+    return tuple(int(p) for p in parts)
+
+
+def build_edit_graph(prompt, negative, model, clip, vae, width, height, steps, seed,
+                     cfg, filename_prefix, ref_name, ref_crop=None):
+    """Reference-guided graph (style lock), per the official Klein edit template."""
+    lw, lh = snap16(width), snap16(height)
+    graph = {
+        "70": {"class_type": "UNETLoader",
+               "inputs": {"unet_name": model, "weight_dtype": "default"}},
+        "71": {"class_type": "CLIPLoader",
+               "inputs": {"clip_name": clip, "type": "flux2"}},
+        "72": {"class_type": "VAELoader", "inputs": {"vae_name": vae}},
+        "80": {"class_type": "LoadImage", "inputs": {"image": ref_name}},
+        "83": {"class_type": "VAEEncode",
+               "inputs": {"vae": ["72", 0]}},
+        "66": {"class_type": "EmptyFlux2LatentImage",
+               "inputs": {"width": lw, "height": lh, "batch_size": 1}},
+        "62": {"class_type": "Flux2Scheduler",
+               "inputs": {"steps": steps, "width": lw, "height": lh}},
+        "61": {"class_type": "KSamplerSelect", "inputs": {"sampler_name": "euler"}},
+        "73": {"class_type": "RandomNoise", "inputs": {"noise_seed": seed}},
+        "74": {"class_type": "CLIPTextEncode",
+               "inputs": {"text": prompt, "clip": ["71", 0]}},
+        "76": {"class_type": "ConditioningZeroOut",
+               "inputs": {"conditioning": ["74", 0]}},
+        "65": {"class_type": "VAEDecode",
+               "inputs": {"samples": ["64", 0], "vae": ["72", 0]}},
+    }
+    ref_src = ["80", 0]
+    if ref_crop:
+        x, y, cw, chh = ref_crop
+        graph["81"] = {"class_type": "ImageCrop",
+                       "inputs": {"image": ref_src, "width": cw, "height": chh,
+                                  "x": x, "y": y}}
+        ref_src = ["81", 0]
+    graph["82"] = {"class_type": "ImageScale",
+                   "inputs": {"image": ref_src, "upscale_method": "lanczos",
+                              "width": lw, "height": lh, "crop": "disabled"}}
+    graph["83"]["inputs"]["pixels"] = ["82", 0]
+    graph["77"] = {"class_type": "ReferenceLatent",
+                   "inputs": {"conditioning": ["74", 0], "latent": ["83", 0]}}
+    graph["78"] = {"class_type": "ReferenceLatent",
+                   "inputs": {"conditioning": ["76", 0], "latent": ["83", 0]}}
+    graph["63"] = {"class_type": "CFGGuider",
+                   "inputs": {"model": ["70", 0], "positive": ["77", 0],
+                              "negative": ["78", 0], "cfg": cfg}}
+    graph["64"] = {"class_type": "SamplerCustomAdvanced",
+                   "inputs": {"noise": ["73", 0], "guider": ["63", 0],
+                              "sampler": ["61", 0], "sigmas": ["62", 0],
+                              "latent_image": ["66", 0]}}
+
+    images = ["65", 0]
+    if (lw, lh) != (width, height):
+        graph["67"] = {"class_type": "ImageScale",
+                       "inputs": {"image": images, "upscale_method": "lanczos",
+                                  "width": width, "height": height,
+                                  "crop": "disabled"}}
+        images = ["67", 0]
+    graph["9"] = {"class_type": "SaveImage",
+                  "inputs": {"images": images, "filename_prefix": filename_prefix}}
+    return graph
+
+
 def post_json(url, payload):
     data = json.dumps(payload).encode("utf-8")
     req = urllib.request.Request(url, data=data,
@@ -180,12 +260,25 @@ def run_graph(server, graph, out, timeout=900, quiet=False, note=""):
 
 def render(server, prompt, out, negative="", model=DEFAULT_MODEL, clip=DEFAULT_CLIP,
            vae=DEFAULT_VAE, width=1024, height=1024, steps=4, seed=42, cfg=1,
-           timeout=900, quiet=False):
-    """Run one generation; returns the saved Path."""
-    graph = build_graph(prompt, negative, model, clip, vae, width, height, steps,
-                        seed, cfg, Path(out).stem)
-    return run_graph(server, graph, out, timeout=timeout, quiet=quiet,
-                     note=f"({width}x{height}, steps={steps}, seed={seed})")
+           timeout=900, quiet=False, ref=None, ref_crop=None):
+    """Run one generation; returns the saved Path.
+
+    With `ref` set this becomes the FLUX.2 edit branch (reference image guides
+    the conditioning -> style lock); `ref_crop` = (x, y, w, h) region of it.
+    """
+    prefix = Path(out).stem
+    if ref:
+        ref_name = upload_image(server, str(ref))
+        graph = build_edit_graph(prompt, negative, model, clip, vae, width, height,
+                                 steps, seed, cfg, prefix, ref_name,
+                                 parse_crop(ref_crop))
+        note = (f"(edit ref={Path(str(ref)).name}, {width}x{height}, "
+                f"steps={steps}, seed={seed})")
+    else:
+        graph = build_graph(prompt, negative, model, clip, vae, width, height, steps,
+                            seed, cfg, prefix)
+        note = f"({width}x{height}, steps={steps}, seed={seed})"
+    return run_graph(server, graph, out, timeout=timeout, quiet=quiet, note=note)
 
 
 def png_size(path):
@@ -257,6 +350,86 @@ def upscale(server, src, out, model=DEFAULT_UPSCALE, scale=2, max_edge=3840,
     return out_path
 
 
+def build_seam_fix_graph(image_name, prompt, negative, model, clip, vae, w, h, band,
+                         steps, seed, cfg, filename_prefix):
+    """Inpaint the centre cross band of an already-rolled tile.
+
+    ComfyUI core has no seamless node, so studio/tools/seamless.py rolls the
+    render by half (wrap continuity by construction) and leaves a ridge where
+    the old borders met.  This graph masks that ridge, re-denoises the band from
+    noise with the rest of the tile as context and composites it back, so the
+    tile borders stay untouched.
+    """
+    graph = {
+        "70": {"class_type": "UNETLoader",
+               "inputs": {"unet_name": model, "weight_dtype": "default"}},
+        "71": {"class_type": "CLIPLoader",
+               "inputs": {"clip_name": clip, "type": "flux2"}},
+        "72": {"class_type": "VAELoader", "inputs": {"vae_name": vae}},
+        "80": {"class_type": "LoadImage", "inputs": {"image": image_name}},
+        "91": {"class_type": "SolidMask",
+               "inputs": {"value": 0.0, "width": w, "height": h}},
+        "92": {"class_type": "SolidMask",
+               "inputs": {"value": 1.0, "width": band, "height": h}},
+        "93": {"class_type": "SolidMask",
+               "inputs": {"value": 1.0, "width": w, "height": band}},
+        "94": {"class_type": "MaskComposite",
+               "inputs": {"destination": ["91", 0], "source": ["92", 0],
+                          "x": w // 2 - band // 2, "y": 0, "operation": "add"}},
+        "95": {"class_type": "MaskComposite",
+               "inputs": {"destination": ["94", 0], "source": ["93", 0],
+                          "x": 0, "y": h // 2 - band // 2, "operation": "add"}},
+        "86": {"class_type": "VAEEncodeForInpaint",
+               "inputs": {"pixels": ["80", 0], "vae": ["72", 0], "mask": ["95", 0],
+                          "grow_mask_by": 8}},
+        "62": {"class_type": "Flux2Scheduler", "inputs": {"steps": steps,
+                                                          "width": w, "height": h}},
+        "61": {"class_type": "KSamplerSelect", "inputs": {"sampler_name": "euler"}},
+        "73": {"class_type": "RandomNoise", "inputs": {"noise_seed": seed}},
+        "74": {"class_type": "CLIPTextEncode", "inputs": {"text": prompt,
+                                                          "clip": ["71", 0]}},
+        "76": {"class_type": "ConditioningZeroOut",
+               "inputs": {"conditioning": ["74", 0]}},
+        "87": {"class_type": "VAEEncode",
+               "inputs": {"pixels": ["80", 0], "vae": ["72", 0]}},
+        "77": {"class_type": "ReferenceLatent",
+               "inputs": {"conditioning": ["74", 0], "latent": ["87", 0]}},
+        "78": {"class_type": "ReferenceLatent",
+               "inputs": {"conditioning": ["76", 0], "latent": ["87", 0]}},
+        "60": {"class_type": "CFGGuider",
+               "inputs": {"model": ["70", 0], "positive": ["77", 0],
+                          "negative": ["78", 0], "cfg": cfg}},
+        "64": {"class_type": "SamplerCustomAdvanced",
+               "inputs": {"noise": ["73", 0], "guider": ["60", 0],
+                          "sampler": ["61", 0], "sigmas": ["62", 0],
+                          "latent_image": ["86", 0]}},
+        "65": {"class_type": "VAEDecode",
+               "inputs": {"samples": ["64", 0], "vae": ["72", 0]}},
+        "66": {"class_type": "ImageCompositeMasked",
+               "inputs": {"destination": ["80", 0], "source": ["65", 0],
+                          "x": 0, "y": 0, "resize_source": False, "mask": ["95", 0]}},
+        "9": {"class_type": "SaveImage",
+              "inputs": {"images": ["66", 0], "filename_prefix": filename_prefix}},
+    }
+    if negative:
+        graph["75"] = {"class_type": "CLIPTextEncode",
+                       "inputs": {"text": negative, "clip": ["71", 0]}}
+        graph["78"]["inputs"]["conditioning"] = ["75", 0]
+    return graph
+
+
+def seam_fix(server, src, out, prompt, band=128, steps=4, seed=707,
+             model=DEFAULT_MODEL, clip=DEFAULT_CLIP, vae=DEFAULT_VAE, cfg=1.0,
+             negative="", timeout=900, quiet=False):
+    """Rebuild the ridge of a rolled tile in place; returns the saved Path."""
+    w, h = png_size(src)
+    name = upload_image(server, src)
+    graph = build_seam_fix_graph(name, prompt, negative, model, clip, vae, w, h,
+                                 band, steps, seed, cfg, Path(out).stem)
+    return run_graph(server, graph, out, timeout=timeout, quiet=quiet,
+                     note=f"(seam fix {w}x{h}, band={band}, steps={steps})")
+
+
 def job_from_entry(entry, server, base_dir):
     """Turn one --batch JSON entry into render() kwargs."""
     out = Path(entry["out"])
@@ -282,6 +455,9 @@ def main() -> int:
     ap.add_argument("--steps", type=int, default=4)
     ap.add_argument("--seed", type=int, default=42)
     ap.add_argument("--cfg", type=float, default=1.0)
+    ap.add_argument("--ref", help="reference image for style lock (FLUX.2 edit branch)")
+    ap.add_argument("--ref-crop", dest="ref_crop",
+                    help="region of --ref to use, as x,y,w,h")
     ap.add_argument("--timeout", type=int, default=900, help="seconds to wait for one image")
     ap.add_argument("--batch", help="JSON file: list of render() kwargs incl. out")
     ap.add_argument("--from", dest="src", help="upscale mode: source PNG")
@@ -293,6 +469,14 @@ def main() -> int:
     ap.add_argument("--max-edge", type=int, default=3840,
                     help="downscale the result to this long edge (0 = keep)")
     ap.add_argument("--check", action="store_true", help="print GPU/VRAM and exit")
+    ap.add_argument("--seam-fix", dest="seam_fix",
+                    help="seam-fix mode: rolled tile to rebuild (paired with --to)")
+    ap.add_argument("--band", type=int, default=128,
+                    help="seam-fix band width in px (default 128)")
+    ap.add_argument("--seam-prompt", dest="seam_prompt",
+                    help="seam-fix mode: prompt describing the same material")
+    ap.add_argument("--seam-steps", dest="seam_steps", type=int, default=4,
+                    help="seam-fix denoise steps (default 4 = full schedule)")
     args = ap.parse_args()
 
     if args.check:
@@ -304,6 +488,19 @@ def main() -> int:
         print(f"[ok] {dev['name']}")
         print(f"     vram_free {dev['vram_free'] / 1024**2:.0f} MB / "
               f"{dev['vram_total'] / 1024**2:.0f} MB")
+        return 0
+
+    if args.seam_fix:
+        if not (args.dst and args.seam_prompt):
+            ap.error("seam-fix mode needs --seam-fix <in>, --to <out> and --seam-prompt")
+        try:
+            seam_fix(args.server, args.seam_fix, args.dst, args.seam_prompt,
+                     band=args.band, steps=args.seam_steps, seed=args.seed,
+                     model=args.model, clip=args.clip, vae=args.vae, cfg=args.cfg,
+                     timeout=args.timeout)
+        except Exception as exc:  # noqa: BLE001
+            print(f"[err] {exc}")
+            return 1
         return 0
 
     if args.src or args.dst:
@@ -342,7 +539,7 @@ def main() -> int:
         render(args.server, args.prompt, args.out, negative=args.negative,
                model=args.model, clip=args.clip, vae=args.vae, width=args.width,
                height=args.height, steps=args.steps, seed=args.seed, cfg=args.cfg,
-               timeout=args.timeout)
+               timeout=args.timeout, ref=args.ref, ref_crop=args.ref_crop)
     except Exception as exc:  # noqa: BLE001 - single failure should exit non-zero
         print(f"[err] {exc}")
         return 1

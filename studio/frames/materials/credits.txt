@@ -1,0 +1,1 @@
+FLUX.2-klein 4B fp8 (local ComfyUI) + ComfyUI mask inpaint (seam band rebuild) | prompt: studio/contract/sets/SET-01 | 2026-10-13
