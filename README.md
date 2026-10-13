@@ -1,56 +1,48 @@
-# 至日 Solstice
+# Solstice
 
-会"活着"的 Windows 动态壁纸：深度视差 + 真实时辰光照 + 天气同步 + 精灵宠物。
-AI 仅用于离线生成素材，运行时零 AI 调用。
+**桌面 3D 场景搭建游戏**：用风格统一的元素组合出随昼夜/天气/季节变化的活场景，宠物相伴；
+内含**壁纸模式**（把你的场景设为桌面）与**图片素材库**等功能模块。
+运行时零 AI 调用；素材 = 程序化 + CC0 双源 + 图片素材库（无图元素路线）。
 
-- **设计文档（必读）**：[docs/DESIGN.md](docs/DESIGN.md)
-- 路线：T0 原型验证（已完成）→ T1 Steam 独立应用（Tauri + 创意工坊）→ T2 生态（代码插件沙箱）
-- 当前状态：**T0.4 单一 UI 中枢 + 圆盘选择器 + 文件素材包管线**（见 DESIGN.md §4.8/§4.10/§5.6）
-- **自制素材**：按 [docs/PACKS_GUIDE.md](docs/PACKS_GUIDE.md) 出图，放进 `src/wallpaper/assets/packs/` 即生效——该格式即 Steam 工坊包格式
+- **设计文档（唯一开发依据）**：[docs/DESIGN.md](docs/DESIGN.md)
+- **素材制作/来源**：[docs/PACKS_GUIDE.md](docs/PACKS_GUIDE.md)（官方双源：Quaternius + Kenney，全 CC0）
+- 路线：**M1 简笔画自然场景（进行中）** → M2 工程化 → M3 场景搭建器 → M4 宠物 → T1 桌面化（Tauri + Steam + 壁纸模式）
 
-## 运行 T0 原型
+## 运行
 
-**在线预览（GitHub Pages）**：https://quoteZZZ.github.io/solstice/ —— 任何电脑的浏览器直接打开，无需本地环境。
+本地：`python -m http.server 8642 --directory .` 后访问 `/app/index.html`，
+或直接双击 `app/index.html`（零构建，经典 `<script>` 加载）。
 
-本地运行：直接双击 `src/wallpaper/index.html`，或 `python -m http.server` 后访问。
-
-调试参数（加到 URL 后）：
-
-| 参数 | 说明 | 默认 |
-|---|---|---|
-| `?hour=21.5` | 强制时辰（0-24），绕过系统时钟 | 系统时钟 |
-| `?lat=39.9` | 纬度（决定日出日落与光照曲线） | 39.9 |
-| `?debug=1` | 信息卡显示详细信息，并自动展开设置面板 | 关 |
-| `?fps=60` | 帧率上限 | 30（功耗预算） |
-| `?par=150` | 视差强度 % | 100 |
-| `?ui=0` | 壁纸模式：隐藏面板/编辑器，仅保留画面与信息卡 | 开 |
-| `?nohid=1` | 缩短隐藏页降级渲染间隔（自动化测试用） | 关 |
-
-交互：左上信息中枢是唯一悬浮组件——`⚙` 打开设置中心（按插件分区，中英双语），`✥` 开启编辑模式后可**点击选中卡片、拖拽移动、右下角手柄缩放、双击重置、右键卡片/天空呼出菜单**；更换变体/天气/预设/添加素材均为**圆盘选择器**（DESIGN.md §4.8/§4.10）。
-
-若 `src/wallpaper/assets/scene.png` 与 `depth.png` 存在，自动切换为"图片+深度图"视差模式；否则显示程序化占位场景。
+调试参数：`?hour=21.5`（强制时辰）`?debug=1`（详细信息）`?nohid=1`（测试推帧）`?ui=0`（纯净画面）
 
 ## 目录结构
 
 ```
 solstice/
-├─ docs/DESIGN.md                 # 完整设计文档
-├─ docs/PACKS_GUIDE.md            # 素材制作指南（提示词模板/规格/深度图）
-├─ index.html                     # GitHub Pages 落地页
-└─ src/wallpaper/                 # 壁纸本体（零构建，经典 <script> 加载）
-   ├─ index.html                  # 入口：样式 + DOM 宿主 + 脚本装配
-   ├─ js/kernel.js                # 微内核：i18n / 存储 / 上下文总线 / 注册表+卡槽仲裁
-   ├─ js/composer.js              # 合成器：双通道（全屏程序化 + 前景精灵贴图）
-   ├─ js/panel.js                 # 设置中心：由插件 settingsGroups 自动生成（双语）
-   ├─ js/editor.js                # 场景编辑器：选中/拖拽/缩放/右键/圆盘选择器
-   ├─ js/main.js                  # 启动装配 + WE/Tauri 属性桥
-   ├─ js/plugins/base.js          # official.base      天空光照 + 日月/星空卡 + 界面
-   ├─ js/plugins/mountains.js     # official.mountains 山峦卡（程序化→声明式）
-   ├─ js/plugins/weather.js       # official.weather   晴/多云/雨/雪/雾 + 手动天气
-   ├─ js/plugins/trees.js         # pack.trees         前景树素材包（四季变体）
-   ├─ js/plugins/presets.js       # official.presets   预设（极简/完整/深夜护眼）
-   ├─ js/plugins/info.js          # official.info      信息中枢（唯一悬浮 UI）
-   └─ assets/packs/               # 素材包目录（manifest.json + PNG，见 PACKS_GUIDE）
+├─ docs/                  # DESIGN.md（设计定稿）· PACKS_GUIDE.md（素材指南）
+├─ index.html             # 落地页（GitHub Pages）
+├─ app/                   # 游戏客户端（TS 全栈，零构建）
+│  ├─ index.html          # 入口：样式 + 画布宿主 + 脚本装配
+│  ├─ js/
+│  │  ├─ kernel.js        # 微内核：i18n / 存储 / 上下文总线 / 注册表+卡槽仲裁
+│  │  ├─ icons.js         # 图标库（Lucide, ISC）
+│  │  ├─ core/            # 渲染后端（StyleSystem 挂钩）
+│  │  │  ├─ composer.js   # 程序化 WebGL 后端 + 主循环指挥
+│  │  │  └─ sketch.js     # 简笔画 2D 后端（M1 开发中）
+│  │  ├─ ui/              # 交互组件
+│  │  │  ├─ panel.js      # 设置中心（插件 schema 生成，双语）
+│  │  │  └─ editor.js     # 场景编辑器（选中/圆盘/菜单/工具）
+│  │  ├─ plugins/         # 内容插件（官方自举）
+│  │  │  ├─ base.js mountains.js weather.js trees.js presets.js info.js
+│  │  └─ main.js          # 装配启动 + 属性桥
+│  └─ assets/
+│     ├─ models/          # GLTF 低模（树等）
+│     ├─ images/          # 图片素材库（F5）
+│     └─ packs/           # 主题素材包
+└─ tools/                 # 脚本
+   ├─ assets/             # 资产生成（asset_image.py / asset_tree_glb.py）
+   ├─ spike/              # 已验证机制留档（workerw_embed.ps1）
+   └─ spike_babylon.html  # 双画布验证页
 ```
 
 ## 开发环境与协作约定

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
@@ -8,9 +8,9 @@
   -----------------------------------------------------------------
   文件结构（经典 <script> 顺序加载，零构建、双击可用）：
     js/kernel.js            微内核：i18n/存储/上下文总线/注册表+卡槽仲裁
-    js/composer.js          合成器：WebGL2 双通道（全屏程序化 + 前景精灵）
-    js/panel.js             设置中心：由插件 settingsGroups 自动生成
-    js/editor.js            场景编辑器：选中/拖拽/缩放/右键菜单/工具条（§4.8）
+    js/core/composer.js          合成器：WebGL2 双通道（全屏程序化 + 前景精灵）
+    js/ui/panel.js             设置中心：由插件 settingsGroups 自动生成
+    js/ui/editor.js            场景编辑器：选中/拖拽/缩放/右键菜单/工具条（§4.8）
     js/plugins/base.js      official.base      天空光照 + 日月/星空卡 + 界面
     js/plugins/mountains.js official.mountains 山峦卡（程序化→声明式）
     js/plugins/weather.js   official.weather   云/雨/雪/雾效果 + T0 手动天气
@@ -148,9 +148,9 @@
 
 <script src="js/kernel.js?v=0.4.1"></script>
 <script src="js/icons.js?v=0.4.1"></script>
-<script src="js/composer.js?v=0.4.1"></script>
-<script src="js/panel.js?v=0.4.1"></script>
-<script src="js/editor.js?v=0.4.1"></script>
+<script src="js/core/composer.js?v=0.4.1"></script>
+<script src="js/ui/panel.js?v=0.4.1"></script>
+<script src="js/ui/editor.js?v=0.4.1"></script>
 <script src="js/plugins/base.js?v=0.4.1"></script>
 <script src="js/plugins/mountains.js?v=0.4.1"></script>
 <script src="js/plugins/weather.js?v=0.4.1"></script>
