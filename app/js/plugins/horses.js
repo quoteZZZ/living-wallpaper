@@ -49,18 +49,26 @@
 
   const rnd=Math.random;
   function update(dt){
+    /* 湖泊避让（v5.4 参数化地形）：马不下水，走近湖缘即调头 */
+    const T=S.cards.terrain, lake=(T&&T.pref!=='hide'&&T.lake)?T.lake:null;
+    const lkHalf=lake?(lake.rx*(lake.scale??1)+.04):0;
     for(const h of herd){
       h.phase+=dt*(h.state==='gallop'?9:3.4);
       if(h.state==='wander'){
         h.u+=h.dir*h.speed*dt*(1+h.sc*.3);
         if(h.u<.05){ h.u=.05; h.dir=1; }
         if(h.u>.92){ h.u=.92; h.dir=-1; }
+        if(lake && h.u>lake.x-lkHalf && h.u<lake.x+lkHalf){
+          h.u=K.util.clamp(h.u, lake.x-lkHalf, lake.x+lkHalf);
+          h.dir=h.u<lake.x?-1:1;
+        }
         if(rnd()<dt*.07){ h.state='gallop'; h.stDur=h.stT=1.2+rnd()*1.6; }
       }else{
         h.stT-=dt;
         if(h.state==='gallop'){
           h.u+=h.dir*h.speed*6*dt*(1+h.sc*.3);
           if(h.u<.04||h.u>.93){ h.dir*=-1; h.u=K.util.clamp(h.u,.04,.93); }
+          if(lake && h.u>lake.x-lkHalf && h.u<lake.x+lkHalf){ h.dir*=-1; }
         }
         if(h.state==='respond') h.jump=Math.sin(Math.PI*Math.max(0,1-h.stT/h.stDur))*.32;
         if(h.stT<=0){ h.state='wander'; h.jump=0; }

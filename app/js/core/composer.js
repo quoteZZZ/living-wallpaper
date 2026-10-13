@@ -11,6 +11,7 @@
 (function(){
   const K = window.Solstice;
   const { S, CFG } = K;
+  const NOTREE = new URLSearchParams(location.search).has('notree');   // 调试：隐藏前景树
 
   const canvas = document.getElementById('gl');
   const gl = canvas.getContext('webgl2', { antialias:false, alpha:false, powerPreference:'low-power' });
@@ -44,6 +45,14 @@ uniform vec2  uMtn;                     // x 山峦垂直偏移, y 起伏缩放�
 uniform float uMtnSnow;                 // 山顶积雪 0–1（雪线高度，冬季=1）
 uniform float uCloudOff;                // 云带垂直偏移（编辑器变换）
 uniform sampler2D uScene, uDepth;
+/* 参数化地形（v5.4 §2.9）：近山控制点山脊 + 河流路径 + 湖泊（用户可编辑，存 S.cards.terrain） */
+uniform float uTerrainOn;
+uniform vec2  uRidgePts[6];             // 山脊控制点 (u, v)（uv 空间，u 递增）
+uniform vec2  uRiverPts[5];             // 河流路径控制点（uv 空间，自山上流向湖）
+uniform float uRiverN;                  // 有效路径点数 (2–5)
+uniform float uRiverW;                  // 河宽（suv 单位）
+uniform float uRiverFlow;               // 流速（噪声滚动速度）
+uniform vec4  uLake;                    // 湖：中心 (suv.x, uv.y) + 半径 (rx, ry)
 
 float hash21(vec2 p){ p=fract(p*vec2(123.34,456.21)); p+=dot(p,p+45.32); return fract(p.x*p.y); }
 float vnoise(vec2 p){
@@ -61,6 +70,44 @@ float ridgeH(float u,float fi,float px,float py){
        +.12*exp(-pow((us-.58-fi*.05)*(5.0+fi*.5),2.))*uMtn.y*(1.-fi*.15)
        +.035*fbm(vec2(us*(6.+fi*2.)+fi*31.7, 11.3))*uMtn.y
        +py;
+}
+/* Catmull-Rom：控制点山脊高度（近山层；"拖拽山脊/把山变平"的几何来源） */
+float crY(float t,float p0,float p1,float p2,float p3){
+  return .5*((2.*p1)+(-p0+p2)*t+(2.*p0-5.*p1+4.*p2-p3)*t*t+(-p0+3.*p1-3.*p2+p3)*t*t*t);
+}
+float ridgeCR(float u){
+  float us=clamp(u, uRidgePts[0].x, uRidgePts[5].x);
+  for(int i=0;i<5;i++){
+    float x1=uRidgePts[min(i+1,5)].x;
+    if(us<=x1 || i==4){
+      float x0=uRidgePts[i].x;
+      float t=clamp((us-x0)/max(x1-x0,1e-4),0.,1.);
+      int ia=max(i-1,0), id=min(i+2,5);
+      return crY(t, uRidgePts[ia].y, uRidgePts[i].y, uRidgePts[i+1].y, uRidgePts[id].y);
+    }
+  }
+  return uRidgePts[5].y;
+}
+/* 近山层高度：地形开启=控制点山脊（保留视差/垂直偏移），否则原程序化 fbm */
+float ridgeNear(float u,float px,float py){
+  if(uTerrainOn>.5) return ridgeCR(u-px*.5) + uMtn.x + py;
+  return ridgeH(u,3.,px,py);
+}
+/* 河流：路径折线 SDF（suv 空间保证河宽均匀） */
+float segDist(vec2 p, vec2 a, vec2 b){
+  vec2 pa=p-a, ba=b-a;
+  float h=clamp(dot(pa,ba)/max(dot(ba,ba),1e-6),0.,1.);
+  return length(pa-ba*h);
+}
+float riverD(vec2 p,float aspect){
+  float d=1e3;
+  for(int i=0;i<4;i++){
+    if(float(i)>uRiverN-2.) break;
+    vec2 a=vec2((uRiverPts[i].x-.5)*aspect,   uRiverPts[i].y);
+    vec2 b=vec2((uRiverPts[i+1].x-.5)*aspect, uRiverPts[i+1].y);
+    d=min(d, segDist(p,a,b));
+  }
+  return d;
 }
 float stars(vec2 uv,float t){
   vec2 g=uv*90.; vec2 id=floor(g); float h=hash21(id);
@@ -130,11 +177,12 @@ void main(){
       float d =.35+fi*.2166;
       float px=uMouse.x*uPar*.27*d;
       float py=uMouse.y*uPar*.05*d;
-      float rg=ridgeH(uv.x,fi,px,py);
+      float rg=(fi>2.5 && uTerrainOn>.5)? ridgeNear(uv.x,px,py) : ridgeH(uv.x,fi,px,py);
       float m=smoothstep(rg, rg-.012, uv.y);
       /* 坡向光照：中心差分求坡度，向阳面提亮、背阳面压暗（光带仅限山脊面） */
       float e=.004;
-      float dh=(ridgeH(uv.x+e,fi,px,py)-ridgeH(uv.x-e,fi,px,py))/(2.*e*aspect);
+      float dh=((fi>2.5 && uTerrainOn>.5)? ridgeNear(uv.x+e,px,py)-ridgeNear(uv.x-e,px,py)
+                                        : ridgeH(uv.x+e,fi,px,py)-ridgeH(uv.x-e,fi,px,py))/(2.*e*aspect);
       vec2 N=normalize(vec2(-dh*2.2,1.));
       vec2 Ld=normalize(vec2(uLum.x-psx, max(uLum.y+.5-uv.y,.12)));
       float lit=clamp(dot(N,Ld),0.,1.);
@@ -151,6 +199,36 @@ void main(){
       mc*=mix(1., lit, exp(-(rg-uv.y)*22.)*mix(.35,1.,smoothstep(.25,.85,d)));
       mc=mix(mc, vec3(.88,.91,.96)*(1.-uNight*.55), uSnow*smoothstep(.45,1.,d)*.7);
       col=mix(col,mc,m*.97);
+    }
+  }
+
+  /* 参数化地形水面（v5.4）：河流 + 湖泊——属于地形元素；天气雨雪仍是系统层 */
+  if(uTerrainOn>.5){
+    vec2 sp=vec2(suv.x, uv.y);
+    /* 河流：折线路径水面 + 流动噪声 + 光源碎光 */
+    float rd=riverD(sp,aspect);
+    float riverA=smoothstep(uRiverW, uRiverW*.45, rd);
+    if(riverA>.001){
+      vec3 wc=mix(vec3(.30,.48,.62), vec3(.09,.16,.28), uNight);
+      wc*=.88+.24*fbm(vec2(uv.x*26.-uTime*.30*uRiverFlow, uv.y*55.));
+      wc+=uLumC*.30*uLumA*smoothstep(.80,.95,fbm(vec2(uv.x*40.-uTime*.8, uv.y*80.+uTime*.3)));
+      col=mix(col,wc,riverA*.9);
+      /* 岸缘压暗（墨线感的岸） */
+      col*=1.-.30*smoothstep(uRiverW*1.15,uRiverW*.75,rd)*smoothstep(uRiverW*.60,uRiverW*.90,rd);
+    }
+    /* 湖泊：参数化椭圆水面 + 日/月光带 + 岸缘 */
+    vec2 lp=vec2((suv.x-uLake.x)/uLake.z, (uv.y-uLake.y)/uLake.w);
+    float le=length(lp);
+    float lakeA=smoothstep(1.,.90,le);
+    if(lakeA>.001){
+      vec3 lc=mix(vec3(.26,.44,.58), vec3(.07,.13,.24), uNight);
+      lc*=.90+.20*fbm(vec2(suv.x*20.+uTime*.06, uv.y*36.));
+      col=mix(col,lc,lakeA*.95);
+      float streak=exp(-pow((suv.x-uLum.x)/(uLake.z*.30),2.))
+                   *step(uv.y,uLake.y)*step(uLake.y-uLake.w,uv.y);
+      col+=uLumC*streak*.28*uLumA*(.75+.25*sin(uTime*2.2+uv.y*46.));
+      float rim=smoothstep(.86,.96,le)*smoothstep(1.,.96,le);
+      col=mix(col,col*.55,rim*.8);
     }
   }
 
@@ -222,7 +300,8 @@ void main(){ vec4 c=texture(uT,vU); o=vec4(c.rgb*uTint, c.a); }`;
   for(const n of ['uRes','uTime','uMouse','uPar','uTop','uHor','uLumC','uFog','uAmb',
                   'uStar','uNight','uLum','uLumA','uMode',
                   'uHasStars','uHasMountains','uCloud','uRain','uSnow','uFogA','uDim',
-                  'uMtn','uMtnSnow','uCloudOff','uScene','uDepth'])
+                  'uMtn','uMtnSnow','uCloudOff','uScene','uDepth',
+                  'uTerrainOn','uRidgePts','uRiverPts','uRiverN','uRiverW','uRiverFlow','uLake'])
     U[n]=gl.getUniformLocation(prog,n);
 
   /* ---- 精灵通道资源 ---- */
@@ -442,9 +521,25 @@ void main(){ vec4 c=texture(uT,vU); o=vec4(c.rgb*uTint, c.a); }`;
     gl.uniform2f(U.uMtn,st.mtnDy,st.mtnScale);
     gl.uniform1f(U.uMtnSnow, st.mtnSnow||0);
     gl.uniform1f(U.uCloudOff,st.cloudDy);
+    /* 参数化地形 uniforms（v5.4 §2.9；数据在 S.cards.terrain，随场景簿存档） */
+    gl.uniform1f(U.uTerrainOn, st.terrainOn?1:0);
+    if(st.terrain){
+      const T=st.terrain;
+      const rf=new Float32Array(12);
+      T.ridge.forEach((p,i)=>{ rf[i*2]=p[0]; rf[i*2+1]=p[1]; });
+      gl.uniform2fv(U.uRidgePts,rf);
+      const rp=T.river.pts, rv=new Float32Array(10);
+      rp.forEach((p,i)=>{ rv[i*2]=p[0]; rv[i*2+1]=p[1]; });
+      gl.uniform2fv(U.uRiverPts,rv);
+      gl.uniform1f(U.uRiverN, T.river.on===false ? 0 : rp.length);
+      gl.uniform1f(U.uRiverW,T.river.width);
+      gl.uniform1f(U.uRiverFlow,T.river.flow??1);
+      const a=innerWidth/innerHeight, ls=T.lake.scale??1;
+      gl.uniform4f(U.uLake,(T.lake.x-.5)*a, T.lake.y, T.lake.rx*ls, T.lake.ry*ls);
+    }
     gl.drawArrays(gl.TRIANGLES,0,3);
 
-    drawTree(st,t);                                  // 通道二：前景精灵
+    if(!NOTREE) drawTree(st,t);                      // 通道二：前景精灵
   }
   function loop(now){ schedule(loop); tickFrame(now); }
   function run(build){ buildFn=build; schedule(loop); }

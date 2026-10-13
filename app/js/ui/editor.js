@@ -18,17 +18,25 @@
   let st=null;
   let sel=null, hover=null;
   let drag=null;
+  let terrainHit=null;                          // 命中的地形控制点（terrain.js 经 st.terrainHandles 提供）
   let on=false;
 
   const cssH=()=>innerHeight, cssW=()=>innerWidth;
   const enabled=()=>on && K.CFG.ui && S.editor;
-  const DRAGGABLE=new Set(['luminary','clouds','mountains','tree']);
+  const DRAGGABLE=new Set(['luminary','clouds','mountains','tree','terrain']);
 
   /* ---------- 命中检测（马群 Actor > 前景树 > 日/月 > 云带 > 山峦 > 天空） ---------- */
   let hitIdx=0;                                 // horses 命中第几匹（互动派发用）
   function hitTest(x,y){
     if(!st) return null;
     const W=cssW(), H=cssH();
+    /* 参数化地形控制点手柄（小目标，最高优先级，v5.4 §2.9） */
+    terrainHit=null;
+    if(st.terrainHandles && st.terrainHandles.length){
+      for(const h of st.terrainHandles){
+        if(Math.abs(x-h.x*W)<12 && Math.abs(y-(1-h.y)*H)<12){ terrainHit=h; return 'terrain'; }
+      }
+    }
     /* Actor：马群（可点击回应，不可拖拽） */
     const hr=st.horsesRects;
     if(hr && hr.length){
@@ -74,6 +82,14 @@
       const d=S.cards.mountains.dy;
       return {x:0, y:(0.42-d)*H, w:W, h:H-(0.42-d)*H, round:false};
     }
+    if(id==='terrain' && st && st.terrainHandles && st.terrainHandles.length){
+      /* 地形：单个控制点手柄（命中时）或整体控制点包围盒 */
+      const hs=terrainHit?[terrainHit]:st.terrainHandles;
+      let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;
+      for(const h of hs){ x0=Math.min(x0,h.x); y0=Math.min(y0,h.y); x1=Math.max(x1,h.x); y1=Math.max(y1,h.y); }
+      const pad=terrainHit?14:30;
+      return {x:x0*W-pad, y:(1-y1)*H-pad, w:(x1-x0)*W+pad*2, h:(y1-y0)*H+pad*2, round:false};
+    }
     return null;
   }
   function place(el,b,thin){
@@ -88,7 +104,7 @@
     else{
       const b=bbox(sel);
       if(!b) gizmo.style.display='none';
-      else { place(gizmo,b); handle.style.display=DRAGGABLE.has(sel)?'block':'none'; }
+      else { place(gizmo,b); handle.style.display=(DRAGGABLE.has(sel)&&sel!=='terrain')?'block':'none'; }
     }
     if(!gizmo) return;
     if(!enabled()||!hover||hover===sel||drag){ ghost.style.display='none'; }
@@ -114,6 +130,10 @@
     }
   }
   function resetCard(id){
+    if(id==='terrain'){                          // 地形：整体恢复默认控制点
+      S.cards.terrain=JSON.parse(JSON.stringify(K.DEFAULTS.cards.terrain));
+      K.saveCfg(); return;
+    }
     const c=S.cards[id], d=K.DEFAULTS.cards[id]||{};
     for(const k of ['dx','dy']) if(k in c) c[k]=d[k]??0;
     if('scale' in c) c.scale=d.scale??1;
@@ -266,12 +286,36 @@
       select(target);
       /* Actor 互动：点击马群 → 行为回应（respond 跳跃嘶鸣） */
       if(target==='horses') K.ctx.emit('actor:click',{id:'horses',index:hitIdx});
-      if(target && DRAGGABLE.has(target)){
+      /* 地形控制点：进入拖点模式（写 S.cards.terrain，随场景簿存档） */
+      if(target==='terrain' && terrainHit){
+        drag={mode:'tpt', h:terrainHit, u0:terrainHit.x, v0:terrainHit.y, x:e.clientX, y:e.clientY};
+        try{ canvas.setPointerCapture(e.pointerId); }catch(_){/* 合成事件 */}
+      }
+      else if(target && DRAGGABLE.has(target)){
         drag={mode:'move',id:target,x:e.clientX,y:e.clientY};
         try{ canvas.setPointerCapture(e.pointerId); }catch(_){/* 合成事件 */}
       }
     });
     canvas.addEventListener('pointermove',e=>{
+      if(drag&&drag.mode==='tpt'){
+        /* 地形拖点：直接写 S.cards.terrain（composer 每帧读 uniforms） */
+        const T=S.cards.terrain, h=drag.h;
+        const u=K.util.clamp(drag.u0+(e.clientX-drag.x)/cssW(), 0, 1);
+        const v=K.util.clamp(drag.v0-(e.clientY-drag.y)/cssH(), .02, .95);
+        if(h.path==='ridge'){
+          const lo=h.i>0 ? T.ridge[h.i-1][0]+.01 : 0;
+          const hi=h.i<T.ridge.length-1 ? T.ridge[h.i+1][0]-.01 : 1;
+          T.ridge[h.i][0]=K.util.clamp(u,lo,hi); T.ridge[h.i][1]=v;
+        }else if(h.path==='river'){
+          T.river.pts[h.i][0]=u; T.river.pts[h.i][1]=v;
+        }else{
+          T.lake.x=u; T.lake.y=v;
+        }
+        h.x=T.ridge?.[h.i]?.[0] ?? T.river?.pts?.[h.i]?.[0] ?? T.lake.x;   // 手柄同步（gizmo 跟手）
+        h.y=v;
+        drawGizmo();
+        return;
+      }
       if(drag&&drag.mode==='move'){
         move(drag.id, e.clientX-drag.x, e.clientY-drag.y);
         drag.x=e.clientX; drag.y=e.clientY;

@@ -77,6 +77,8 @@ window.Solstice = (function(){
       sceneTitle:'场景簿', sceneSave:'存', sceneLoad:'读', sceneClear:'清',
       sceneEmpty:'空', horses:'马群', horsesCount:'数量',
       devTitle:'开发者', hintPlayer:'改动即时生效并自动保存。',
+      terrain:'地形', ridge:'山脊', river:'河流', lake:'湖泊',
+      riverWidth:'河宽', flow:'流速', lakeSize:'湖面大小',
     },
     en: {
       title:'Solstice Scene Settings',
@@ -119,6 +121,8 @@ window.Solstice = (function(){
       sceneTitle:'Scene book', sceneSave:'Save', sceneLoad:'Load', sceneClear:'Del',
       sceneEmpty:'Empty', horses:'Horses', horsesCount:'Count',
       devTitle:'Developer', hintPlayer:'Changes apply instantly and persist.',
+      terrain:'Terrain', ridge:'Ridge', river:'River', lake:'Lake',
+      riverWidth:'River width', flow:'Flow', lakeSize:'Lake size',
     },
   };
   const i18n = {
@@ -156,6 +160,14 @@ window.Solstice = (function(){
       tree    :{pref:'auto', dx:0, dy:0, scale:1, anchor:'left', sway:.4,
                 variant:'summer'},          // variant 在 pref=show 时生效；auto=跟随季节
       horses  :{pref:'auto', count:3},        // Actor：马群（数量=count）
+      /* 参数化地形（v5.4 §2.9）：控制点几何 + 材质填充，全部可编辑/可存档
+       * ridge: 近山山脊控制点 [u, v]（v=uv.y 自下而上），Catmull-Rom 平滑
+       * river.pts: 河流路径控制点（自山上流向湖）；lake: 湖中心+半径（uv） */
+      terrain :{ pref:'auto',
+        ridge:[[.06,.66],[.24,.52],[.42,.60],[.58,.47],[.76,.58],[.97,.52]],
+        river:{ on:true, pts:[[.74,.46],[.70,.40],[.65,.34],[.62,.28],[.60,.24]], width:.020, flow:1 },
+        lake: { x:.60, y:.17, rx:.15, ry:.065, scale:1 },
+      },
     },
     info:{ expanded:true, showSec:true, showDate:true, showWeather:true,
            showDebug:false, scale:1, dx:0, dy:0 },
@@ -332,6 +344,10 @@ window.Solstice = (function(){
                  : snowP==='off'   ? 0
                  : snowP==='winter'? 1
                  : (seasonOf(env.date)==='winter' ? 1 : .25);
+
+      /* 参数化地形（v5.4 §2.9）：近山控制点山脊 + 河流路径 + 湖泊（composer 着色器消费） */
+      st.terrainOn = C.terrain.pref!=='hide';
+      st.terrain   = st.terrainOn ? C.terrain : null;
 
       /* 前景树：auto=跟随真实季节；show=自选变体 */
       const t=C.tree;

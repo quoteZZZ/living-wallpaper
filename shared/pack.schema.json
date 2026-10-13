@@ -41,6 +41,22 @@
         }
       }
     },
+    "materials": {
+      "type": "array",
+      "description": "地形无接缝材质包（v5.4 §2.9：程序化几何 + 材质填充）。tile 必须 2×2 平铺无缝、均匀平光。",
+      "items": {
+        "type": "object",
+        "required": ["id", "image"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "材质槽 id：rock-cliff | grass-slope | snow | water | ground-cover（扩展只加不改）"
+          },
+          "image": { "type": "string", "description": "同目录下的 PNG 文件名，1024×1024 无接缝 tile" },
+          "name": { "$ref": "#/definitions/i18n" }
+        }
+      }
+    },
     "settings": {
       "type": "array",
       "description": "包级设置 schema（设置中心据此生成条目，双语）"
