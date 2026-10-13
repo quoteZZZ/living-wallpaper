@@ -107,14 +107,17 @@
       for(const g of groups){
         const gt=K.i18n.t(g.titleKey);
         if(gt!==secTitle) body.appendChild(cap(gt));   // 组名与插件同名时不重复
-        for(const def of g.items) body.appendChild(row(def));
+        for(const def of g.items){
+          if(def.dev && !K.CFG.dbg) continue;          // 开发者参数：仅 ?debug=1
+          body.appendChild(row(def));
+        }
       }
       sec.appendChild(body);
       panelEl.appendChild(sec);
     }
 
     const hint=document.createElement('div'); hint.className='hint';
-    hint.innerHTML=`${K.i18n.t('hint1')}<br>${K.i18n.t('hint2')}`;
+    hint.textContent=K.i18n.t('hintPlayer');
     panelEl.appendChild(hint);
 
     refresh();

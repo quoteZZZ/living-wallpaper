@@ -6,7 +6,7 @@
   const K = window.Solstice;
 
   K.panel.init();
-  if(K.CFG.ui) K.editor.init();
+  if(K.CFG.ui){ K.editor.init(); K.hud.init(); }      // 壁纸态(ui=0)无 HUD，纯展示
   if(K.CFG.dbg) K.S.info.showDebug=true;               // 会话级，不入库
 
   K.composer.run((now,t)=>{

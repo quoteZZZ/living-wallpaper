@@ -31,6 +31,7 @@ window.Solstice = (function(){
     dbg : Q.get('debug')==='1',
     ui  : Q.get('ui')!=='0',                                  // WE 工坊版传 ui=0
     nohid: Q.get('nohid')==='1',                              // 调试：忽略 hidden 跳帧（截图/自动化测试）
+    winter: Q.get('winter')==='1',                            // 调试：强制冬季雪山
   };
 
   /* ---------- ⑥ i18n：字符串表 + t() ---------- */
@@ -45,6 +46,7 @@ window.Solstice = (function(){
       rainAuto:'跟随天气', rainOn:'强制', rainOff:'关闭',
       stAuto:'夜晚显示',   stShow:'常显', stHide:'隐藏',
       mAuto:'显示',        mHide:'隐藏',
+      snowLine:'山顶积雪', snAuto:'自动 · 冬季', snWinter:'常年雪山', snOff:'无积雪',
       tAuto:'跟随季节',    tShow:'自选变体', tHide:'隐藏',
       variant:'变体', spring:'春 · 花', summer:'夏 · 绿', autumn:'秋 · 橙', winter:'冬 · 雪',
       anchor:'位置', left:'左', center:'中', right:'右', sway:'摇曳',
@@ -66,6 +68,15 @@ window.Solstice = (function(){
       hubEdit:'编辑模式', hubReset:'重置全部卡片', hubPanel:'场景设置',
       hintBar:'提示：右键卡片 / 天空可编辑，拖拽太阳调位置大小，双击卡片重置。',
       gotIt:'知道了',
+      /* ---- 游戏 HUD（v0.5） ---- */
+      dockWeather:'天气', dockTime:'时间', dockBuild:'搭建', dockPets:'伙伴',
+      dockScene:'场景', dockEdit:'编辑', dockSettings:'设置',
+      intensity:'强度', modeReal:'跟随真实', modeLock:'锁定时段',
+      lockedAt:'当前时刻', buildTitle:'元素架', buildNature:'自然', buildPlants:'草木', buildSky:'天象',
+      invClouds:'云', invMountains:'山峦', invStars:'星空', invRain:'雨雪',
+      sceneTitle:'场景簿', sceneSave:'存', sceneLoad:'读', sceneClear:'清',
+      sceneEmpty:'空', horses:'马群', horsesCount:'数量',
+      devTitle:'开发者', hintPlayer:'改动即时生效并自动保存。',
     },
     en: {
       title:'Solstice Scene Settings',
@@ -77,6 +88,7 @@ window.Solstice = (function(){
       rainAuto:'Follow weather', rainOn:'Force on', rainOff:'Off',
       stAuto:'Night only', stShow:'Always show', stHide:'Hide',
       mAuto:'Show', mHide:'Hide',
+      snowLine:'Snow caps', snAuto:'Auto (winter)', snWinter:'Always snowy', snOff:'None',
       tAuto:'Follow season', tShow:'Pick variant', tHide:'Hide',
       variant:'Variant', spring:'Spring', summer:'Summer', autumn:'Autumn', winter:'Winter',
       anchor:'Position', left:'Left', center:'Center', right:'Right', sway:'Sway',
@@ -98,6 +110,15 @@ window.Solstice = (function(){
       hubEdit:'Edit mode', hubReset:'Reset all cards', hubPanel:'Scene settings',
       hintBar:'Tip: right-click a card or the sky to edit; drag the sun to move/resize; double-click resets.',
       gotIt:'Got it',
+      /* ---- Game HUD (v0.5) ---- */
+      dockWeather:'Weather', dockTime:'Time', dockBuild:'Build', dockPets:'Companion',
+      dockScene:'Scene', dockEdit:'Edit', dockSettings:'Settings',
+      intensity:'Intensity', modeReal:'Real time', modeLock:'Locked',
+      lockedAt:'Current', buildTitle:'Element shelf', buildNature:'Nature', buildPlants:'Plants', buildSky:'Sky',
+      invClouds:'Clouds', invMountains:'Mountains', invStars:'Stars', invRain:'Rain / Snow',
+      sceneTitle:'Scene book', sceneSave:'Save', sceneLoad:'Load', sceneClear:'Del',
+      sceneEmpty:'Empty', horses:'Horses', horsesCount:'Count',
+      devTitle:'Developer', hintPlayer:'Changes apply instantly and persist.',
     },
   };
   const i18n = {
@@ -130,10 +151,11 @@ window.Solstice = (function(){
       luminary:{pref:'auto', dx:0, dy:0, scale:1},
       clouds  :{pref:'auto', dy:0},
       stars   :{pref:'auto'},
-      mountains:{pref:'auto', dy:0, scale:1},
+      mountains:{pref:'auto', dy:0, scale:1, snow:'auto'},
       rain    :{pref:'auto'},
       tree    :{pref:'auto', dx:0, dy:0, scale:1, anchor:'left', sway:.4,
                 variant:'summer'},          // variant 在 pref=show 时生效；auto=跟随季节
+      horses  :{pref:'auto', count:3},        // Actor：马群（数量=count）
     },
     info:{ expanded:true, showSec:true, showDate:true, showWeather:true,
            showDebug:false, scale:1, dx:0, dy:0 },
@@ -233,16 +255,21 @@ window.Solstice = (function(){
       return p;
     },
     plugin(id){ return this.plugins.find(p=>p.manifest.id===id); },
-    /* 卡实例视图：偏好与变换统一存 S.cards[id] */
-    cards(){
+    /* 卡实例视图：偏好与变换统一存 S.cards[id]。
+     * v0.5：actors[] 是 cards[] 的演进（交互实体：行为 + 互动钩子），
+     * 状态同存 S.cards[id]，编辑器/设置中心对两者一视同仁。 */
+    _entries(){
       const out=[];
       for(const p of this.plugins)
-        for(const c of (p.manifest.cards||[])){
+        for(const c of [...(p.manifest.cards||[]), ...(p.manifest.actors||[])]){
           if(!S.cards[c.id]) S.cards[c.id]={pref:'auto',dx:0,dy:0,scale:1};
           out.push({plugin:p, card:c, st:S.cards[c.id]});
         }
       return out;
     },
+    cards(){ return this._entries(); },
+    /* Actor 视图：仅交互实体（宠物/动物/可回应元素） */
+    actors(){ return this._entries().filter(e=>e.card.behaviors); },
     /* 冲突仲裁：元素卡决定"有没有"，世界决定"什么样"（§4.2 矩阵 + §4.4 五种天气） */
     resolveFrame(env){
       const C=S.cards, w=ctx.weather, I=S.weatherI??1;
@@ -299,6 +326,12 @@ window.Solstice = (function(){
       st.starI = sp==='hide'?0 : sp==='show'?Math.max(pal.star,overcast?0:0.85) : pal.star;
       st.mtnOn = C.mountains.pref!=='hide';
       st.mtnDy=C.mountains.dy; st.mtnScale=C.mountains.scale;
+      /* 山顶积雪：off=无 / winter=常年 / auto=真实季节（冬季满雪，其余季高海拔残雪） */
+      const snowP=C.mountains.snow||'auto';
+      st.mtnSnow = CFG.winter ? 1
+                 : snowP==='off'   ? 0
+                 : snowP==='winter'? 1
+                 : (seasonOf(env.date)==='winter' ? 1 : .25);
 
       /* 前景树：auto=跟随真实季节；show=自选变体 */
       const t=C.tree;
@@ -317,5 +350,27 @@ window.Solstice = (function(){
   /* ---------- 素材包运行时注册（文件包加载器写入，见 assets/packs/） ---------- */
   const assets = { treeImages:null };         // {variantId: imageUrl}
 
-  return { version:'0.4', Q, CFG, S, DEFAULTS, saveCfg, resetCfg, util, i18n, storage, ctx, registry, assets };
+  /* ---------- 场景簿：把"当前场景"作为一级对象保存/读取（核心循环②搭建） ----------
+   * 快照 = 环境(天气/时辰/亮度/预设) + 全部卡片与 Actor 状态；存 lw.scene.v1.<i>。 */
+  const scenes = {
+    slots:3,
+    key(i){ return 'lw.scene.v1.'+i; },
+    snapshot(){
+      return { ts:Date.now(),
+        weather:S.weather, weatherI:S.weatherI, timeMode:S.timeMode,
+        lockedHour:S.lockedHour, dim:S.dim, preset:S.preset,
+        cards:JSON.parse(JSON.stringify(S.cards)) };
+    },
+    list(){ const a=[]; for(let i=0;i<this.slots;i++){
+      const d=storage.get(this.key(i),null); a.push(d?{i,ts:d.ts}:null); } return a; },
+    save(i){ storage.set(this.key(i), this.snapshot()); ctx.emit('cfg',S); },
+    load(i){ const d=storage.get(this.key(i),null); if(!d) return false;
+      S.weather=d.weather; S.weatherI=d.weatherI; S.timeMode=d.timeMode;
+      S.lockedHour=d.lockedHour; S.dim=d.dim; S.preset=d.preset;
+      S.cards=JSON.parse(JSON.stringify(d.cards));
+      ctx.weather=S.weather; saveCfg(); return true; },
+    del(i){ try{ localStorage.removeItem(this.key(i)); }catch(e){} },
+  };
+
+  return { version:'0.5', Q, CFG, S, DEFAULTS, saveCfg, resetCfg, util, i18n, storage, ctx, registry, assets, scenes };
 })();

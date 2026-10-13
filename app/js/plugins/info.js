@@ -1,16 +1,17 @@
 /* ============================================================
- * official.info —— 信息中枢（唯一悬浮 UI 组件）
+ * official.info —— 信息纸签（v0.5 降级：不再是唯一 UI）
  * ------------------------------------------------------------
- * 版式：细字重大时钟 + 日期·天气行 + 分隔线 + 图标按钮列
- * 主题色 --acc 实时取自当前时辰调色板（UI 与天空同步，品牌语言）
- * 按钮：– 收缩 / ✎ 编辑 / ↺ 重置 / ⚙ 设置；WE 壁纸态自动隐藏控制列
+ * v0.5 变化：时间/日期/天气保留为右下角小纸签；控制功能
+ * （编辑/重置/设置）移交游戏 HUD（ui/hud.js）。职责变化：
+ * · 每帧把 st.night 写入 body.night → 全 UI 纸墨主题昼夜间过渡
+ * · 收缩/拖拽/缩放保留；WE 壁纸态纯展示（无 Dock）
  * ============================================================ */
 "use strict";
 (function(){
   const K = window.Solstice, S = K.S;
   const save = ()=>K.saveCfg();
 
-  let el, timeEl, secEl, dateEl, wxEl, wxIcoEl, dbgEl, minBtn, editBtn, lastAcc='';
+  let el, timeEl, secEl, dateEl, wxEl, wxIcoEl, dbgEl, minBtn, lastAcc='', lastNight=null;
 
   function build(){
     el=document.createElement('div');
@@ -23,30 +24,15 @@
       <div class="ic-dbg"></div>
       <div class="ic-btns">
         <button class="ic-btn" data-a="min"></button>
-        <button class="ic-btn" data-a="edit" title=""></button>
-        <button class="ic-btn" data-a="reset" title=""></button>
-        <button class="ic-btn" data-a="cfg" title=""></button>
       </div>`;
-    document.getElementById('infoHost').appendChild(el);
+    document.body.appendChild(el);
     timeEl=el.querySelector('.ic-hm'); secEl=el.querySelector('.ic-sec');
     dateEl=el.querySelector('.ic-date'); wxEl=el.querySelector('.ic-wx');
     wxIcoEl=el.querySelector('.ic-wxico');
     dbgEl=el.querySelector('.ic-dbg');
     minBtn=el.querySelector('[data-a=min]');
-    editBtn=el.querySelector('[data-a=edit]');
 
-    const t=k=>K.i18n.t(k);
-    el.querySelector('[data-a=cfg]').innerHTML=K.icon('gear',15);
-    el.querySelector('[data-a=cfg]').title=t('hubPanel');
-    editBtn.innerHTML=K.icon('pencil',15);
-    editBtn.title=t('hubEdit');
-    el.querySelector('[data-a=reset]').innerHTML=K.icon('rotate',15);
-    el.querySelector('[data-a=reset]').title=t('hubReset');
-
-    el.querySelector('[data-a=cfg]').onclick=e=>{ e.stopPropagation(); K.panel.open(); };
-    editBtn.onclick=e=>{ e.stopPropagation(); K.editor && K.editor.toggle(); };
-    el.querySelector('[data-a=reset]').onclick=e=>{
-      e.stopPropagation(); K.editor && K.editor.resetAll(); };
+    minBtn.innerHTML=K.icon('minus',15);
     minBtn.onclick=e=>{
       e.stopPropagation();
       S.info.expanded=!S.info.expanded; apply(); save();
@@ -57,7 +43,7 @@
     let drag=null;
     el.addEventListener('pointerdown',e=>{
       if(e.target.closest('.ic-btn')) return;
-      if(!editorOn()) return;
+      if(!(K.editor&&K.editor.enabled())) return;
       drag={x:e.clientX,y:e.clientY,dx:S.info.dx,dy:S.info.dy};
       try{ el.setPointerCapture(e.pointerId); }catch(_){/* 合成事件 */}
     });
@@ -71,7 +57,6 @@
 
     apply();
   }
-  function editorOn(){ return K.editor && K.editor.enabled(); }
 
   function apply(){
     el.classList.toggle('min', !S.info.expanded);
@@ -79,11 +64,6 @@
     const i=S.info;
     el.style.transform=`translate(${i.dx}px,${i.dy}px) scale(${i.scale})`;
     el.style.display='flex';                          // WE 版也显示（是壁纸内容）
-    const ui=!!K.CFG.ui;
-    for(const b of el.querySelectorAll('[data-a=edit],[data-a=reset],[data-a=cfg]'))
-      b.style.display=ui?'':'none';
-    editBtn.classList.toggle('on', ui && editorOn());
-    editBtn.title=t('hubEdit');
     dateEl.style.display =i.showDate?'':'none';
     wxEl.style.display   =i.showWeather?'':'none';
     wxIcoEl.style.display=i.showWeather?'':'none';
@@ -94,6 +74,7 @@
 
   const pad=n=>String(n).padStart(2,'0');
   const wIcon={clear:'sun',cloudy:'cloud',rain:'rain',snow:'snow',fog:'fog'};
+  const wxKey=w=>w==='rain'?'rainy':w==='snow'?'snowy':w==='fog'?'foggy':w==='cloudy'?'cloudy':'clear';
   function tick(now, st){
     if(!el){ build(); }
     const d=new Date();
@@ -103,9 +84,16 @@
     dateEl.textContent=d.toLocaleDateString(tag,{month:'long',day:'numeric',weekday:'short'});
     const w=S.weather;
     wxIcoEl.innerHTML=K.icon(st&&st.night>0.5&&w==='clear'?'moon':(wIcon[w]||'sun'),13,2);
-    wxEl.textContent=t(w==='rain'?'rainy':w==='snow'?'snowy':w==='fog'?'foggy':w==='cloudy'?'cloudy':'clear');
+    wxEl.textContent=t(wxKey(w));
 
-    /* 主题色跟随天空：调色板顶色 → 归一化亮度 → CSS 变量 */
+    /* 昼夜主题：夜晚系数 → body.night（全 UI 纸墨令牌随场景切换） */
+    const night=st ? st.night>0.5 : false;
+    if(night!==lastNight){
+      document.body.classList.toggle('night',night);
+      lastNight=night;
+    }
+
+    /* 主题点缀色跟随天空：调色板顶色 → CSS 变量（HUD/纸签 hover 用） */
     if(st && st.pal){
       const a=st.pal.top.map(v=>Math.round((0.40+0.42*v)*255));
       const css=`rgb(${a[0]},${a[1]},${a[2]})`;
@@ -117,24 +105,23 @@
 
     if(S.info.showDebug){
       const C=S.cards, sun=K.ctx.sunState(d);
-      const wLabel=t(w==='rain'?'rainy':w==='snow'?'snowy':w==='fog'?'foggy':w==='cloudy'?'cloudy':'clear');
       dbgEl.textContent=
         `${t('time')} ${d.toLocaleTimeString()}  ·  ${t('fpsCap')} ${K.composer.fps.toFixed(0)}/${S.fps}\n`+
-        `☉ ${(sun.elev*180/Math.PI).toFixed(1)}°  ·  ${t('weather')} ${wLabel}\n`+
+        `☉ ${(sun.elev*180/Math.PI).toFixed(1)}°  ·  ${t('weather')} ${t(wxKey(w))}\n`+
         `${t('luminary')} ${C.luminary.pref} · ${t('clouds')} ${C.clouds.pref} · `+
-        `${t('rain')} ${C.rain.pref} · ${t('parallax')} ${(S.par*100)|0}%`+
+        `${t('horses')} ${C.horses?C.horses.pref:'-'} · ${t('parallax')} ${(S.par*100)|0}%`+
         (K.composer.mode?'\n[img+depth]':'');
     }
   }
 
   K.registry.register({
     id:'official.info', api:1, type:'behavior',
-    name:{zh:'信息中枢', en:'Info hub'},
-    description:{zh:'时间 / 日期 / 天气 + 控制中枢，可收缩', en:'Time / date / weather + control hub, collapsible'},
+    name:{zh:'信息纸签', en:'Info tag'},
+    description:{zh:'时间 / 日期 / 天气小纸签，可收缩', en:'Time / date / weather tag, collapsible'},
     cards:[],
     settingsGroups:[
       { titleKey:'infoTitle', items:[
-        { type:'check', label:{zh:'展开信息卡', en:'Expand widget'},
+        { type:'check', label:{zh:'展开纸签', en:'Expand tag'},
           get:()=>S.info.expanded, set:v=>{ S.info.expanded=v; save(); if(el) apply(); } },
         { type:'check', labelKey:'showSec',
           get:()=>S.info.showSec, set:v=>{ S.info.showSec=v; save(); } },

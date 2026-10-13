@@ -24,10 +24,19 @@
   const enabled=()=>on && K.CFG.ui && S.editor;
   const DRAGGABLE=new Set(['luminary','clouds','mountains','tree']);
 
-  /* ---------- 命中检测（前景树 > 日/月 > 云带 > 山峦 > 天空） ---------- */
+  /* ---------- 命中检测（马群 Actor > 前景树 > 日/月 > 云带 > 山峦 > 天空） ---------- */
+  let hitIdx=0;                                 // horses 命中第几匹（互动派发用）
   function hitTest(x,y){
     if(!st) return null;
     const W=cssW(), H=cssH();
+    /* Actor：马群（可点击回应，不可拖拽） */
+    const hr=st.horsesRects;
+    if(hr && hr.length){
+      for(let i=0;i<hr.length;i++){
+        const r=hr[i];
+        if(x>=r.x*W && x<=(r.x+r.w)*W && y>=(1-(r.y+r.h))*H && y<=(1-r.y)*H){ hitIdx=i; return 'horses'; }
+      }
+    }
     if(st.treeOn){
       const r=K.composer.treeRect(st);
       if(x>=r.x*W && x<=(r.x+r.w)*W && y<=(r.y+r.h)*H && y>=r.y*H) return 'tree';
@@ -43,6 +52,10 @@
   /* ---------- Gizmo / 悬停包围盒（css px） ---------- */
   function bbox(id){
     const W=cssW(), H=cssH(), a=K.composer.aspect;
+    if(id==='horses' && st && st.horsesRects && st.horsesRects[hitIdx]){
+      const r=st.horsesRects[hitIdx];
+      return {x:r.x*W, y:(1-(r.y+r.h))*H, w:r.w*W, h:r.h*H, round:false};
+    }
     if(id==='tree' && st){
       const r=K.composer.treeRect(st);
       return {x:r.x*W, y:(1-(r.y+r.h))*H, w:r.w*W, h:r.h*H, round:false};
@@ -80,7 +93,9 @@
     if(!gizmo) return;
     if(!enabled()||!hover||hover===sel||drag){ ghost.style.display='none'; }
     else { const hb=bbox(hover); hb?place(ghost,hb,true):ghost.style.display='none'; }
-    canvas.style.cursor = drag?'grabbing' : (hover&&DRAGGABLE.has(hover))?'grab':'default';
+    canvas.style.cursor = drag?'grabbing'
+      : hover==='horses'?'pointer'
+      : (hover&&DRAGGABLE.has(hover))?'grab':'default';
   }
 
   /* ---------- 变换换算 ---------- */
@@ -249,6 +264,8 @@
       closeMenu();
       const target=hitTest(e.clientX,e.clientY);
       select(target);
+      /* Actor 互动：点击马群 → 行为回应（respond 跳跃嘶鸣） */
+      if(target==='horses') K.ctx.emit('actor:click',{id:'horses',index:hitIdx});
       if(target && DRAGGABLE.has(target)){
         drag={mode:'move',id:target,x:e.clientX,y:e.clientY};
         try{ canvas.setPointerCapture(e.pointerId); }catch(_){/* 合成事件 */}
