@@ -41,6 +41,7 @@ uniform float uLumA;                    // 日/月可见度（隐藏=0）
 uniform float uMode;                    // 0 程序化 / 1 图片+深度
 uniform float uHasStars, uHasMountains, uCloud, uRain, uSnow, uFogA, uDim;
 uniform vec2  uMtn;                     // x 山峦垂直偏移, y 起伏缩放（编辑器变换）
+uniform float uMtnSnow;                 // 山顶积雪 0–1（雪线高度，冬季=1）
 uniform float uCloudOff;                // 云带垂直偏移（编辑器变换）
 uniform sampler2D uScene, uDepth;
 
@@ -52,6 +53,15 @@ float vnoise(vec2 p){
 }
 float fbm(vec2 p){ float v=0.,a=.5;
   for(int i=0;i<5;i++){ v+=a*vnoise(p); p=p*2.03+vec2(19.7,7.3); a*=.5; } return v; }
+/* 山脊高度场：山体填充与坡向光照（中心差分）共用；含一座程序化主峰（视差一致） */
+float ridgeH(float u,float fi,float px,float py){
+  float us=u-px/(1.2+fi*1.2);
+  return .44-fi*.07+uMtn.x
+       +fbm(vec2(us*(1.2+fi*1.2)+fi*13.1, fi*7.7))*(.08+fi*.03)*uMtn.y
+       +.12*exp(-pow((us-.58-fi*.05)*(5.0+fi*.5),2.))*uMtn.y*(1.-fi*.15)
+       +.035*fbm(vec2(us*(6.+fi*2.)+fi*31.7, 11.3))*uMtn.y
+       +py;
+}
 float stars(vec2 uv,float t){
   vec2 g=uv*90.; vec2 id=floor(g); float h=hash21(id);
   if(h<.93) return 0.;
@@ -111,18 +121,34 @@ void main(){
   col+=uLumC*exp(-gd*gd*26.)*.55*uLumA;
   col+=uLumC*smoothstep(uLum.z,uLum.z*.5,gd)*uLumA*(1.25-uNight*.8);
 
-  /* 山峦分层视差（uMtn = 编辑器垂直偏移/起伏缩放；uSnow 近脊积雪） */
+  /* 山峦分层视差：坡向光照（法线·日/月向）+ 雪线积雪（uMtnSnow，陡坡露岩）
+   * uSnow 仍为天气降雪盖白（世界系统层），与山顶积雪相互独立 */
   if(uMode<.5 && uHasMountains>.5){
+    float psx=(uv.x-.5)*aspect;
     for(int i=0;i<4;i++){
       float fi=float(i);
       float d =.35+fi*.2166;
       float px=uMouse.x*uPar*.27*d;
       float py=uMouse.y*uPar*.05*d;
-      float ridge=.44-fi*.07+uMtn.x
-                 +fbm(vec2(uv.x*(1.2+fi*1.2)-px+fi*13.1, fi*7.7))*(.08+fi*.03)*uMtn.y
-                 +py;
-      float m=smoothstep(ridge, ridge-.012, uv.y);
+      float rg=ridgeH(uv.x,fi,px,py);
+      float m=smoothstep(rg, rg-.012, uv.y);
+      /* 坡向光照：中心差分求坡度，向阳面提亮、背阳面压暗（光带仅限山脊面） */
+      float e=.004;
+      float dh=(ridgeH(uv.x+e,fi,px,py)-ridgeH(uv.x-e,fi,px,py))/(2.*e*aspect);
+      vec2 N=normalize(vec2(-dh*2.2,1.));
+      vec2 Ld=normalize(vec2(uLum.x-psx, max(uLum.y+.5-uv.y,.12)));
+      float lit=clamp(dot(N,Ld),0.,1.);
+      lit=mix(.60,1.06,lit)*mix(.72,1.,uLumA);
+      lit=mix(1., lit, 1.-uNight*.55);          // 夜晚方向光减弱，雪面趋平
       vec3 mc=mix(uFog*.85+uHor*.35, uFog*.25+vec3(.015,.02,.05), pow(d,1.3));
+      /* 绝对雪线：只有主峰与最高脊线积雪（冬季雪线下移），陡坡露岩 */
+      float sl=.455-uMtnSnow*.035+fbm(vec2(uv.x*6., 3.7))*.03;
+      float steep=clamp(abs(dh)*1.2,0.,1.);
+      float snowA=clamp(uMtnSnow*smoothstep(sl, sl+.02, uv.y)*(1.-steep*.6),0.,1.);
+      mc=mix(mc, mix(vec3(.70,.76,.88), vec3(.95,.97,1.), lit)*mix(1.,.32,uNight), snowA);
+      /* 山体岩石微纹理；方向光只作用于山脊面带，往下衰减回大气透视色 */
+      mc*=.93+.14*fbm(vec2(uv.x*(9.+fi*3.), uv.y*7.-fi*4.));
+      mc*=mix(1., lit, exp(-(rg-uv.y)*22.)*mix(.35,1.,smoothstep(.25,.85,d)));
       mc=mix(mc, vec3(.88,.91,.96)*(1.-uNight*.55), uSnow*smoothstep(.45,1.,d)*.7);
       col=mix(col,mc,m*.97);
     }
@@ -196,7 +222,7 @@ void main(){ vec4 c=texture(uT,vU); o=vec4(c.rgb*uTint, c.a); }`;
   for(const n of ['uRes','uTime','uMouse','uPar','uTop','uHor','uLumC','uFog','uAmb',
                   'uStar','uNight','uLum','uLumA','uMode',
                   'uHasStars','uHasMountains','uCloud','uRain','uSnow','uFogA','uDim',
-                  'uMtn','uCloudOff','uScene','uDepth'])
+                  'uMtn','uMtnSnow','uCloudOff','uScene','uDepth'])
     U[n]=gl.getUniformLocation(prog,n);
 
   /* ---- 精灵通道资源 ---- */
@@ -211,7 +237,10 @@ void main(){ vec4 c=texture(uT,vU); o=vec4(c.rgb*uTint, c.a); }`;
   function makeTex(img,unit,uni){
     gl.activeTexture(gl.TEXTURE0+unit);
     const t=gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D,t);
+    /* 仅本纹理翻转行序：WebGL t=0 是图像首行，而 vUv.y=0 在屏幕底部 */
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,true);
     gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,img);
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false);
     gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);
     gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
     gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);
@@ -411,6 +440,7 @@ void main(){ vec4 c=texture(uT,vU); o=vec4(c.rgb*uTint, c.a); }`;
     gl.uniform1f(U.uFogA,st.fogI||0);
     gl.uniform1f(U.uDim,S.dim??1);
     gl.uniform2f(U.uMtn,st.mtnDy,st.mtnScale);
+    gl.uniform1f(U.uMtnSnow, st.mtnSnow||0);
     gl.uniform1f(U.uCloudOff,st.cloudDy);
     gl.drawArrays(gl.TRIANGLES,0,3);
 

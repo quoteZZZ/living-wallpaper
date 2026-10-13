@@ -19,6 +19,9 @@
         { type:'select', labelKey:'mountains', card:'mountains',
           options:[['auto','mAuto'],['hide','mHide']],
           get:()=>S.cards.mountains.pref, set:v=>{ S.cards.mountains.pref=v; save(); } },
+        { type:'select', labelKey:'snowLine', card:'mountains',
+          options:[['auto','snAuto'],['winter','snWinter'],['off','snOff']],
+          get:()=>S.cards.mountains.snow||'auto', set:v=>{ S.cards.mountains.snow=v; save(); } },
       ]},
     ],
   }, {});
