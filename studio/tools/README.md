@@ -1,9 +1,12 @@
 # studio/tools/ —— 生产线可执行工具
 
-四个工具，纯 Python 标准库（**零第三方依赖**，不需要 pip install）。
+五个工具，纯 Python 标准库（**零第三方依赖**，不需要 pip install）。
 
-出图链路：`gen.py`（渲染/放大/垫图/接缝重绘）→ `seamless.py`（错位+接缝处理+质检）
-→ `finish.py`（一键把 raw 渲染变成无接缝成品 tile）→ `pack.py`（打包成运行时素材包）。
+- **卡面线（现行，《牌语四季》CF-M1）**：`gen.py`（`--batch` 批单出图，`--ref` 垫 S1 锁风格）
+  → `contact.py`（把一季候选排成一张评审图）→ 自检 → 落 `studio/frames/cards/`。
+  卡面必须走垫图：纯文生图会自己画出卡框（合同禁止），见 `card-faces.md`。
+- **无缝 tile 线（Solstice 时期，工具仍在）**：`gen.py --seam-fix` + `seamless.py` + `finish.py`。
+- **打包**：`pack.py`（Solstice 包格式；卡牌走 `shared/card.schema.json` 的 cardpack 数据，由代码机对接）。
 
 ## `gen.py` —— 出图与放大
 
@@ -18,7 +21,10 @@ D:\ComfyUI\python_embeded\python.exe studio\tools\gen.py --prompt "<见 studio/j
   --out studio\work\raw\probe.png --width 1920 --height 1080 --steps 4 --seed 303
 
 # 3) 批量出图（作业单 JSON，每项 = 一次 render 的 kwargs）
-D:\ComfyUI\python_embeded\python.exe studio\tools\gen.py --batch studio\jobs\target-frames.json
+D:\ComfyUI\python_embeded\python.exe studio\tools\gen.py --batch studio\jobs\cards-cf-m1-spring.json
+
+# 3b) 续跑：已存在的 --out 直接跳过（长批次中断后只补缺的 / 只出新增变体）
+D:\ComfyUI\python_embeded\python.exe studio\tools\gen.py --batch studio\jobs\cards-cf-m1-spring.json --skip-existing
 
 # 4) 放大到规格（RealESRGAN ×2 → 长边封顶 3840）
 D:\ComfyUI\python_embeded\python.exe studio\tools\gen.py --from studio\work\raw\probe.png `
@@ -92,6 +98,20 @@ D:\ComfyUI\python_embeded\python.exe studio\tools\finish.py `
 - 产物 `studio/work/raw/<name>_seamless.png`（候选，gitignore）+ `_tile2x2.png`（目视验收）。
 - `--flatten 0.35` 默认开启（SET-01 要求平光）；`--seed-offset` 让接缝重绘与出图用不同种子。
 - 结尾打印质检表：接缝比 ≈1.0、`light dY` ≈0 即为过。
+
+## `contact.py` —— 评审图拼版（纯像素运算，不占显存）
+
+把一批候选拼成一张缩略图网格，用于「一季 15 张一次看完」的批量裁决；无文字标签，
+阅读顺序 = 命令行给的顺序（行优先）。
+
+```powershell
+D:\ComfyUI\python_embeded\python.exe studio\tools\contact.py `
+  --out studio\frames\candidates\cards\CF-M1-spring-review.png --cols 5 --cell 480 `
+  --from studio\frames\cards\mt-plum-ridge.1.png studio\frames\cards\pl-plum.1.png ...
+```
+
+- `--cell` 是每格**高度**（宽度按原图比例算）；`--cols` 默认 5。
+- 只做等比缩放的盒式重采样 + 拼版，不裁切、不加字。
 
 ## `pack.py` —— 打包
 

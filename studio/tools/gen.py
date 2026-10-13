@@ -431,11 +431,17 @@ def seam_fix(server, src, out, prompt, band=128, steps=4, seed=707,
 
 
 def job_from_entry(entry, server, base_dir):
-    """Turn one --batch JSON entry into render() kwargs."""
+    """Turn one --batch JSON entry into render() kwargs.
+
+    Keys starting with `_` are bookkeeping only (card id, season, suit, ...)
+    and are ignored, so a job file can double as the per-image disclosure
+    record without breaking the render call.
+    """
     out = Path(entry["out"])
     if not out.is_absolute():
         out = base_dir / out
-    kwargs = {k: v for k, v in entry.items() if k != "out"}
+    kwargs = {k: v for k, v in entry.items()
+              if k != "out" and not k.startswith("_")}
     kwargs.setdefault("negative", "")
     kwargs["server"] = server
     return kwargs, out
@@ -460,6 +466,9 @@ def main() -> int:
                     help="region of --ref to use, as x,y,w,h")
     ap.add_argument("--timeout", type=int, default=900, help="seconds to wait for one image")
     ap.add_argument("--batch", help="JSON file: list of render() kwargs incl. out")
+    ap.add_argument("--skip-existing", dest="skip_existing", action="store_true",
+                    help="batch mode: skip entries whose --out already exists "
+                         "(resume a long batch / only render new variants)")
     ap.add_argument("--from", dest="src", help="upscale mode: source PNG")
     ap.add_argument("--to", dest="dst", help="upscale mode: output PNG")
     ap.add_argument("--upscale-model", default=DEFAULT_UPSCALE,
@@ -521,15 +530,21 @@ def main() -> int:
             print("[err] --batch file must contain a JSON list")
             return 1
         failures = 0
+        skipped = 0
         for i, entry in enumerate(entries, 1):
             kwargs, out = job_from_entry(entry, args.server, Path.cwd())
+            if args.skip_existing and out.exists():
+                skipped += 1
+                print(f"[{i}/{len(entries)}] {out.name} (exists, skipped)")
+                continue
             print(f"[{i}/{len(entries)}] {out.name}")
             try:
                 render(**kwargs, out=out, timeout=args.timeout)
             except Exception as exc:  # noqa: BLE001 - keep going, report at the end
                 failures += 1
                 print(f"[err] {out.name}: {exc}")
-        print(f"[done] {len(entries) - failures}/{len(entries)} ok")
+        print(f"[done] {len(entries) - failures - skipped}/{len(entries) - skipped} ok"
+              f"{f', {skipped} skipped' if skipped else ''}")
         return 1 if failures else 0
 
     if not args.prompt or not args.out:
