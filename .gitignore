@@ -6,3 +6,4 @@ tmp/
 .playwright-cli/
 shot-*.png
 tools/inbox/raw/
+__pycache__/
