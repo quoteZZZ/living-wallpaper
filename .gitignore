@@ -5,3 +5,4 @@ node_modules/
 tmp/
 .playwright-cli/
 shot-*.png
+tools/inbox/raw/

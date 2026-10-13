@@ -7,8 +7,8 @@
 
 | 档 | 模型 | 参数要点 |
 |---|---|---|
-| **云端（主档）** | Nano Banana 2 / Seedream 5.0 Pro | 垫 TF01 出图，原生 ≥4K |
-| 本地（备选） | ComfyUI · FLUX.2-klein 4B **fp8**（8GB 显存档） | 1920×1080 生成 → Topaz/ESRGAN 放大到 ≥4K；IP-Adapter 垫 TF01；快速初筛可用 Z-Image-Turbo 6B（8 步） |
+| **本地（主档）** | ComfyUI · FLUX.2-klein 4B **fp8**（8GB 显存档） | 1920×1080 生成 → 放大到 ≥4K；IP-Adapter 垫 TF01；快速初筛可用 Z-Image-Turbo 6B（8 步） |
+| 云端（备用） | Nano Banana 2 / Seedream 5.0 Pro | 仅当本地整图质量不达标时补刀 |
 
 - 张数：出 2–4 张候选 → 用户挑 1 张成包（raw 不入库）
 - 分辨率：**16:9，长边 ≥3840**（宁大勿小）
