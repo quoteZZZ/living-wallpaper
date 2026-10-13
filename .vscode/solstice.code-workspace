@@ -1,0 +1,28 @@
+// 《至日 · 岁局》工作区文件
+// 用法：VSCode → 文件 → 打开工作区 → 选择本文件
+//
+// 为什么不拆成多根工作区？
+//   本项目所有 task / launch 都用 ${workspaceFolder} 定位仓库根（tools\ 与 studio\ 脚本、.uproject 路径）。
+//   多根工作区会让 ${workspaceFolder} 解析到各自的根，导致任务与调试路径错乱。
+//   → 因此这里保持「单根 = 仓库根」，用 files.exclude / search.exclude 来收纳子目录的噪音。
+//
+// 为什么这里没有 extensions 段？
+//   扩展清单的唯一真源是 .vscode\extensions.json。工作区文件里的 extensions 段会与之叠加，
+//   极易出现两份清单不一致（改了一处忘了另一处），故统一收敛到 extensions.json。
+//
+// 为什么这里只留极少的 settings？
+//   与语言 / 扩展 / 终端相关的配置统一放 .vscode\settings.json（打开文件夹方式时同样生效），
+//   此处只保留「纯工作区外观」类的差异项，避免同一配置出现两个真源。
+{
+  "folders": [
+    {
+      "name": "岁局 · Solstice",
+      "path": ".."
+    }
+  ],
+  "settings": {
+    "window.title": "岁局 · ${activeEditorShort}${separator}${rootName}",
+    "workbench.editor.labelFormat": "short",
+    "explorer.compactFolders": false
+  }
+}

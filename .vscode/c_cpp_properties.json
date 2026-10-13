@@ -1,0 +1,55 @@
+// C/C++ IntelliSense 配置（ms-vscode.cpptools）
+// ⚠ 占位符 __UE_ENGINE_ROOT__ 由 tools\configure-vscode.ps1 自动替换为真实引擎路径。
+//    引擎未安装时保持占位状态——此时工程源码自身的 IntelliSense 仍然可用（只是引擎头文件解析不到）。
+{
+  "version": 4,
+  "configurations": [
+    {
+      "name": "SolsticeEditor Win64 Development",
+      "cStandard": "c17",
+      "cppStandard": "c++20",
+      "intelliSenseMode": "windows-msvc-x64",
+      // 优先使用 UBT 生成的编译数据库（最准）；未生成时回退到 includePath
+      "compileCommands": "${workspaceFolder}/game/compile_commands.json",
+      "configurationProvider": "ms-vscode.cpptools",
+      "includePath": [
+        // ---- 本项目 ----
+        "${workspaceFolder}/game/Source/**",
+        "${workspaceFolder}/game/Plugins/**",
+        "${workspaceFolder}/game/Intermediate/Build/Win64/UnrealEditor/Inc/**",
+        // ---- 虚幻引擎 ----
+        "__UE_ENGINE_ROOT__/Engine/Source/**",
+        "__UE_ENGINE_ROOT__/Engine/Plugins/**",
+        "__UE_ENGINE_ROOT__/Engine/Intermediate/Build/Win64/UnrealEditor/Inc/**"
+      ],
+      "defines": [
+        "__UNREAL__",
+        "UNICODE",
+        "_UNICODE",
+        "PLATFORM_WINDOWS=1",
+        "PLATFORM_WIN64=1",
+        "WITH_EDITOR=1",
+        "IS_PROGRAM=0",
+        "UE_EDITOR=1",
+        "UE_BUILD_DEVELOPMENT=1",
+        "UE_ENABLE_ICU=1",
+        "CURRENT_FILE_ID=__COUNTER__"
+      ],
+      // 故意不设 compilerPath：优先依赖 compileCommands / includePath，
+      // 让 cpptools 自行探测 MSVC，避免硬编码 VS 版本路径（换版本即失效）。
+      "browse": {
+        "path": [
+          "${workspaceFolder}/game/Source",
+          "${workspaceFolder}/game/Plugins",
+          "__UE_ENGINE_ROOT__/Engine/Source/Runtime",
+          "__UE_ENGINE_ROOT__/Engine/Source/Editor"
+        ],
+        "limitSymbolsToIncludedHeaders": true,
+        // ⚠ 必须落在「可再生且已被 .gitignore 覆盖」的目录里。
+        //   原先指向 game/.vscode/，会在仓库内生成 BROWSE.VC.DB{,-shm,-wal} 垃圾文件
+        //   （-shm/-wal 还不被 *.VC.db 规则覆盖，导致 git status 一直挂着 game/）。
+        "databaseFilename": "${workspaceFolder}/game/DerivedDataCache/vscode/browse.vc.db"
+      }
+    }
+  ]
+}

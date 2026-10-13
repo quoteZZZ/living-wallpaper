@@ -1,0 +1,69 @@
+# 《至日 · 岁局》C++ 代码格式
+# 由 VSCode 的 ms-vscode.cpptools（内置 clang-format）读取，见 .vscode/settings.json 的 "[cpp]" 段。
+# 基调对齐虚幻引擎风格（Allman 大括号、指针靠左、无列宽强制、4 空格缩进）。
+# 与 .editorconfig 保持一致：indent_style = space，indent_size = 4（不使用 Tab）。
+
+BasedOnStyle: LLVM
+
+Language: Cpp
+
+# ---- 缩进 ----
+IndentWidth: 4
+TabWidth: 4
+UseTab: Never                      # 与 .editorconfig 一致；引擎官方用 Tab，本项目统一用空格
+AccessModifierOffset: -4           # public:/private: 与 class 同级缩进
+NamespaceIndentation: All          # 命名空间内缩进（UE 风格）
+IndentCaseLabels: false            # switch 的 case 不额外缩进
+ContinuationIndentWidth: 4
+
+# ---- 大括号 ----
+BreakBeforeBraces: Allman          # 大括号另起一行（UE 风格）
+AllowShortFunctionsOnASingleLine: Inline
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: false
+AllowShortBlocksOnASingleLine: Never
+AllowShortCaseLabelsOnASingleLine: false
+
+# ---- 列宽：UE 不强制换行 ----
+ColumnLimit: 0
+
+# ---- 指针 / 引用靠左：Type* Ptr / Type& Ref ----
+PointerAlignment: Left
+ReferenceAlignment: Pointer
+DerivePointerAlignment: false
+
+# ---- 空格 ----
+SpaceBeforeParens: ControlStatements
+SpaceInEmptyParentheses: false
+SpacesInAngles: false
+SpacesInContainerLiterals: false
+SpaceAfterCStyleCast: false
+SpaceAfterTemplateKeyword: false
+
+# ---- 换行策略 ----
+BinPackArguments: true
+BinPackParameters: true
+AllowAllArgumentsOnNextLine: true
+AllowAllParametersOfDeclarationOnNextLine: true
+ConstructorInitializerAllOnOneLineOrOnePerLine: true
+BreakConstructorInitializers: BeforeColon
+PackConstructorInitializers: Never
+BreakInheritanceList: BeforeColon
+
+# ---- 成员与继承 ----
+AlwaysBreakTemplateDeclarations: Yes
+SortIncludes: false                # 关掉：UE 的 include 顺序有硬性要求（.generated.h 必须在最后）
+IncludeBlocks: Preserve
+
+# ---- 其他 ----
+AlignAfterOpenBracket: Align
+AlignConsecutiveMacros: false
+AlignConsecutiveAssignments: false
+AlignConsecutiveDeclarations: false
+AlignEscapedNewlines: Left
+AlignOperands: Align
+AlignTrailingComments: true
+FixNamespaceComments: true
+MaxEmptyLinesToKeep: 2
+ReflowComments: false
+KeepEmptyLinesAtTheStartOfBlocks: false

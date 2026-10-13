@@ -1,9 +1,109 @@
+# ============================================================
+# 《至日 · 岁局》仓库忽略规则
+# 原则：源码 / 契约(schema) / 文档 / manifest 留档 必须入库；
+#       构建产物、缓存、可再生的大二进制资产 不入库。
+# 策略说明见 docs/STRUCTURE.md §5
+# ============================================================
+
+# ---------- 1. 虚幻引擎构建产物 ----------
+# 均由 UBT / 编辑器生成，可由源码完全重建。
+[Bb]inaries/
+[Ii]ntermediate/
+[Ss]aved/
+[Dd]erivedDataCache/
+
+# Build/ 下多为平台中间产物；仅保留图标等必要小文件。
+# 注意：必须先忽略目录内容再用 ! 例外，否则例外不生效。
+[Bb]uild/*
+![Bb]uild/*.ico
+
+# .uproject 生成的解决方案 / 工程文件。
+*.sln
+*.suo
+*.opensdf
+*.sdf
+# 浏览数据库（VS / cpptools 的 Go To Definition 缓存），带 -shm/-wal 附属文件，需一并忽略。
+*.VC.db
+*.VC.db-shm
+*.VC.db-wal
+*.vc.db
+*.vc.db-shm
+*.vc.db-wal
+*.VC.VC.opendb
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+*.xcodeproj/
+*.xcworkspace/
+compile_commands.json
+
+# VS / 编译器本地状态与二进制中间件。
+.vs/
+*.pdb
+*.target
+*.modules
+*.obj
+*.ilk
+*.exp
+*.dll
+*.lib
+*.exe
+
+# ---------- 2. UE Content/ 大二进制资产策略 ----------
+# 策略：Content/ 下的 .uasset/.umap 及媒体大文件不入 git，
+#       由管线 / 编辑器本地再生；契约与 manifest 入库。
+#       若改用 Git LFS 托管，见下方「LFS 可选段」。
+game/Content/**/*.uasset
+game/Content/**/*.umap
+game/Content/**/*.uexp
+game/Content/**/*.ubulk
+game/Content/**/*.png
+game/Content/**/*.jpg
+game/Content/**/*.jpeg
+game/Content/**/*.tga
+game/Content/**/*.wav
+game/Content/**/*.fbx
+game/Content/**/*.mp4
+# 例外：保留目录结构与说明。
+!game/Content/**/.gitkeep
+!game/Content/**/README.md
+
+# -------- Git LFS 可选段（启用资产 LFS 托管时取消注释）--------
+# 启用后请删除上方 Content/ 的 png/jpg/... 忽略行，并执行：
+#   git lfs install
+#   git lfs track "game/Content/**"
+# *.uasset filter=lfs diff=lfs merge=lfs -text
+# *.umap   filter=lfs diff=lfs merge=lfs -text
+# *.png    filter=lfs diff=lfs merge=lfs -text
+
+# ---------- 3. studio 本地生图产出 ----------
+# out/ 为生成产物（可重生），work/ 为临时工作区（中间缓存），均不入库；
+# 但 manifest.jsonl 必须入库（Steam AI 内容披露的合规留档）。
+studio/out/**
+!studio/out/.gitkeep
+!studio/out/manifest.jsonl
+!studio/out/**/.gitkeep
+studio/work/**
+!studio/work/.gitkeep
+!studio/work/**/.gitkeep
+studio/**/__pycache__/
+studio/**/*.pyc
+
+# ---------- 4. 通用杂项 ----------
 *.log
-.DS_Store
 Thumbs.db
-node_modules/
+ehthumbs.db
+.DS_Store
 tmp/
-.playwright-cli/
-shot-*.png
-studio/work/
+temp/
 __pycache__/
+*.py[cod]
+.venv/
+venv/
+.idea/
+
+# ---------- 5. 项目数据目录（必须保留，勿忽略）----------
+# .codebuddy 是项目数据目录，不可删除、不应被忽略。
+# 显式反向声明，防止被上游或全局 gitignore 误伤。
+!.codebuddy/
+!.codebuddy/**

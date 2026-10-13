@@ -1,0 +1,274 @@
+// 工作区任务（Ctrl+Shift+B 构建 / Ctrl+Shift+P → Run Task）
+// 所有任务均以 -ExecutionPolicy Bypass 调用 tools\ 与 studio\ 下的脚本。
+{
+  "version": "2.0.0",
+  "tasks": [
+    // ==================== 构建 ====================
+    {
+      "label": "Solstice: 构建 SolsticeEditor (Development)",
+      "detail": "编译 C++ 主模块。改过头文件/反射宏/模块时，请先关闭虚幻编辑器。",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}/tools/build.ps1",
+        "-Target",
+        "SolsticeEditor",
+        "-Config",
+        "Development"
+      ],
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": ["$msCompile"],
+      "group": { "kind": "build", "isDefault": true },
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true }
+    },
+    {
+      "label": "Solstice: 构建 SolsticeEditor (Shipping)",
+      "detail": "发行配置编译，用于性能验收（M6）。",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}/tools/build.ps1",
+        "-Target",
+        "SolsticeEditor",
+        "-Config",
+        "Shipping"
+      ],
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": ["$msCompile"],
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true }
+    },
+    {
+      "label": "Solstice: 清理并全量重编",
+      "detail": "删中间产物后重编。仅在 UBT 行为异常时使用（耗时长）。",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}/tools/build.ps1",
+        "-Target",
+        "SolsticeEditor",
+        "-Config",
+        "Development",
+        "-Clean"
+      ],
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": ["$msCompile"],
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true }
+    },
+
+    // ==================== 工程文件 ====================
+    {
+      "label": "Solstice: 生成工程文件 (Solution / cpptools)",
+      "detail": "生成 game\\Solstice.sln，供 ms-vscode.cpptools 提供 IntelliSense。",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}/tools/gen-projectfiles.ps1",
+        "-Mode",
+        "Solution"
+      ],
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": [],
+      "presentation": { "reveal": "always", "panel": "shared", "clear": true }
+    },
+    {
+      "label": "Solstice: 生成工程文件 (ClangDb / clangd)",
+      "detail": "生成 game\\compile_commands.json，供 clangd（路线 B）。",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}/tools/gen-projectfiles.ps1",
+        "-Mode",
+        "ClangDb"
+      ],
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": [],
+      "presentation": { "reveal": "always", "panel": "shared", "clear": true }
+    },
+    {
+      "label": "Solstice: 配置 VSCode (写入引擎路径)",
+      "detail": "把探测到的引擎路径写入 .vscode 配置，替换 __UE_ENGINE_ROOT__。",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}/tools/configure-vscode.ps1"
+      ],
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": [],
+      "presentation": { "reveal": "always", "panel": "shared", "clear": true }
+    },
+    {
+      "label": "Solstice: 启动编辑器",
+      "detail": "用 UnrealEditor 打开 game\\Solstice.uproject。",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}/tools/launch-editor.ps1"
+      ],
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": [],
+      "presentation": { "reveal": "always", "panel": "shared" }
+    },
+
+    // ==================== 环境 ====================
+    {
+      "label": "环境: 体检",
+      "detail": "只读检查工具链是否齐备（Epic / UE / VS2022 / ComfyUI / GPU / 磁盘）。",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}/tools/check-env.ps1"
+      ],
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": [],
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true }
+    },
+    {
+      "label": "环境: 探测虚幻引擎",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}/tools/find-ue.ps1",
+        "-All"
+      ],
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": [],
+      "presentation": { "reveal": "always", "panel": "shared", "clear": true }
+    },
+
+    // ==================== 契约 ====================
+    {
+      "label": "契约: 校验 shared（schema + 交叉引用）",
+      "detail": "校验 shared/examples 下的数据是否符合 schema，并检查 id 交叉引用完整性。⚠ shared/ 目录尚未落地（规划见 docs\\STRUCTURE.md §1），在此之前运行会报「文件不存在」。",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}/shared/validate.ps1"
+      ],
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": [],
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true }
+    },
+
+    // ==================== 生图线 ====================
+    {
+      "label": "生图: 启动 ComfyUI",
+      "detail": "启动本地 ComfyUI 并等待 API 就绪。⚠ studio/ 目录尚未落地（规划见 docs\\STRUCTURE.md §1），在此之前运行会报「文件不存在」。",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}/studio/scripts/start-comfy.ps1"
+      ],
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": [],
+      "presentation": { "reveal": "always", "panel": "dedicated" }
+    },
+    {
+      "label": "生图: 环境体检",
+      "detail": "检查 ComfyUI / 显卡 / 模型是否就绪。⚠ studio/ 目录尚未落地，在此之前运行会报「文件不存在」。",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}/studio/scripts/check-comfy.ps1"
+      ],
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": [],
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true }
+    },
+    {
+      "label": "生图: 干跑卡面批单（DryRun）",
+      "detail": "不占用 GPU，只校验批单与 prompt 拼装是否正确。⚠ 依赖 studio/jobs/ 与 studio/scripts/，目录尚未落地。",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}/studio/scripts/generate-batch.ps1",
+        "-JobsFile",
+        "${workspaceFolder}/studio/jobs/cards-m0-sample.jsonl",
+        "-DryRun"
+      ],
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": [],
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true }
+    },
+
+    // ==================== 版本控制 ====================
+    {
+      "label": "Git: 同步（pull --rebase + push）",
+      "type": "shell",
+      "command": "git",
+      "args": ["pull", "--rebase", "--autostash"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": [],
+      "presentation": { "reveal": "always", "panel": "shared" }
+    },
+    {
+      "label": "Git: 提交全部改动",
+      "detail": "提交信息请用英文简短祈使句（仓库约定）。",
+      "type": "shell",
+      "command": "git",
+      "args": ["commit", "-a", "-m", "${input:commitMessage}"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": [],
+      "presentation": { "reveal": "always", "panel": "shared" }
+    }
+  ],
+  "inputs": [
+    {
+      "id": "commitMessage",
+      "type": "promptString",
+      "description": "英文提交信息（简短祈使句）",
+      "default": "chore: update"
+    }
+  ]
+}

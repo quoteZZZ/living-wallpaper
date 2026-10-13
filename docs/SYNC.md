@@ -1,60 +1,79 @@
-# 双机协作与同步（SYNC）
+# 双机 git 同步（SYNC）
 
-> **背景**：双机模式——代码机（开发与 git 提交）+ 素材机（部署模型出图，跑 `studio/`）。
-> 痛点：靠"每次对话手动 pull / commit / push"太慢。本方案 = **git 仍是唯一真源 + 计划任务自动同步**，5 分钟内两机互通。
-> 目录归属与命名见 [`STRUCTURE.md`](STRUCTURE.md)。
+> 约定：**git 是唯一真源** + 计划任务定时 `pull` / `push`。大二进制资产不进 git（见 §4）。
 
-## 1. 方案总览
+---
 
-| 层 | 载体 | 时效 | 说明 |
-|---|---|---|---|
-| **代码 / 文档 / 成包素材** | git（GitHub quoteZZZ/solstice） | ≤5 分钟 | 唯一真源；两台机各挂一个计划任务 |
-| **raw 候选图**（不入库） | 本机磁盘，不共享 | — | 放 `studio/work/raw/`（已 gitignore），只有选中图才提交 |
+## 1. 基本约定
 
-不引入 Syncthing/网盘实时同步**工作区**：两台机同时改工作树 + 各自 `.git`，索引冲突是灾难。素材交付走 git（选中图体积可控），raw 走线下。
+- **唯一真源 = 远端仓库（origin）**。未 push 的本地改动视为"未落地"。
+- 拉取用 **`git pull --rebase --autostash`**，避免无谓 merge commit 与脏工作树阻塞。
+- **同一时间只允许一台机器改同一文件**；跨机改同名文件前先在群里对齐。
+- 素材/产出**单独提交**（便于回溯与回退），不与代码混提。
 
-## 2. 一次性配置（每台机各执行一次）
+---
 
-脚本：`dev/sync/sync_once.ps1`（单次：pull --rebase --autostash；`-Push` 时自动 commit+push）。
+## 2. 定时同步（注册计划任务）
 
-**代码机（示例 `e:\solstice`，pull-only）**：
+### 方式一：`Register-ScheduledTask`（推荐）
+
 ```powershell
-schtasks /Create /TN "SolsticeSync" /SC MINUTE /MO 5 /F /TR "powershell -NoProfile -ExecutionPolicy Bypass -File e:\solstice\dev\sync\sync_once.ps1"
+$repo = 'd:\GitCode\solstice'
+$action  = New-ScheduledTaskAction -Execute 'cmd.exe' `
+  -Argument "/c cd /d $repo && git pull --rebase --autostash && git push"
+$trigger = New-ScheduledTaskTrigger -Once -At (Get-Date) `
+  -RepetitionInterval (New-TimeSpan -Minutes 15)
+$settings = New-ScheduledTaskSettingsSet -MultipleInstances IgnoreNew -StartWhenAvailable
+Register-ScheduledTask -TaskName 'Solstice Git Sync' -Action $action -Trigger $trigger -Settings $settings -Force
 ```
 
-**素材机（本机实际为 `D:\GitCode\solstice`）**：
+### 方式二：`schtasks`（最简）
+
 ```powershell
-schtasks /Create /TN "SolsticeSync" /SC MINUTE /MO 5 /F /TR "powershell -NoProfile -ExecutionPolicy Bypass -File D:\GitCode\solstice\dev\sync\sync_once.ps1 -Push"
+schtasks /Create /TN "Solstice Git Sync" /SC MINUTE /MO 15 /TR "cmd /c cd /d d:\GitCode\solstice && git pull --rebase --autostash && git push"
 ```
 
-- 验证：`schtasks /Run /TN "SolsticeSync"` 后看仓库 `git log` 是否出现远端提交。
-- 删除：`schtasks /Delete /TN "SolsticeSync" /F`。
-- 跨网：Tailscale 直连时同样走 GitHub，无需额外配置。
+### 取消与查看
 
-## 3. 角色约定（防冲突的核心）
-
-| 机 | 自动行为 | 不自动做的事 |
-|---|---|---|
-| **代码机** | 每 5 分钟 pull | **不自动 commit/push**——开发中的半成品绝不入库；改动在每次对话收尾时显式提交 |
-| **素材机** | 每 5 分钟 pull + 自动 commit/push 本机变更 | 不改代码/文档（只按任务书落素材） |
-
-- 两机**不同时改同一文件**：代码机管 `app/**`、`docs/**`、`shared/**`；素材机管 `studio/**` 与 `app/assets/packs/**` → rebase 基本无冲突。
-- 万一冲突：脚本停手不推进，人工 `git status` 处理后正常 push。
-
-## 4. 对话开场/收尾约定（AI 侧）
-
-- **开场**：先 `git pull --rebase --autostash` 拿对方最新产出，再干活。
-- **收尾**：有改动就 commit + push（英文祈使句提交信息），不留未推提交。
-- 素材任务按 `studio/contract/sets/INDEX.md` 一套一套走，状态由 SET 文档验收清单勾选体现。
-
-## 5. 素材机产出落位（git 内）
-
+```powershell
+Unregister-ScheduledTask -TaskName 'Solstice Git Sync' -Confirm:$false
+Get-ScheduledTask -TaskName 'Solstice Git Sync' | Get-ScheduledTaskInfo
 ```
-studio/contract/            # 任务书与合同（要什么；代码机维护）
-studio/jobs/                # 生成作业单（怎么生成；素材机维护）
-studio/frames/selected/     # 裁决入选帧（SET-00）
-studio/frames/golden/       # 黄金帧 TF01（视觉回归基准）
-studio/frames/candidates/   # 候选草案（裁决用，可清理）
-app/assets/packs/<name>/    # 成包素材（SET-01/02/03，studio/tools/pack.py 产出）
-studio/work/raw/            # raw 候选（gitignore，永不提交）
+
+- 运行身份用当前用户（复用凭据缓存）。无人值守需配 **SSH key** 或 **Git Credential Manager**。
+- 手动兜底：
+
+```powershell
+cd d:\GitCode\solstice
+git pull --rebase --autostash
+git add -A; git commit -m "chore: sync"; git push
 ```
+
+---
+
+## 3. 避免冲突的实践
+
+1. **目录归属分工**：素材机只动 `studio/`，代码机只动 `game/`、`tools/`、`shared/`。
+2. **小步提交、频繁同步**：宁可多 push，不攒一整天。
+3. **派生文件不入库**：`Intermediate`、`Binaries`、`*_generated.h`、`compile_commands.json`、`.sln` 一律忽略，跨机各自生成。
+4. **遇分叉**：`git pull --rebase --autostash`；冲突解决后 `git rebase --continue`。
+5. **不要 force push 共享分支**。
+
+---
+
+## 4. `Content/` 下大资产的处理
+
+`game/Content/**` 的 `.uasset` / `.umap` 体积大且二进制不可合并，**默认不入 git**（见 `docs/STRUCTURE.md` §5）。三选一：
+
+- **优先（当前策略）：本地再生 + 契约入库。** 只版本化 `Source/`、`Config/`、`shared/`、`studio/prompts`、`manifest.jsonl`。
+- **可选：Git LFS**（仅跟踪少量确需共享的关键资产）：
+
+```powershell
+git lfs install
+git lfs track "game/Content/**/*.uasset" "game/Content/**/*.umap"
+git add .gitattributes game/Content
+```
+
+> ⚠ LFS 需远端配额（GitHub/GitLab 均有）；**不要**把 `Intermediate` / `DerivedDataCache` 塞进 LFS。
+
+- **不同步**：两台机器各自持有编辑器生成的资产副本，靠 `Source/` + 脚本重建。**若两台机都改同一批资产，这是唯一不会冲突的方案。**

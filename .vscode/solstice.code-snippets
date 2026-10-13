@@ -1,0 +1,184 @@
+// 《至日 · 岁局》C++ 代码片段（适用于 cpp / c 文件）
+// 输入前缀 + Tab 即可展开，减少虚幻引擎反射宏的样板敲打。
+{
+  "UE: 头文件骨架（pragma + 生成头）": {
+    "scope": "cpp",
+    "prefix": "ueh",
+    "body": [
+      "#pragma once",
+      "",
+      "#include \"CoreMinimal.h\"",
+      "#include \"${1:${TM_FILENAME_BASE}}.generated.h\"",
+      "",
+      "// ${2:说明}",
+      "${0}"
+    ],
+    "description": "UE 头文件骨架，注意 .generated.h 必须放在最后一个 include"
+  },
+  "UE: UCLASS": {
+    "scope": "cpp",
+    "prefix": "uclass",
+    "body": [
+      "UCLASS(${1:BlueprintType})",
+      "class SOLSTICE_API ${2:UMyClass} : public ${3:UObject}",
+      "{",
+      "\\tGENERATED_BODY()",
+      "",
+      "public:",
+      "\\t${4}",
+      "};",
+      "${0}"
+    ]
+  },
+  "UE: UCLASS(Abstract) 组件/子系统": {
+    "scope": "cpp",
+    "prefix": "uclassa",
+    "body": [
+      "UCLASS(Abstract)",
+      "class SOLSTICE_API ${1:UMyWidget} : public ${2:UUserWidget}",
+      "{",
+      "\\tGENERATED_BODY()",
+      "",
+      "protected:",
+      "\\tUFUNCTION(BlueprintImplementableEvent, Category = \"Solstice|UI\")",
+      "\\tvoid On${3:Refreshed}(const TArray<FName>& ${4:Ids});",
+      "};",
+      "${0}"
+    ]
+  },
+  "UE: USTRUCT": {
+    "scope": "cpp",
+    "prefix": "ustruct",
+    "body": [
+      "USTRUCT(BlueprintType)",
+      "struct SOLSTICE_API ${1:FMyStruct}${2: : public FTableRowBase}",
+      "{",
+      "\\tGENERATED_BODY()",
+      "",
+      "\\tUPROPERTY(EditAnywhere, BlueprintReadWrite, Category = \"Solstice|${3:Data}\")",
+      "\\t${4:int32} ${5:Value} = ${6:0};",
+      "};",
+      "${0}"
+    ]
+  },
+  "UE: UENUM": {
+    "scope": "cpp",
+    "prefix": "uenum",
+    "body": [
+      "UENUM(BlueprintType)",
+      "enum class ${1:EMyEnum} : uint8",
+      "{",
+      "\\t${2:None} UMETA(DisplayName = \"${3:无}\"),",
+      "\\t${4:Value} UMETA(DisplayName = \"${5:值}\")",
+      "};",
+      "${0}"
+    ]
+  },
+  "UE: UPROPERTY（可编辑）": {
+    "scope": "cpp",
+    "prefix": "uprop",
+    "body": [
+      "UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = \"Solstice|${1:Data}\")",
+      "\\t${2:int32} ${3:Value} = ${4:0};"
+    ]
+  },
+  "UE: UPROPERTY（只读）": {
+    "scope": "cpp",
+    "prefix": "upropr",
+    "body": [
+      "UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = \"Solstice|${1:Data}\")",
+      "\\tTObjectPtr<${2:UObject}> ${3:Ref};"
+    ]
+  },
+  "UE: UFUNCTION（蓝图可调用）": {
+    "scope": "cpp",
+    "prefix": "ufunc",
+    "body": [
+      "UFUNCTION(BlueprintCallable, Category = \"Solstice|${1:Category}\")",
+      "\\t${2:void} ${3:DoSomething}(${4});"
+    ]
+  },
+  "UE: UFUNCTION（纯函数）": {
+    "scope": "cpp",
+    "prefix": "ufuncp",
+    "body": [
+      "UFUNCTION(BlueprintPure, Category = \"Solstice|${1:Category}\")",
+      "\\tstatic ${2:float} ${3:Compute}(${4});"
+    ]
+  },
+  "UE: UE_LOG": {
+    "scope": "cpp",
+    "prefix": "ulog",
+    "body": [
+      "UE_LOG(LogTemp, ${1:Log}, TEXT(\"[Solstice] ${2:%s}\")${3:, *${4:Value}});"
+    ]
+  },
+  "UE: 主模块实现": {
+    "scope": "cpp",
+    "prefix": "uemodule",
+    "body": [
+      "#include \"${1:Solstice}.h\"",
+      "#include \"Modules/ModuleManager.h\"",
+      "",
+      "IMPLEMENT_PRIMARY_GAME_MODULE(FDefaultGameModuleImpl, ${1:Solstice}, \"${1:Solstice}\");",
+      "${0}"
+    ]
+  },
+  "UE: GameInstanceSubsystem": {
+    "scope": "cpp",
+    "prefix": "usubsystem",
+    "body": [
+      "UCLASS()",
+      "class SOLSTICE_API U${1:Solstice}Subsystem : public UGameInstanceSubsystem",
+      "{",
+      "\\tGENERATED_BODY()",
+      "",
+      "public:",
+      "\\tvirtual void Initialize(FSubsystemCollectionBase& Collection) override;",
+      "",
+      "\\tUFUNCTION(BlueprintCallable, Category = \"Solstice|${2:Category}\")",
+      "\\t${3:void} ${4:DoWork}();",
+      "};",
+      "${0}"
+    ]
+  },
+  "UE: DataAsset": {
+    "scope": "cpp",
+    "prefix": "udataasset",
+    "body": [
+      "UCLASS(BlueprintType)",
+      "class SOLSTICE_API U${1:Card}DataAsset : public UDataAsset",
+      "{",
+      "\\tGENERATED_BODY()",
+      "",
+      "public:",
+      "\\tUPROPERTY(EditAnywhere, BlueprintReadOnly, Category = \"Solstice|${2:Data}\")",
+      "\\t${3:F${1:Card}Definition} Definition;",
+      "};",
+      "${0}"
+    ]
+  },
+  "Solstice: 契约字段（双语文本）": {
+    "scope": "cpp",
+    "prefix": "sloc",
+    "body": [
+      "UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = \"Solstice|Text\")",
+      "\\tFSolsticeLocalizedText ${1:Name};"
+    ]
+  },
+  "Solstice: 契约字段（id）": {
+    "scope": "cpp",
+    "prefix": "sid",
+    "body": [
+      "UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = \"Solstice|${1:Data}\")",
+      "\\tFName Id;"
+    ]
+  },
+  "Solstice: 元素相克调用": {
+    "scope": "cpp",
+    "prefix": "selm",
+    "body": [
+      "const float Effectiveness = USolsticeElementChart::GetEffectiveness(${1:AttackerElement}, ${2:DefenderElement});"
+    ]
+  }
+}

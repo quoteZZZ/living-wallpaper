@@ -1,0 +1,67 @@
+// 调试配置（F5）
+// cppvsdbg = Visual Studio 调试引擎，需要 VS2022 生成工具已安装（见 docs/ENV.md）
+// __UE_ENGINE_ROOT__ 由 tools\configure-vscode.ps1 自动替换为真实引擎路径
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      // 日常首选：编辑器常驻，改完 C++ 用 Live Coding 热编译后附加调试
+      "name": "Solstice: 附加到 UnrealEditor",
+      "type": "cppvsdbg",
+      "request": "attach",
+      "processId": "${command:pickProcess}",
+      "symbolSearchPath": "${workspaceFolder}/game/Binaries/Win64",
+      "sourceFileMap": {}
+    },
+    {
+      // 干净复现：由 VSCode 直接拉起编辑器并进入游戏（-game 跳过编辑器 UI）
+      "name": "Solstice: 启动 UnrealEditor（-game）",
+      "type": "cppvsdbg",
+      "request": "launch",
+      "program": "__UE_ENGINE_ROOT__/Engine/Binaries/Win64/UnrealEditor.exe",
+      "args": [
+        "${workspaceFolder}/game/Solstice.uproject",
+        "-game",
+        "-log",
+        "-windowed",
+        "-ResX=1600",
+        "-ResY=900"
+      ],
+      "cwd": "${workspaceFolder}/game",
+      "environment": [],
+      "console": "externalTerminal",
+      "symbolSearchPath": "${workspaceFolder}/game/Binaries/Win64"
+    },
+    {
+      // 完整编辑器（要拖资产、连蓝图时用这个）
+      "name": "Solstice: 启动 UnrealEditor（编辑器 UI）",
+      "type": "cppvsdbg",
+      "request": "launch",
+      "program": "__UE_ENGINE_ROOT__/Engine/Binaries/Win64/UnrealEditor.exe",
+      "args": ["${workspaceFolder}/game/Solstice.uproject", "-log"],
+      "cwd": "${workspaceFolder}/game",
+      "environment": [],
+      "console": "externalTerminal"
+    },
+    {
+      // 离线平衡模拟器：M1 起落地（纯 C++ 命令行，不依赖渲染）
+      "name": "Solstice: 岁局模拟器（占位，M1 启用）",
+      "type": "cppvsdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/game/Binaries/Win64/SolsticeSim.exe",
+      "args": ["--runs", "1000", "--seed", "1"],
+      "cwd": "${workspaceFolder}/game",
+      "console": "integratedTerminal",
+      "preLaunchTask": "Solstice: 构建 SolsticeEditor (Development)"
+    },
+    {
+      // 调试 tools/ 下的 PowerShell 脚本
+      "name": "PowerShell: 调试当前脚本",
+      "type": "PowerShell",
+      "request": "launch",
+      "script": "${file}",
+      "cwd": "${workspaceFolder}",
+      "createTemporaryIntegratedConsole": true
+    }
+  ]
+}

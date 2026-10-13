@@ -1,0 +1,87 @@
+// 工作区扩展建议 —— **扩展清单的唯一真源**
+//   recommendations         = 打开本仓库时提示安装（标 ✅ 的是本机已装）
+//   unwantedRecommendations = 与本项目无关，抑制 VS Code 的推荐噪音（只降噪，不卸载）
+// 增删本机扩展请走 tools\vscode-extensions.ps1（默认只读；-RemoveUnwanted 先预览，
+// 加 -Confirm 才真正全局卸载）。扩展分析与处置记录见 docs\VSCODE.md §3。
+//
+// ⚠ 已装但按设计「不启用」的扩展（刻意不写进下面两张清单，以免被 -RemoveUnwanted 一并卸掉）：
+//   · llvm-vs-code-extensions.vscode-clangd —— 路线 B 专用。当前路线 A（cpptools）下两套
+//     IntelliSense 会重复报错，请在扩展面板对它右键 → Disable (Workspace)。
+//     彻底移除：code --uninstall-extension llvm-vs-code-extensions.vscode-clangd
+//   · 个人工具（翻译 / 键位，随你保留）：intellsmi.comment-translate、
+//     xiaodiyan.translator-helper、k--kato.intellij-idea-keybindings、orionunique.troll
+// 注：openai.chatgpt、openai.codex-audio 已于 2026-10-13 卸载；本项目唯一 AI 助手 = CodeBuddy
+//     （tencent-cloud.coding-copilot）。详见 docs\VSCODE.md §3.6。
+{
+  "recommendations": [
+    // ---- 必需：C++ / 虚幻引擎 ----
+    "ms-vscode.cpptools", // C++ IntelliSense + cppvsdbg 调试（✅ 已装）
+    "ms-vscode.cpptools-themes", // C++ 语义着色主题（✅ 已装）
+
+    // ---- 必需：脚本与工程 ----
+    "ms-vscode.powershell", // tools/ 下全部脚本（✅ 已装）
+    "editorconfig.editorconfig", // 统一编码/缩进/换行（✅ 已装，规则见仓库根 .editorconfig）
+
+    // ---- 必需：界面语言（代码、脚本、文档全中文，界面统一为简体中文）----
+    "ms-ceintl.vscode-language-pack-zh-hans", // 简体中文语言包（✅ 已装）
+
+    // ---- 高价值：数据与文档 ----
+    "redhat.vscode-yaml", // YAML 校验与补全（✅ 已装）
+    "yzhang.markdown-all-in-one", // 文档表格/TOC/预览（✅ 已装）
+    "davidanson.vscode-markdownlint", // 文档规范（✅ 已装）
+
+    // ---- 高价值：开发体验 ----
+    "usernamehw.errorlens", // 行内显示 C++ 错误（✅ 已装）
+    "gruntfuggly.todo-tree", // 汇总 TODO/FIXME（✅ 已装）
+    "streetsidesoftware.code-spell-checker", // 中英拼写检查（已配 cSpell.words）（✅ 已装）
+    "christian-kohler.path-intellisense", // 路径补全（✅ 已装）
+    "sleistner.vscode-fileutils", // 文件操作增强（✅ 已装）
+
+    // ---- 可选：按需安装（下列均已装；未用到不影响任何功能）----
+    "eamodio.gitlens", // git blame / 历史（双机同步场景有用）（✅ 已装）
+    "mhutchie.git-graph", // 图形化 git 历史（✅ 已装）
+    "bierner.markdown-mermaid", // 文档里画流程图（✅ 已装）
+    "jock.svg", // SVG 预览（UI 素材）（✅ 已装）
+    "ms-vscode.hexeditor", // 十六进制查看 .uasset 头部（✅ 已装）
+    "wayou.vscode-todo-highlight" // 可选：TODO 行内高亮。设置里已配 todo-tree.highlights.defaultHighlight，功能与之重叠；想精简可卸载，不影响 todo-tree（✅ 已装）
+  ],
+  "unwantedRecommendations": [
+    // Java / Spring / Maven —— 与本项目无关
+    "redhat.java",
+    "vscjava.vscode-java-pack",
+    "vscjava.vscode-java-debug",
+    "vscjava.vscode-java-dependency",
+    "vscjava.vscode-java-test",
+    "vscjava.vscode-maven",
+    "vscjava.vscode-spring-boot-dashboard",
+    "vscjava.vscode-spring-initializr",
+    "vmware.vscode-spring-boot",
+    "vmware.vscode-boot-dev-pack",
+    "oracle.oracle-java",
+    "caolin.java-run",
+    // 前端：Vue / JS / HTML / CSS —— 本项目零前端源码
+    "vue.volar",
+    "octref.vetur",
+    "hollowtree.vue-snippets",
+    "oysun.vuehelper",
+    "morningstart.vue3-snipptes",
+    "fallenmax.mithril-emmet",
+    "ecmel.vscode-html-css",
+    "ritwickdey.liveserver",
+    "techer.open-in-browser",
+    "formulahendry.auto-close-tag",
+    "formulahendry.auto-rename-tag",
+    "xabikos.javascriptsnippets",
+    "christian-kohler.npm-intellisense",
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "rvest.vs-code-prettier-eslint",
+    "orta.vscode-jest",
+    // 其他无关工具链
+    "mtxr.sqltools",
+    "johnstoncode.svn-scm",
+    "ms-azuretools.vscode-containers",
+    "formulahendry.code-runner",
+    "dotjoshjohnson.xml"
+  ]
+}

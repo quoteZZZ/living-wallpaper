@@ -1,0 +1,255 @@
+// 《至日 · 岁局》工作区设置
+// 说明：这是「工作区级」设置，只影响本仓库，不改动你的用户级全局设置。
+// 引擎路径占位符 __UE_ENGINE_ROOT__ 由 tools\configure-vscode.ps1 自动替换。
+{
+  // ========================= 文件与编码 =========================
+  "files.encoding": "utf8",
+  "files.eol": "\n",
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true,
+  "files.trimFinalNewlines": true,
+  "files.autoSave": "off", // 改头文件会触发编译，交给显式保存更安全
+  "files.associations": {
+    "*.uproject": "jsonc",
+    "*.uplugin": "jsonc",
+    "*.upluginmanifest": "json",
+    "*.Build.cs": "csharp",
+    "*.Target.cs": "csharp",
+    "*.usf": "cpp",
+    "*.ush": "cpp",
+    "*.inl": "cpp",
+    "*.ini": "ini"
+  },
+
+  // 把 UE 生成物设为只读，避免误编辑（改了也会被覆盖）
+  "files.readonlyInclude": {
+    "**/game/Binaries/**": true,
+    "**/game/Intermediate/**": true,
+    "**/game/Saved/**": true,
+    "**/game/DerivedDataCache/**": true
+  },
+
+  // ========================= 性能：排除 UE 生成物 =========================
+  // 注：studio/ 与 shared/ 目前尚未落地（见 docs\STRUCTURE.md §1 的规划），
+  //     下面这些 studio/* 排除项属于预置，目录一旦建立即自动生效，现在留着无副作用。
+  "files.exclude": {
+    "**/game/Binaries": true,
+    "**/game/Intermediate": true,
+    "**/game/Saved": true,
+    "**/game/DerivedDataCache": true,
+    "**/game/.vs": true,
+    "**/studio/work": true,
+    "**/__pycache__": true
+  },
+  "search.exclude": {
+    "**/game/Binaries": true,
+    "**/game/Intermediate": true,
+    "**/game/Saved": true,
+    "**/game/DerivedDataCache": true,
+    "**/game/Content": true,
+    "**/studio/out": true,
+    "**/studio/work": true,
+    "**/*.sln": true
+  },
+  "files.watcherExclude": {
+    "**/game/Binaries/**": true,
+    "**/game/Intermediate/**": true,
+    "**/game/Saved/**": true,
+    "**/game/DerivedDataCache/**": true,
+    "**/studio/out/**": true,
+    "**/studio/work/**": true,
+    "**/.git/objects/**": true
+  },
+
+  // ========================= 编辑器 =========================
+  "editor.tabSize": 4,
+  "editor.insertSpaces": true,
+  "editor.detectIndentation": false, // 固定为 4 空格，不被文件内容带偏
+  "editor.rulers": [120],
+  "editor.formatOnSave": false, // 关键：避免全局 prettier/eslint 去动 C++ / PS1 / ini
+  "editor.formatOnPaste": false,
+  "editor.renderWhitespace": "boundary",
+  "editor.bracketPairColorization.enabled": true,
+  "editor.guides.bracketPairs": "active",
+  "editor.suggestSelection": "first",
+  "editor.minimap.maxColumn": 120,
+  "editor.largeFileOptimizations": true,
+  "editor.unicodeHighlight.ambiguousCharacters": false, // 中英混排不刷黄
+
+  // 语言级覆盖
+  "[cpp]": {
+    "editor.defaultFormatter": "ms-vscode.cpptools", // 走 clang-format（配置见仓库根 .clang-format）
+    "editor.wordBasedSuggestions": "off",
+    "editor.tabSize": 4
+  },
+  "[c]": {
+    "editor.defaultFormatter": "ms-vscode.cpptools"
+  },
+  "[csharp]": { "editor.tabSize": 4, "editor.insertSpaces": false },
+  "[powershell]": {
+    "editor.tabSize": 4,
+    "editor.insertSpaces": true,
+    "editor.detectIndentation": false
+  },
+  "[json]": { "editor.tabSize": 2 },
+  "[jsonc]": { "editor.tabSize": 2 },
+  "[yaml]": { "editor.tabSize": 2 },
+  "[ini]": { "editor.tabSize": 2 }, // UE 的 Config/*.ini，与 .editorconfig 一致
+  "[markdown]": {
+    "editor.wordWrap": "on",
+    "editor.rulers": [],
+    "editor.quickSuggestions": { "comments": "off", "strings": "off", "other": "on" },
+    "files.trimTrailingWhitespace": false
+  },
+
+  // ========================= C/C++（csproj / clangd CLI 均为可选） =========================
+  // 路线 A（当前启用）：cpptools + Solstice.sln
+  "C_Cpp.intelliSenseEngine": "default",
+  "C_Cpp.default.cStandard": "c17",
+  "C_Cpp.default.cppStandard": "c++20",
+  "C_Cpp.default.intelliSenseMode": "windows-msvc-x64",
+  "C_Cpp.default.compileCommands": "${workspaceFolder}/game/compile_commands.json",
+  "C_Cpp.errorSquiggles": "enabled",
+  "C_Cpp.autocompleteAddParentheses": true,
+  "C_Cpp.intelliSenseCacheSize": 2048,
+  "C_Cpp.workspaceParsingPriority": "high",
+  "C_Cpp.vcpkg.enabled": false,
+  "C_Cpp.files.exclude": {
+    "**/game/Binaries/**": true,
+    "**/game/Intermediate/**": true,
+    "**/game/Saved/**": true,
+    "**/game/DerivedDataCache/**": true
+  },
+  // ⚠ 冲突警示：本机已装 llvm-vs-code-extensions.vscode-clangd，但当前走的是路线 A。
+  //   两套引擎同时提供 IntelliSense 会出现重复报错/重复高亮。处置（保持路线 A）：
+  //     扩展面板 → llvm-vs-code-extensions.vscode-clangd → 右键 → Disable (Workspace)
+  //   彻底移除：code --uninstall-extension llvm-vs-code-extensions.vscode-clangd
+  //
+  // 路线 B（clangd）切换步骤：
+  //   1) 确保 clangd 扩展已安装并在本工作区启用
+  //   2) 运行 task「Solstice: 生成工程文件 (ClangDb)」
+  //   3) 把上面的 C_Cpp.intelliSenseEngine 改为 "disabled"，并取消注释下面 clangd 三行
+  // "clangd.arguments": ["--compile-commands-dir=${workspaceFolder}/game", "--background-index", "--header-insertion=never"],
+  // "clangd.fallbackFlags": ["-std=c++20", "-D__UNREAL__", "-DPLATFORM_WINDOWS=1"],
+  // "clangd.detectExtensionConflicts": true,
+
+  // ========================= PowerShell =========================
+  // 本项目所有 .ps1 均为 UTF-8 with BOM（PS 5.1 才不会把中文当 ANSI 解析）
+  "powershell.codeFormatting.preset": "OTBS",
+  "powershell.codeFormatting.autoTrimWhitespace": true,
+  "powershell.codeFormatting.whitespaceBetweenParameters": true,
+  "powershell.scriptAnalysis.enable": true,
+  "powershell.integratedConsole.showOnStartup": false,
+  "powershell.integratedConsole.focusConsoleOnExecute": false,
+
+  // ========================= 终端 =========================
+  // 用一个基于系统 PowerShell 的 profile，自动带上 -ExecutionPolicy Bypass
+  "terminal.integrated.defaultProfile.windows": "PowerShell (Solstice)",
+  "terminal.integrated.profiles.windows": {
+    "PowerShell (Solstice)": {
+      "source": "PowerShell",
+      "args": ["-NoLogo", "-ExecutionPolicy", "Bypass"]
+    }
+  },
+  "terminal.integrated.cwd": "${workspaceFolder}",
+  "terminal.integrated.scrollback": 10000,
+  "terminal.integrated.env.windows": {
+    "SOLSTICE_REPO": "${workspaceFolder}"
+  },
+
+  // ========================= JSON Schema 校验 =========================
+  // 让编辑器直接校验 shared/examples 下的数据是否符合契约。
+  // ⚠ shared/schema/* 尚未落地时保持注释；落地后取消注释即可生效。
+  // "json.schemas": [
+  //   { "fileMatch": ["/shared/examples/spirits.sample.json"], "url": "./shared/schema/spirit.schema.json" },
+  //   { "fileMatch": ["/shared/examples/cards.sample.json"], "url": "./shared/schema/card.schema.json" },
+  //   { "fileMatch": ["/shared/examples/wards.sample.json"], "url": "./shared/schema/warden.schema.json" },
+  //   { "fileMatch": ["/shared/examples/synergies.sample.json"], "url": "./shared/schema/synergy.schema.json" },
+  //   { "fileMatch": ["/shared/examples/keywords.sample.json"], "url": "./shared/schema/keyword.schema.json" },
+  //   { "fileMatch": ["/shared/examples/story.sample.json"], "url": "./shared/schema/story.schema.json" },
+  //   { "fileMatch": ["/studio/out/manifest.jsonl"], "url": "./shared/schema/manifest.schema.json" }
+  // ],
+
+  // ========================= 扩展行为调优 =========================
+  "todo-tree.general.tags": ["TODO", "FIXME", "HACK", "NOTE", "@todo", "XXX"],
+  "todo-tree.filtering.excludeGlobs": [
+    "**/game/Binaries/**",
+    "**/game/Intermediate/**",
+    "**/game/Saved/**",
+    "**/studio/out/**"
+  ],
+  "todo-tree.highlights.defaultHighlight": {
+    "type": "text-and-comment",
+    "foreground": "#FFFFFF",
+    "background": "#1E1A24",
+    "border": "#C9A227"
+  },
+  "errorLens.enabledDiagnosticLevels": ["error", "warning"],
+  "errorLens.excludeBySource": ["cpptools/clang-diagnostics"],
+
+  "markdownlint.config": {
+    "MD013": false, // 文档里有长表格与长句，不强制换行
+    "MD033": false, // 允许内联 HTML
+    "MD041": false,
+    "MD024": { "siblings_only": true }
+  },
+  "markdown.extension.toc.levels": "2..3",
+  "markdown.extension.toc.updateOnSave": false,
+
+  "yaml.schemas": {
+    // 预留：后续 CI / 工作流 YAML 的 schema 挂载点
+  },
+  "yaml.validate": true,
+  "yaml.format.enable": true,
+
+  "cSpell.language": "en,zh-CN",
+  "cSpell.words": [
+    "Solstice",
+    "岁局",
+    "UCLASS",
+    "USTRUCT",
+    "UENUM",
+    "UPROPERTY",
+    "UFUNCTION",
+    "FTableRowBase",
+    "DataTable",
+    "DataAsset",
+    "cppvsdbg",
+    "clangd",
+    "UnrealBuildTool",
+    "uproject",
+    "uplugin",
+    "uasset",
+    "umap",
+    "ComfyUI",
+    "safetensors",
+    "RealESRGAN",
+    "Lumen",
+    "Nanite",
+    "subsystem",
+    "Bulwark",
+    "Yearguard",
+    "Yearbound",
+    "SolsticeSim",
+    "OTBS",
+    "Allman"
+  ],
+
+  // ========================= 项目级安全 / 工作流 =========================
+  "explorer.confirmDelete": true, // 覆盖全局的 false：游戏资产与生成图删错代价高
+  "explorer.confirmDragAndDrop": true,
+  "workbench.editor.enablePreview": false, // 双击不顶掉当前标签，方便多个 .cpp 之间对照
+  "git.autofetch": true,
+  "git.confirmSync": false,
+  "git.enableSmartCommit": false,
+  "git.detectSubmodules": false,
+
+  // ========================= 无关扩展的降噪设置（已整段清理） =========================
+  // 原先这里为 Java / Vue / eslint / prettier / jest / sqltools / svn / xml 等扩展
+  // 逐条写死「关闭功能」。这些扩展现已全部卸载（清单见 .vscode\extensions.json 的
+  // unwantedRecommendations），对应设置随之失效，因此整段移除，避免留下误导性的死配置。
+  // 日后若重新安装某个扩展，直接在编辑器 UI 里按需关闭即可，无需回到本文件。
+  //
+  // 唯一的保险保留在「编辑器」段：editor.formatOnSave = false，
+  // 即使将来装了格式化类扩展，也不会误动 C++ / PS1 / ini。
+}
