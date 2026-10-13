@@ -40,10 +40,10 @@ cinematic wide shot 16:9, masterpiece, best quality, ultra detailed, 4k wallpape
 ## 4. 打包（素材机本机执行）
 
 ```powershell
-python tools/pack_builder.py --out app/assets/packs/mountains `
+python studio/tools/pack.py --out app/assets/packs/mountains `
   --id pack.mountains --name-zh "远景主视觉" --name-en "Scene Background" --slot mid `
   --image scene.png --depth depth.png `
-  --credit "<模型名> | prompt: tools/prompts/sets/SET-01 | <日期>"
+  --credit "<模型名> | prompt: studio/contract/sets/SET-01 | <日期>"
 ```
 
 打包器自动校验：PNG 格式、长边 ≥2048、深度图与原图尺寸一致（不一致会告警，必须处理后再提交）。
@@ -51,7 +51,7 @@ python tools/pack_builder.py --out app/assets/packs/mountains `
 ## 5. 提交
 
 ```
-git add app/assets/packs/mountains tools/prompts/selected/TF01.png
+git add app/assets/packs/mountains studio/frames/selected/TF01.png
 git commit -m "assets: SET-01 background pack (TF01 style)"
 git push
 ```

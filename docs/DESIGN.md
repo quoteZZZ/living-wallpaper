@@ -118,27 +118,21 @@
 - 后端契约：`init() / frame(st, t)`，吃同一份 st（太阳/卡片/天气/夜晚系数），编辑器命中区由后端暴露几何（lakeBox/horseBand）
 - 新风格 = 新后端或后端内的预设分支，**元素与交互零改动**
 
-### 2.3 目录规范（红线：新文件必须归位；2026-10-13 已重组为 app/）
+### 2.3 目录规范（红线：新文件必须归位）
+
+**完整目录树、命名规则与归位决策表见 [`STRUCTURE.md`](STRUCTURE.md)（唯一真源）**；本节只留形状摘要：
+
 ```
-app/
-├─ index.html            # 入口：纸墨主题令牌 + 画布宿主 + 脚本装配
-├─ js/
-│  ├─ kernel.js          # 微内核：i18n/存储/上下文总线/注册表(cards+actors)/场景簿/配置S
-│  ├─ icons.js           # Lucide 图标（ISC）
-│  ├─ core/              # 渲染后端
-│  │  ├─ composer.js     # WebGL 程序化后端 + 主循环指挥
-│  │  └─ sketch.js       # 简笔画 2D 后端（M1）
-│  ├─ ui/                # 交互组件
-│  │  ├─ hud.js          # 游戏 HUD：底部 Dock（注册制）+ 纸签弹出面板
-│  │  ├─ panel.js        # 设置中心（玩家层/开发者层）
-│  │  └─ editor.js       # 场景编辑器（圆盘/Gizmo/菜单/工具）
-│  ├─ plugins/           # 内容插件（官方自举）
-│  │  ├─ base.js mountains.js weather.js trees.js horses.js presets.js info.js
-│  └─ main.js            # 装配启动
-└─ assets/               # 模型/图片素材库（F5）
-tools/                   # 资产脚本（pack_builder / target-frames / spike_workerw）
-docs/                    # DESIGN / PACKS_GUIDE
+app/        运行时：游戏本体 + 壁纸模式（发布物）—— js/{kernel,core,ui,plugins,vendor,shell} + assets/{packs,models,images}
+shared/     跨域契约：pack manifest schema + 图层类/卡槽表（运行时与生产线共读，零逻辑）
+studio/     素材生产线（离线）：contract(要什么) · jobs(怎么生成) · tools(怎么跑) · frames(跑出什么) · work(中间件，gitignore)
+dev/        工程基建：双机同步（sync）+ 机制验证留档（spikes）
+docs/       文档：DESIGN(设计) · STRUCTURE(目录) · PACKS_GUIDE(素材) · SYNC(协作)
+site/       落地页资源；根级 index.html 为 Pages 入口（硬约束，见 STRUCTURE §8）
 ```
+
+三分法：**会进发行包的 → `app/`；产出素材的 → `studio/`；双方共读的定义 → `shared/`**。
+加文件前先查 `STRUCTURE.md §4` 归位决策表；依赖方向单向（见 `STRUCTURE.md §5`）。
 
 ### 2.4 状态与配置（S 模型）
 ```
@@ -162,12 +156,12 @@ K.scenes = { slots:3, snapshot(), save(i), load(i), del(i), list() }   # 场景�
 | 3D 低模 | ~~CC0 双源~~ **v5.3 移出素材线**（2.5D 定稿；Quaternius 仅存 spike 工具资产；Kenney 2D/UI 粒子可作开发期占位） | — |
 
 **公共环节（红线）**：
-1. **目标帧合同**：优美线素材开工前必须先有经用户裁决锁定的目标帧（8 张关键帧，`tools/prompts/target-frames.md`）；成图与目标帧显著偏离 = 退回。TF01 兼作黄金帧基准。
+1. **目标帧合同**：优美线素材开工前必须先有经用户裁决锁定的目标帧（8 张关键帧，`studio/contract/target-frames.md`）；成图与目标帧显著偏离 = 退回。TF01 兼作黄金帧基准。
 2. **渲染氛围层**：色彩分级 LUT、雾、太阳光辉、辉光进正式管线——素材只负责造型，氛围由渲染承担。
 3. 图片元素入素材库登记来源/许可/适用风格；素材留档 prompt+来源，备 Steam AI 披露审查。
 
 ### 2.6 壁纸模式（F4）实现要点
-- 机制已验证（tools/spike_workerw.ps1）：WebView2 窗口 → WS_CHILD → SetParent
+- 机制已验证（`dev/spikes/workerw_embed.ps1`）：WebView2 窗口 → WS_CHILD → SetParent
 - 目标层回退链：`DefView 宿主后的 WorkerW`（Win10/部分 Win11）→ `DefView 宿主（Progman）本体`（Win11 25H2 实测回退有效，图标层保持在上）
 - 功耗：30fps 门控 + hidden 跳帧（原型的帧指挥保留）
 - 时机：M2 后，作为"游戏的一个功能按钮"（设置里：设为桌面壁纸 / 恢复）
@@ -181,7 +175,7 @@ K.scenes = { slots:3, snapshot(), save(i), load(i), del(i), list() }   # 场景�
 | WorkerW 嵌入机制（PowerShell 复现） | ✅ 机制验证通过（含 Win11 Progman 回退）；Tauri 集成待 F4 阶段 |
 | steamworks 插件 | ⏳ F4/T1.3 |
 
-> **v5.3 备注**：上表 Babylon/GLTF spike 结果**保留存档**（`tools/spike_babylon.html`、`app/assets/models/`），
+> **v5.3 备注**：上表 Babylon/GLTF spike 结果**保留存档**（`app/assets/models/`；`tools/spike_babylon.html` 已在 2026-10-13 分域整理时删除，需要时从 git 历史取回），
 > 但 2.5D 定稿后**不再推进**：引擎不引入 Babylon，新素材一律 2D 生成（§2.5）。
 
 ### 2.8 Actor 协议与游戏 HUD（v5.2 定稿，2026-10-13）
@@ -226,7 +220,8 @@ K.scenes = { slots:3, snapshot(), save(i), load(i), del(i), list() }   # 场景�
 - v3：web 壁纸原型（微内核+插件、三态冲突、双画布）——现役代码
 - v4.0：Godot 4 + C# 方案——经引擎对比后否决（用户语言路线）
 - v4.1：TS 全栈定稿；简笔画场景包"AI 整图拆层"管线存档（路线 B / 照片级远景时启用）
-- v5.1（2026-10-13）：素材生产定稿**混合分层路线**（远景整图分层 + 前景 sprite + 目标帧合同 + 渲染氛围层）；CC0 双源降级为占位资产。见 §2.5、`tools/prompts/target-frames.md`、`tools/pack_builder.py`
+- v5.1（2026-10-13）：素材生产定稿**混合分层路线**（远景整图分层 + 前景 sprite + 目标帧合同 + 渲染氛围层）；CC0 双源降级为占位资产。见 §2.5、`studio/contract/target-frames.md`、`studio/tools/pack.py`
 - v5.2（2026-10-13）：**UI 游戏化 + Actor 协议**——游戏为主壁纸为输出；Dock/纸签面板/元素架/场景簿落地；马群成为首个交互 Actor（点击回应）；纸墨主题令牌；设置中心拆玩家/开发者两层。见 §1.3、§2.8
 - v5.3（2026-10-13）：**2.5D 定稿**——放弃 3D/Babylon 线，素材统一为部署模型 2D 生成（深度视差 + sprite + LUT 氛围层）；Babylon/GLTF spike 保留存档不推进；素材全部由素材机本地部署模型生成（云端降备用）；双机自动同步（`docs/SYNC.md`）。
-- WorkerW / Pollinations / 图片包管线脚本：`tools/`
+- WorkerW spike / 双机同步脚本：`dev/spikes/`、`dev/sync/`；Pollinations 与图片包管线脚本已删除（见 [`STRUCTURE.md`](STRUCTURE.md) §6 迁移表）
+- v5.4（2026-10-13）：**目录分域定稿**——`tools/` 杂物抽屉拆为 `studio/`（素材生产线）+ `dev/`（工程基建）+ `shared/`（跨域契约），落地页资源归 `site/`，删除 4 个废弃脚本；目录与命名规范独立成 [`STRUCTURE.md`](STRUCTURE.md)（§2.3 收缩为摘要）。

@@ -1,7 +1,7 @@
 # 目标帧候选（本地 FLUX.2 [klein] 4B 草案）
 
 > **这些不是正式素材。**
-> 按 `docs/PACKS_GUIDE.md` §0 与 `tools/prompts/target-frames.md`，正式目标帧要求
+> 按 `docs/PACKS_GUIDE.md` §0 与 `studio/contract/target-frames.md`，正式目标帧要求
 > **16:9 / ≥4K / 云端顶级模型**产出。本目录是**本地 FLUX 快速草案**，用途是在花钱跑云端之前
 > 先完成两件便宜的事：**Phase 1 风格裁决**、**Phase 2 光照/天气方向预览**。
 > 目标帧一旦锁定，按 §0 重走云端正式产出，本目录即可清理。
@@ -10,13 +10,13 @@
 
 ```powershell
 # 需要本机 ComfyUI 已在 8188 监听（桌面 comfyui.bat）
-python tools/gen/local_flux.py --check
-python tools/gen/local_flux.py --batch tools/gen/jobs/target-frames.json
+python studio/tools/gen.py --check
+python studio/tools/gen.py --batch studio/jobs/target-frames.json
 ```
 
-- 作业单 `tools/gen/jobs/target-frames.json` 内含**逐张完整提示词**（风格段 + 光照段 + 场景锚点 + 画质锚点），
+- 作业单 `studio/jobs/target-frames.json` 内含**逐张完整提示词**（风格段 + 光照段 + 场景锚点 + 画质锚点），
   按 `target-frames.md` 的固定拼接格式生成，可直接作为 Steam AI 披露的提示词留档。
-- 工具 `tools/gen/local_flux.py` 为 stdlib-only，无第三方依赖。
+- 工具 `studio/tools/gen.py` 为 stdlib-only，无第三方依赖。
 
 ## 生成规格（实测）
 
@@ -48,7 +48,7 @@ candidates/
 1. **负面词无效**：蒸馏版跑 `cfg=1`，负条件是 `ConditioningZeroOut`，`target-frames.md` 的通用负面词
    在本批草案里**不会生效**。需要负面词时改用 base 权重：
    ```powershell
-   python tools/gen/local_flux.py --model flux-2-klein-base-4b-fp8.safetensors `
+   python studio/tools/gen.py --model flux-2-klein-base-4b-fp8.safetensors `
      --cfg 5 --steps 20 --negative "people, face, text, watermark, ..." --prompt "..." --out tmp/x.png
    ```
    （base 权重尚未下载）
@@ -60,6 +60,6 @@ candidates/
 
 ## 下一步
 
-1. 你从 30 张里裁决出一种风格（S1 / S2 / S3），存 `tools/prompts/selected/S?-TF01.png`。
+1. 你从 30 张里裁决出一种风格（S1 / S2 / S3），存 `studio/frames/selected/S?-TF01.png`。
 2. 我按锁定风格补管线：IP-Adapter 锁风格 + BiRefNet 抠图 + 本地深度图。
 3. 风格锁定后，正式目标帧按 §0 走云端 16:9 ≥4K 重出。

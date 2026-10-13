@@ -8,7 +8,7 @@
 
 | SET | 内容 | 前置 | 产出包 | 状态 |
 |---|---|---|---|---|
-| [SET-00](SET-00-target-frames.md) | 目标帧 11 张（3 风格 + 8 关键帧） | 无 | `tools/prompts/selected/` + `tools/golden/` | 待生成 |
+| [SET-00](SET-00-target-frames.md) | 目标帧 11 张（3 风格 + 8 关键帧） | 无 | `studio/frames/selected/` + `studio/frames/golden/` | **Phase 1 已出稿**（S1/S2/S3 @4K，待用户裁决风格；进度见 `studio/frames/selected/README.md`） |
 | [SET-01](SET-01-scene-background.md) | 远景主视觉整图 + 深度图 | TF01 锁定 | `app/assets/packs/mountains/` | 待前置 |
 | [SET-02](SET-02-trees-seasons.md) | 前景树 · 四季 sprite | TF01 锁定 | `app/assets/packs/trees/`（替换占位） | 待前置 |
 | [SET-03](SET-03-horses-sprites.md) | 马群 sprite（优美线 Actor） | TF01 锁定 | `app/assets/packs/horses/` | 待前置（可后置） |

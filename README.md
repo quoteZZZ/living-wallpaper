@@ -1,11 +1,14 @@
 # Solstice
 
-**桌面 3D 场景搭建游戏**：用风格统一的元素组合出随昼夜/天气/季节变化的活场景，宠物相伴；
+**桌面 2.5D 场景搭建游戏**：用风格统一的元素组合出随昼夜/天气/季节变化的活场景，宠物相伴；
 内含**壁纸模式**（把你的场景设为桌面）与**图片素材库**等功能模块。
-运行时零 AI 调用；素材 = 程序化 + CC0 双源 + 图片素材库（无图元素路线）。
+运行时零 AI 调用；素材 = 程序化占位 + 离线部署模型 2D 生成（v5.3 起 3D 线移出主线）。
 
 - **设计文档（唯一开发依据）**：[docs/DESIGN.md](docs/DESIGN.md)
-- **素材制作/来源**：[docs/PACKS_GUIDE.md](docs/PACKS_GUIDE.md)（官方双源：Quaternius + Kenney，全 CC0）
+- **目录与命名（唯一真源）**：[docs/STRUCTURE.md](docs/STRUCTURE.md)
+- **素材制作/规格**：[docs/PACKS_GUIDE.md](docs/PACKS_GUIDE.md)（混合分层路线：目标帧合同锁风格 → 远景整图分层 + 前景 sprite）
+- **素材生产线**：[studio/README.md](studio/README.md)（任务书 → 生成 → 打包）
+- **双机协作**：[docs/SYNC.md](docs/SYNC.md)
 - 路线：**M1 简笔画自然场景（进行中）** → M2 工程化 → M3 场景搭建器 → M4 宠物 → T1 桌面化（Tauri + Steam + 壁纸模式）
 
 ## 运行
@@ -19,31 +22,30 @@
 
 ```
 solstice/
-├─ docs/                  # DESIGN.md（设计定稿）· PACKS_GUIDE.md（素材指南）
-├─ index.html             # 落地页（GitHub Pages）
-├─ app/                   # 游戏客户端（TS 全栈，零构建）
-│  ├─ index.html          # 入口：样式 + 画布宿主 + 脚本装配
+├─ app/                   # ① 运行时（发布物）：游戏本体 + 壁纸模式
+│  ├─ index.html          #    入口：纸墨主题令牌 + 画布宿主 + 脚本装配
 │  ├─ js/
-│  │  ├─ kernel.js        # 微内核：i18n / 存储 / 上下文总线 / 注册表+卡槽仲裁
-│  │  ├─ icons.js         # 图标库（Lucide, ISC）
-│  │  ├─ core/            # 渲染后端（StyleSystem 挂钩）
-│  │  │  ├─ composer.js   # 程序化 WebGL 后端 + 主循环指挥
-│  │  │  └─ sketch.js     # 简笔画 2D 后端（M1 开发中）
-│  │  ├─ ui/              # 交互组件
-│  │  │  ├─ panel.js      # 设置中心（插件 schema 生成，双语）
-│  │  │  └─ editor.js     # 场景编辑器（选中/圆盘/菜单/工具）
-│  │  ├─ plugins/         # 内容插件（官方自举）
-│  │  │  ├─ base.js mountains.js weather.js trees.js presets.js info.js
-│  │  └─ main.js          # 装配启动 + 属性桥
-│  └─ assets/
-│     ├─ models/          # GLTF 低模（树等）
-│     ├─ images/          # 图片素材库（F5）
-│     └─ packs/           # 主题素材包
-└─ tools/                 # 脚本
-   ├─ assets/             # 资产生成（asset_image.py / asset_tree_glb.py）
-   ├─ spike/              # 已验证机制留档（workerw_embed.ps1）
-   └─ spike_babylon.html  # 双画布验证页
+│  │  ├─ kernel.js        #    微内核：i18n / 存储 / 上下文总线 / 注册表+卡槽仲裁 / 场景簿
+│  │  ├─ icons.js         #    图标库（Lucide, ISC）
+│  │  ├─ core/            #    渲染后端：composer(WebGL) · sketch(2D 简笔画)
+│  │  ├─ ui/              #    交互：hud(Dock/纸签) · panel(设置中心) · editor(场景编辑器)
+│  │  ├─ plugins/         #    内容插件（官方自举）：base · mountains · weather · trees · horses · presets · info
+│  │  └─ main.js          #    装配启动 + 属性桥
+│  └─ assets/             #    运行时素材：packs(成包) · models(低模) · images(图片素材库 F5)
+├─ shared/                # ② 跨域契约：pack.schema.json + slots.json（运行时与生产线共读）
+├─ studio/                # ③ 素材生产线（离线，不随游戏发布）
+│  ├─ contract/           #    要什么：target-frames.md（目标帧合同）+ sets/（SET 任务书）
+│  ├─ jobs/               #    怎么生成：作业单 JSON（提示词 + 参数 + AI 披露留档）
+│  ├─ tools/              #    怎么跑：gen.py（出图+放大） · pack.py（打包）
+│  ├─ frames/             #    跑出什么：candidates(候选) · selected(入选) · golden(黄金帧)
+│  └─ work/               #    中间产物（gitignore，永不入库）
+├─ dev/                   # ④ 工程基建：sync(双机同步) · spikes(机制验证留档)
+├─ docs/                  # ⑤ 文档：DESIGN · STRUCTURE · PACKS_GUIDE · SYNC
+├─ site/                  # ⑥ 落地页资源（截图）
+└─ index.html             #   落地页（GitHub Pages 入口，必须在根目录）
 ```
+
+> 每个目录放什么、加新文件该归哪个位，看 [`docs/STRUCTURE.md`](docs/STRUCTURE.md) 的归位决策表。
 
 ## 开发环境与协作约定
 
@@ -53,8 +55,9 @@ solstice/
   - `solstice-core`（`alwaysApply`）——每次会话必读：技术栈锁定、微内核架构红线、性能功耗预算、非目标清单。
   - `solstice-workflow`（按需加载）——路线图、风险优先级、资产管线与验收指标。
   - 改动代码前请先读 `docs/DESIGN.md`；**设计与实现冲突时以设计文档为准**，并在同一次改动中回写文档。
+  - 新增文件前先读 `docs/STRUCTURE.md`；**目录/命名冲突时以 STRUCTURE 为准**。
 - **本地预览**（三种任选）
-  1. 双击 `src/wallpaper/index.html`（`file://` 直开，最快）
+  1. 双击 `app/index.html`（`file://` 直开，最快）
   2. 编辑器里用 Live Server 打开（默认 `127.0.0.1:5500`，带热重载）
   3. `npx -y http-server . -p 8000`
 - **远程开发（可选）**：主力机可运行 CodeBuddy Web 工作台

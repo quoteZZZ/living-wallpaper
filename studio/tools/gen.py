@@ -3,7 +3,7 @@
 
 Talks to a local ComfyUI instance running FLUX.2 [klein] 4B fp8 and writes a
 PNG.  This is the "foreground / interactive element" production endpoint from
-docs/PACKS_GUIDE.md section 0 -- see also tools/prompts/target-frames.md.
+docs/PACKS_GUIDE.md section 0 -- see also studio/contract/target-frames.md.
 
 Graph shape mirrors the official ComfyUI template
 `image_flux2_klein_text_to_image.json` (distilled 4-step branch):
@@ -15,21 +15,21 @@ zeroed out and **negative prompts have no effect**.  Use the base model
 (`--model flux-2-klein-base-4b-fp8.safetensors --cfg 5 --steps 20`) if you
 need negatives to bite.
 
-Usage (PowerShell), with ComfyUI already listening:
-  python tools/gen/local_flux.py --prompt "a lone oak tree" --out tmp/oak.png
+Usage (PowerShell), with ComfyUI already listening (see studio/tools/README.md):
+  python studio/tools/gen.py --prompt "a lone oak tree" --out studio/work/oak.png
 
-  python tools/gen/local_flux.py --prompt "..." --out tmp/oak.png `
-    --width 1344 --height 768 --steps 4 --seed 42
+  python studio/tools/gen.py --prompt "..." --out studio/work/oak.png `
+    --width 1920 --height 1080 --steps 4 --seed 42
 
   # base model + real negative prompt
-  python tools/gen/local_flux.py --prompt "..." --negative "blurry, lowres" `
-    --out tmp/oak.png --model flux-2-klein-base-4b-fp8.safetensors --cfg 5 --steps 20
+  python studio/tools/gen.py --prompt "..." --negative "blurry, lowres" `
+    --out studio/work/oak.png --model flux-2-klein-base-4b-fp8.safetensors --cfg 5 --steps 20
 
 Batch file (JSON list, each entry = kwargs for one render):
-  python tools/gen/local_flux.py --batch tools/gen/jobs/example.json
+  python studio/tools/gen.py --batch studio/jobs/target-frames.json
 
-Upscale an existing image to the SET-00 spec (1920x1080 -> >=4K):
-  python tools/gen/local_flux.py --from tmp/probe/a.png --to tools/prompts/selected/S1.png `
+Upscale an existing image to the frame spec (1920x1080 -> 3840x2160):
+  python studio/tools/gen.py --from studio/work/a.png --to studio/frames/selected/S1.png `
     --max-edge 3840
 """
 import argparse

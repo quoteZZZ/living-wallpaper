@@ -1,7 +1,7 @@
 # 目标帧 Phase 1 · 风格候选（已出稿，待裁决）
 
 > 状态：**Phase 1 三张已出，等待用户裁决风格（S1 / S2 / S3）**。
-> 裁决后本目录继续放 TF01–TF08（Phase 2），并把 TF01 复制一份到 `tools/golden/`。
+> 裁决后本目录继续放 TF01–TF08（Phase 2），并把 TF01 复制一份到 `studio/frames/golden/`。
 
 ## 产出
 
@@ -19,19 +19,21 @@
 - 硬件：素材机本机 RTX 5060 8GB（峰值显存 7456/8151 MB）
 - 流程：1920×1080 出图 → `RealESRGAN_x2plus` → 3840×2160
 - 日期：2026-10-13
-- 提示词：`tools/gen/jobs/target-frames.json` 内 TF01 三风格条目（风格段 + TF01 光照段 + 场景锚点 + 画质锚点，按 `../target-frames.md` 固定拼接格式）
-- 候选：每风格 3 张（seed 101 / 202 / 303），raw 留在 `tools/inbox/raw/set00-phase1/`（gitignore，不入库），本目录只放入选张
+- 提示词：`studio/jobs/target-frames.json` 内 TF01 三风格条目（风格段 + TF01 光照段 + 场景锚点 + 画质锚点，按 `../target-frames.md` 固定拼接格式）
+- 候选：每风格 3 张（seed 101 / 202 / 303），raw 留在 `studio/work/raw/set00-phase1/`（gitignore，不入库），本目录只放入选张
 
 ## 复现
 
 ```powershell
 # 需要本机 ComfyUI 已在 127.0.0.1:8188 监听；系统 python 不可用时用 ComfyUI 内置解释器
-D:\ComfyUI\python_embeded\python.exe tools\gen\local_flux.py --check
-D:\ComfyUI\python_embeded\python.exe tools\gen\local_flux.py --prompt "<TF01 提示词>" `
-  --out tmp/x.png --width 1920 --height 1080 --steps 4 --seed 303
-D:\ComfyUI\python_embeded\python.exe tools\gen\local_flux.py --from tmp/x.png `
-  --to tools/prompts/selected/S1.png --max-edge 3840
+D:\ComfyUI\python_embeded\python.exe studio\tools\gen.py --check
+D:\ComfyUI\python_embeded\python.exe studio\tools\gen.py --prompt "<TF01 提示词>" `
+  --out studio\work\raw\x.png --width 1920 --height 1080 --steps 4 --seed 303
+D:\ComfyUI\python_embeded\python.exe studio\tools\gen.py --from studio\work\raw\x.png `
+  --to studio\frames\selected\S1.png --max-edge 3840
 ```
+
+> 工具说明与全部参数见 `studio/tools/README.md`。
 
 ## 已知限制
 
@@ -42,4 +44,4 @@ D:\ComfyUI\python_embeded\python.exe tools\gen\local_flux.py --from tmp/x.png `
 ## 下一步（需要用户）
 
 1. 从 `S1.png` / `S2.png` / `S3.png` 里**裁决一种风格**（用户唯一裁判权）。
-2. 选定后：落 `tools/prompts/selected/TF01.png` → 按 `../sets/SET-00-target-frames.md` §2 出 TF02–TF08 → TF01 复制到 `tools/golden/`。
+2. 选定后：落 `studio/frames/selected/TF01.png` → 按 `../sets/SET-00-target-frames.md` §2 出 TF02–TF08 → TF01 复制到 `studio/frames/golden/`。

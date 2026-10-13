@@ -53,7 +53,8 @@ provider:
 
 ## 6. 代码风格与验证要求
 
-- 沿用现有风格：单文件 + JSDoc 注释，保持 `src/wallpaper/index.html` 自包含、可双击直接运行。
-- 调试参数必须始终可用：`?hour=` `?lat=` `?debug=1` `?fps=` `?par=`；改动渲染或设置面板后，给出可复现 URL 并自测，例如 `index.html?hour=22&debug=1`。
-- 素材缺失要优雅回退：`src/wallpaper/assets/scene.png` 与 `depth.png` 不存在时走程序化占位场景，不能报错或白屏。
+- 沿用现有风格：单文件 + JSDoc 注释，保持 `app/index.html` 自包含、可双击直接运行。
+- 调试参数必须始终可用：`?hour=` `?lat=` `?debug=1` `?fps=` `?par=`；改动渲染或设置面板后，给出可复现 URL 并自测，例如 `app/index.html?hour=22&debug=1`。
+- 素材缺失要优雅回退：`app/assets/` 下的素材（如 `packs/<name>/scene.png` 与同尺寸 `depth.png`）不存在时走程序化占位场景，不能报错或白屏。
+- 新增文件前先读 `docs/STRUCTURE.md`（目录与命名唯一真源，含归位决策表）；**目录/命名冲突以它为准**。三分法：进发行包 → `app/`，产出素材 → `studio/`，双方共读的定义 → `shared/`。
 - 提交信息用英文、简短祈使句，与仓库现有历史保持一致。

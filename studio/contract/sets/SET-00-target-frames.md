@@ -13,7 +13,7 @@
 
 - 规格：**16:9，≥4K**（本地 1920×1080 → ESRGAN/Topaz 无损级放大到 3840×2160）
 - 张数：Phase 1 出 3 张（S1/S2/S3 各 1 张「清晨·晴」）；风格锁定后 Phase 2 出 8 张（TF01–TF08）
-- 每帧**多出 2–4 张候选**挑最好（raw 不入库，放 `tools/inbox/raw/`）
+- 每帧**多出 2–4 张候选**挑最好（raw 不入库，放 `studio/work/raw/`）
 
 ## 2. 执行步骤
 
@@ -25,9 +25,9 @@
 ## 3. 产出与落盘（提交 git）
 
 ```
-tools/prompts/selected/S1.png S2.png S3.png          # Phase 1 三张（裁决前）
-tools/prompts/selected/TF01.png … TF08.png           # Phase 2 锁定帧
-tools/golden/TF01.png                                # TF01 复制一份作黄金帧基准
+studio/frames/selected/S1.png S2.png S3.png          # Phase 1 三张（裁决前）
+studio/frames/selected/TF01.png … TF08.png           # Phase 2 锁定帧
+studio/frames/golden/TF01.png                                # TF01 复制一份作黄金帧基准
 ```
 
 ## 4. 回传信息（提交时一并说明）

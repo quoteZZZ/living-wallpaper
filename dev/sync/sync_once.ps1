@@ -1,4 +1,4 @@
-# tools/sync/sync_once.ps1 — Solstice 双机 git 单次同步
+# dev/sync/sync_once.ps1 — Solstice 双机 git 单次同步
 # ------------------------------------------------------------
 # 设计：git 仍是唯一真源；本脚本给两台机的计划任务周期调用。
 #   代码机（本机）：默认 pull-only —— 不自动提交，避免把未完成的开发
@@ -7,9 +7,9 @@
 #                   可以放心自动入库）。
 # 注册（每台机各执行一次，路径按本机实际改）：
 #   代码机：schtasks /Create /TN "SolsticeSync" /SC MINUTE /MO 5 /F ^
-#             /TR "powershell -NoProfile -ExecutionPolicy Bypass -File e:\solstice\tools\sync\sync_once.ps1"
+#             /TR "powershell -NoProfile -ExecutionPolicy Bypass -File e:\solstice\dev\sync\sync_once.ps1"
 #   素材机：schtasks /Create /TN "SolsticeSync" /SC MINUTE /MO 5 /F ^
-#             /TR "powershell -NoProfile -ExecutionPolicy Bypass -File D:\solstice\tools\sync\sync_once.ps1 -Push"
+#             /TR "powershell -NoProfile -ExecutionPolicy Bypass -File D:\GitCode\solstice\dev\sync\sync_once.ps1 -Push"
 # 冲突处理：rebase 失败即停手退出（人工解决），绝不 force。
 # ------------------------------------------------------------
 param([switch]$Push)

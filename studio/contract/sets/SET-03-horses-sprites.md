@@ -43,10 +43,10 @@ correct horse anatomy, crisp silhouette, masterpiece, best quality, ultra detail
 ## 4. 打包（素材机本机执行）
 
 ```powershell
-python tools/pack_builder.py --out app/assets/packs/horses `
+python studio/tools/pack.py --out app/assets/packs/horses `
   --id pack.horses --name-zh "马群 sprite" --name-en "Horse Sprites" --slot near `
   --variant brown:brown.png --variant black:black.png --variant white:white.png `
-  --credit "FLUX.2-klein 4B fp8 + BiRefNet | prompt: tools/prompts/sets/SET-03 | <日期>"
+  --credit "FLUX.2-klein 4B fp8 + BiRefNet | prompt: studio/contract/sets/SET-03 | <日期>"
 ```
 
 ## 5. 提交

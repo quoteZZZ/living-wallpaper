@@ -69,6 +69,6 @@ cinematic wide shot 16:9, masterpiece, best quality, ultra detailed, 4k wallpape
 
 ## 3. 裁决后做什么
 
-1. 选定图存 `tools/prompts/selected/TF01.png … TF08.png`，告知我风格编号（S1/S2/S3）
+1. 选定图存 `studio/frames/selected/TF01.png … TF08.png`，告知我风格编号（S1/S2/S3）
 2. 此后**所有**前景元素生成必须带 TF01 作参考图（垫图 / IP-Adapter / 多参考图），统一中性顶光
-3. TF01 另存一份为黄金帧基准 → `tools/golden/TF01.png`（视觉回归比对用）
+3. TF01 另存一份为黄金帧基准 → `studio/frames/golden/TF01.png`（视觉回归比对用）

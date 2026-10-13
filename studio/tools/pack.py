@@ -4,25 +4,57 @@
 Builds an assets pack folder (manifest.json + credits.txt + copied images)
 from source images + depth map + meta.  See docs/PACKS_GUIDE.md section 4.
 
+The pack format lives in shared/pack.schema.json and the layer classes in
+shared/slots.json -- this script validates against those, it does not own
+a second copy of the contract.
+
 Usage (PowerShell):
-  python tools/pack_builder.py --out app/assets/packs/mountains `
+  python studio/tools/pack.py --out app/assets/packs/mountains `
     --id pack.mountains --name-zh "中景山峦" --name-en "Mountains" --slot mid `
     --image scene.png --depth depth.png `
-    --credit "Seedream 5.0 Pro | prompt: see tools/prompts | 2026-10-13"
+    --credit "Seedream 5.0 Pro | prompt: studio/contract/sets/SET-01 | 2026-10-13"
 
-  python tools/pack_builder.py --out app/assets/packs/trees `
+  python studio/tools/pack.py --out app/assets/packs/trees `
     --id pack.trees --name-zh "四季树" --name-en "Trees" --slot near `
     --variant spring:spring.png --variant summer:summer.png `
-    --credit "FLUX.2 klein + BiRefNet | 2026-10-13"
+    --credit "FLUX.2 klein + BiRefNet | studio/contract/sets/SET-02 | 2026-10-13"
 """
 import argparse
 import json
+import re
 import shutil
 import struct
 import sys
 from pathlib import Path
 
-VALID_SLOTS = {"sky", "far", "mid", "near", "foreground", "overlay"}
+ROOT = Path(__file__).resolve().parents[2]          # studio/tools/pack.py -> repo root
+SHARED = ROOT / "shared"
+
+
+def load_contract():
+    """Read the shared pack contract; fails loudly if it is missing."""
+    slots = json.loads((SHARED / "slots.json").read_text(encoding="utf-8"))
+    schema = json.loads((SHARED / "pack.schema.json").read_text(encoding="utf-8"))
+    return slots, schema
+
+
+def check_manifest(manifest, slots, schema):
+    """Minimal structural check against shared/pack.schema.json."""
+    problems = []
+    for key in schema.get("required", []):
+        if key not in manifest:
+            problems.append(f"missing required field: {key}")
+    name = manifest.get("name") or {}
+    for lang in ("zh", "en"):
+        if not name.get(lang):
+            problems.append(f"name.{lang} missing (双语红线, see STRUCTURE §3.8)")
+    pattern = schema["properties"]["id"].get("pattern")
+    if pattern and not re.match(pattern, str(manifest.get("id", ""))):
+        problems.append(f"id {manifest.get('id')!r} does not match {pattern}")
+    allowed = [c["id"] for c in slots.get("layerClasses", [])]
+    if manifest.get("slot") not in allowed:
+        problems.append(f"slot {manifest.get('slot')!r} not in shared/slots.json {allowed}")
+    return problems
 
 
 def png_size(path: Path):
@@ -54,12 +86,16 @@ def parse_variant(text: str) -> tuple:
 
 
 def main() -> int:
+    slots, schema = load_contract()
+    layer_classes = sorted(c["id"] for c in slots.get("layerClasses", []))
+
     ap = argparse.ArgumentParser(description="Build a Solstice assets pack folder.")
     ap.add_argument("--out", required=True, help="output pack directory")
     ap.add_argument("--id", required=True, help="pack id, e.g. pack.mountains")
     ap.add_argument("--name-zh", required=True)
     ap.add_argument("--name-en", required=True)
-    ap.add_argument("--slot", required=True, choices=sorted(VALID_SLOTS), help="layer slot")
+    ap.add_argument("--slot", required=True, choices=layer_classes,
+                    help="layer class, see shared/slots.json")
     ap.add_argument("--image", help="scene image (whole-layer pack)")
     ap.add_argument("--depth", help="depth.png paired with --image (optional)")
     ap.add_argument("--variant", action="append", default=[], type=parse_variant,
@@ -75,43 +111,55 @@ def main() -> int:
     if args.depth and not args.image:
         ap.error("--depth requires --image")
 
-    out = Path(args.out)
-    out.mkdir(parents=True, exist_ok=True)
+    # 1. assemble the manifest and validate it against shared/ BEFORE touching files,
+    #    so a rejected pack never leaves a half-written directory behind.
     manifest = {
         "id": args.id,
         "api": 1,
         "name": {"zh": args.name_zh, "en": args.name_en},
         "slot": args.slot,
     }
+    if args.image:
+        scene = {"image": "scene.png"}
+        if args.depth:
+            scene["depth"] = "depth.png"
+        manifest["scene"] = scene
+    for vid, _file in args.variant:
+        manifest.setdefault("variants", []).append({"id": vid, "image": f"{vid}.png"})
 
-    # scene pack
+    problems = check_manifest(manifest, slots, schema)
+    if problems:
+        for item in problems:
+            print(f"[err] {item}")
+        return 1
+
+    # 2. validate the images, then copy
+    out = Path(args.out)
+    out.mkdir(parents=True, exist_ok=True)
     if args.image:
         img = Path(args.image)
         iw, ih = check_image(img, 2048)
-        shutil.copy2(img, out / "scene.png")
-        scene = {"image": "scene.png"}
         if args.depth:
             dep = Path(args.depth)
             dw, dh = check_image(dep, 512)
             if (dw, dh) != (iw, ih):
                 print(f"[warn] depth size {dw}x{dh} != scene size {iw}x{ih}")
-            shutil.copy2(dep, out / "depth.png")
-            scene["depth"] = "depth.png"
-        manifest["scene"] = scene
-
-    # variant pack
+        shutil.copy2(img, out / "scene.png")
+        if args.depth:
+            shutil.copy2(Path(args.depth), out / "depth.png")
     for vid, file in args.variant:
         path = Path(file)
         check_image(path, 2048)
         shutil.copy2(path, out / f"{vid}.png")
-        manifest.setdefault("variants", []).append({"id": vid, "image": f"{vid}.png"})
 
+    # 3. write the pack
     (out / "manifest.json").write_text(
         json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
     (out / "credits.txt").write_text(args.credit + "\n", encoding="utf-8")
 
+    kind = f"{len(manifest.get('variants', []))} variants" if manifest.get("variants") else "scene"
     print(f"[ok] pack built: {out}")
-    print(f"     manifest: {len(manifest.get('variants', [])) or 'scene'} entries, slot={args.slot}")
+    print(f"     {manifest['id']} · slot={args.slot} · {kind} · schema={schema['title']}")
     return 0
 
 

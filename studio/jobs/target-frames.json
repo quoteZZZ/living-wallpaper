@@ -1,6 +1,6 @@
 [
   {
-    "out": "tools/prompts/candidates/S1/TF01_v1.png",
+    "out": "studio/frames/candidates/S1/TF01_v1.png",
     "seed": 101,
     "width": 1344,
     "height": 768,
@@ -8,7 +8,7 @@
     "prompt": "breathtaking anime film background art, Makoto Shinkai and Studio Ghibli style, golden sunrise light, soft mist over lake, long soft shadows, fresh green tones, a crystal-clear alpine lake reflecting the sky, wildflower meadow foreground, horses grazing midground, snow-capped mountains on the horizon, cumulus clouds, strong foreground-midground-background layering, key light from upper left, cinematic wide shot 16:9, masterpiece, best quality, ultra detailed, 4k wallpaper"
   },
   {
-    "out": "tools/prompts/candidates/S1/TF01_v2.png",
+    "out": "studio/frames/candidates/S1/TF01_v2.png",
     "seed": 202,
     "width": 1344,
     "height": 768,
@@ -16,7 +16,7 @@
     "prompt": "breathtaking anime film background art, Makoto Shinkai and Studio Ghibli style, golden sunrise light, soft mist over lake, long soft shadows, fresh green tones, a crystal-clear alpine lake reflecting the sky, wildflower meadow foreground, horses grazing midground, snow-capped mountains on the horizon, cumulus clouds, strong foreground-midground-background layering, key light from upper left, cinematic wide shot 16:9, masterpiece, best quality, ultra detailed, 4k wallpaper"
   },
   {
-    "out": "tools/prompts/candidates/S1/TF01_v3.png",
+    "out": "studio/frames/candidates/S1/TF01_v3.png",
     "seed": 303,
     "width": 1344,
     "height": 768,
@@ -24,7 +24,7 @@
     "prompt": "breathtaking anime film background art, Makoto Shinkai and Studio Ghibli style, golden sunrise light, soft mist over lake, long soft shadows, fresh green tones, a crystal-clear alpine lake reflecting the sky, wildflower meadow foreground, horses grazing midground, snow-capped mountains on the horizon, cumulus clouds, strong foreground-midground-background layering, key light from upper left, cinematic wide shot 16:9, masterpiece, best quality, ultra detailed, 4k wallpaper"
   },
   {
-    "out": "tools/prompts/candidates/S1/TF02.png",
+    "out": "studio/frames/candidates/S1/TF02.png",
     "seed": 101,
     "width": 1344,
     "height": 768,
@@ -32,7 +32,7 @@
     "prompt": "breathtaking anime film background art, Makoto Shinkai and Studio Ghibli style, bright midday sun, vivid blue sky, crisp shadows, vivid greens, a crystal-clear alpine lake reflecting the sky, wildflower meadow foreground, horses grazing midground, snow-capped mountains on the horizon, cumulus clouds, strong foreground-midground-background layering, key light from upper left, cinematic wide shot 16:9, masterpiece, best quality, ultra detailed, 4k wallpaper"
   },
   {
-    "out": "tools/prompts/candidates/S1/TF03.png",
+    "out": "studio/frames/candidates/S1/TF03.png",
     "seed": 101,
     "width": 1344,
     "height": 768,
@@ -40,7 +40,7 @@
     "prompt": "breathtaking anime film background art, Makoto Shinkai and Studio Ghibli style, golden hour, orange and pink sky, sun low on horizon, long dramatic shadows, warm rim light, a crystal-clear alpine lake reflecting the sky, wildflower meadow foreground, horses grazing midground, snow-capped mountains on the horizon, cumulus clouds, strong foreground-midground-background layering, key light from upper left, cinematic wide shot 16:9, masterpiece, best quality, ultra detailed, 4k wallpaper"
   },
   {
-    "out": "tools/prompts/candidates/S1/TF04.png",
+    "out": "studio/frames/candidates/S1/TF04.png",
     "seed": 101,
     "width": 1344,
     "height": 768,
@@ -48,7 +48,7 @@
     "prompt": "breathtaking anime film background art, Makoto Shinkai and Studio Ghibli style, deep blue night, starry sky with milky way, full moon, moonlight path on the lake, cool tones, a crystal-clear alpine lake reflecting the sky, wildflower meadow foreground, horses grazing midground, snow-capped mountains on the horizon, cumulus clouds, strong foreground-midground-background layering, key light from upper left, cinematic wide shot 16:9, masterpiece, best quality, ultra detailed, 4k wallpaper"
   },
   {
-    "out": "tools/prompts/candidates/S1/TF05.png",
+    "out": "studio/frames/candidates/S1/TF05.png",
     "seed": 101,
     "width": 1344,
     "height": 768,
@@ -56,7 +56,7 @@
     "prompt": "breathtaking anime film background art, Makoto Shinkai and Studio Ghibli style, thick morning fog, ethereal atmosphere, muted desaturated colors, soft diffused light, a crystal-clear alpine lake reflecting the sky, wildflower meadow foreground, horses grazing midground, snow-capped mountains on the horizon, cumulus clouds, strong foreground-midground-background layering, key light from upper left, cinematic wide shot 16:9, masterpiece, best quality, ultra detailed, 4k wallpaper"
   },
   {
-    "out": "tools/prompts/candidates/S1/TF06.png",
+    "out": "studio/frames/candidates/S1/TF06.png",
     "seed": 101,
     "width": 1344,
     "height": 768,
@@ -64,7 +64,7 @@
     "prompt": "breathtaking anime film background art, Makoto Shinkai and Studio Ghibli style, overcast rain, dark heavy clouds, rain streaks, wet reflective surfaces, moody grey-green palette, a crystal-clear alpine lake reflecting the sky, wildflower meadow foreground, horses grazing midground, snow-capped mountains on the horizon, cumulus clouds, strong foreground-midground-background layering, key light from upper left, cinematic wide shot 16:9, masterpiece, best quality, ultra detailed, 4k wallpaper"
   },
   {
-    "out": "tools/prompts/candidates/S1/TF07.png",
+    "out": "studio/frames/candidates/S1/TF07.png",
     "seed": 101,
     "width": 1344,
     "height": 768,
@@ -72,7 +72,7 @@
     "prompt": "breathtaking anime film background art, Makoto Shinkai and Studio Ghibli style, heavy snowfall, snow-covered meadow, partially frozen lake, cold blue tones, soft overcast light, a crystal-clear alpine lake reflecting the sky, wildflower meadow foreground, horses grazing midground, snow-capped mountains on the horizon, cumulus clouds, strong foreground-midground-background layering, key light from upper left, cinematic wide shot 16:9, masterpiece, best quality, ultra detailed, 4k wallpaper"
   },
   {
-    "out": "tools/prompts/candidates/S1/TF08.png",
+    "out": "studio/frames/candidates/S1/TF08.png",
     "seed": 101,
     "width": 1344,
     "height": 768,
@@ -80,7 +80,7 @@
     "prompt": "breathtaking anime film background art, Makoto Shinkai and Studio Ghibli style, thunderstorm at dusk, lightning bolt, wind-blown grass, dark dramatic clouds, high contrast, a crystal-clear alpine lake reflecting the sky, wildflower meadow foreground, horses grazing midground, snow-capped mountains on the horizon, cumulus clouds, strong foreground-midground-background layering, key light from upper left, cinematic wide shot 16:9, masterpiece, best quality, ultra detailed, 4k wallpaper"
   },
   {
-    "out": "tools/prompts/candidates/S2/TF01_v1.png",
+    "out": "studio/frames/candidates/S2/TF01_v1.png",
     "seed": 101,
     "width": 1344,
     "height": 768,
@@ -88,7 +88,7 @@
     "prompt": "epic fantasy landscape concept art, painterly oil brushwork, rich color grading, golden sunrise light, soft mist over lake, long soft shadows, fresh green tones, a crystal-clear alpine lake reflecting the sky, wildflower meadow foreground, horses grazing midground, snow-capped mountains on the horizon, cumulus clouds, strong foreground-midground-background layering, key light from upper left, cinematic wide shot 16:9, masterpiece, best quality, ultra detailed, 4k wallpaper"
   },
   {
-    "out": "tools/prompts/candidates/S2/TF01_v2.png",
+    "out": "studio/frames/candidates/S2/TF01_v2.png",
     "seed": 202,
     "width": 1344,
     "height": 768,
@@ -96,7 +96,7 @@
     "prompt": "epic fantasy landscape concept art, painterly oil brushwork, rich color grading, golden sunrise light, soft mist over lake, long soft shadows, fresh green tones, a crystal-clear alpine lake reflecting the sky, wildflower meadow foreground, horses grazing midground, snow-capped mountains on the horizon, cumulus clouds, strong foreground-midground-background layering, key light from upper left, cinematic wide shot 16:9, masterpiece, best quality, ultra detailed, 4k wallpaper"
   },
   {
-    "out": "tools/prompts/candidates/S2/TF01_v3.png",
+    "out": "studio/frames/candidates/S2/TF01_v3.png",
     "seed": 303,
     "width": 1344,
     "height": 768,
@@ -104,7 +104,7 @@
     "prompt": "epic fantasy landscape concept art, painterly oil brushwork, rich color grading, golden sunrise light, soft mist over lake, long soft shadows, fresh green tones, a crystal-clear alpine lake reflecting the sky, wildflower meadow foreground, horses grazing midground, snow-capped mountains on the horizon, cumulus clouds, strong foreground-midground-background layering, key light from upper left, cinematic wide shot 16:9, masterpiece, best quality, ultra detailed, 4k wallpaper"
   },
   {
-    "out": "tools/prompts/candidates/S2/TF02.png",
+    "out": "studio/frames/candidates/S2/TF02.png",
     "seed": 101,
     "width": 1344,
     "height": 768,
@@ -112,7 +112,7 @@
     "prompt": "epic fantasy landscape concept art, painterly oil brushwork, rich color grading, bright midday sun, vivid blue sky, crisp shadows, vivid greens, a crystal-clear alpine lake reflecting the sky, wildflower meadow foreground, horses grazing midground, snow-capped mountains on the horizon, cumulus clouds, strong foreground-midground-background layering, key light from upper left, cinematic wide shot 16:9, masterpiece, best quality, ultra detailed, 4k wallpaper"
   },
   {
-    "out": "tools/prompts/candidates/S2/TF03.png",
+    "out": "studio/frames/candidates/S2/TF03.png",
     "seed": 101,
     "width": 1344,
     "height": 768,
@@ -120,7 +120,7 @@
     "prompt": "epic fantasy landscape concept art, painterly oil brushwork, rich color grading, golden hour, orange and pink sky, sun low on horizon, long dramatic shadows, warm rim light, a crystal-clear alpine lake reflecting the sky, wildflower meadow foreground, horses grazing midground, snow-capped mountains on the horizon, cumulus clouds, strong foreground-midground-background layering, key light from upper left, cinematic wide shot 16:9, masterpiece, best quality, ultra detailed, 4k wallpaper"
   },
   {
-    "out": "tools/prompts/candidates/S2/TF04.png",
+    "out": "studio/frames/candidates/S2/TF04.png",
     "seed": 101,
     "width": 1344,
     "height": 768,
@@ -128,7 +128,7 @@
     "prompt": "epic fantasy landscape concept art, painterly oil brushwork, rich color grading, deep blue night, starry sky with milky way, full moon, moonlight path on the lake, cool tones, a crystal-clear alpine lake reflecting the sky, wildflower meadow foreground, horses grazing midground, snow-capped mountains on the horizon, cumulus clouds, strong foreground-midground-background layering, key light from upper left, cinematic wide shot 16:9, masterpiece, best quality, ultra detailed, 4k wallpaper"
   },
   {
-    "out": "tools/prompts/candidates/S2/TF05.png",
+    "out": "studio/frames/candidates/S2/TF05.png",
     "seed": 101,
     "width": 1344,
     "height": 768,
@@ -136,7 +136,7 @@
     "prompt": "epic fantasy landscape concept art, painterly oil brushwork, rich color grading, thick morning fog, ethereal atmosphere, muted desaturated colors, soft diffused light, a crystal-clear alpine lake reflecting the sky, wildflower meadow foreground, horses grazing midground, snow-capped mountains on the horizon, cumulus clouds, strong foreground-midground-background layering, key light from upper left, cinematic wide shot 16:9, masterpiece, best quality, ultra detailed, 4k wallpaper"
   },
   {
-    "out": "tools/prompts/candidates/S2/TF06.png",
+    "out": "studio/frames/candidates/S2/TF06.png",
     "seed": 101,
     "width": 1344,
     "height": 768,
@@ -144,7 +144,7 @@
     "prompt": "epic fantasy landscape concept art, painterly oil brushwork, rich color grading, overcast rain, dark heavy clouds, rain streaks, wet reflective surfaces, moody grey-green palette, a crystal-clear alpine lake reflecting the sky, wildflower meadow foreground, horses grazing midground, snow-capped mountains on the horizon, cumulus clouds, strong foreground-midground-background layering, key light from upper left, cinematic wide shot 16:9, masterpiece, best quality, ultra detailed, 4k wallpaper"
   },
   {
-    "out": "tools/prompts/candidates/S2/TF07.png",
+    "out": "studio/frames/candidates/S2/TF07.png",
     "seed": 101,
     "width": 1344,
     "height": 768,
@@ -152,7 +152,7 @@
     "prompt": "epic fantasy landscape concept art, painterly oil brushwork, rich color grading, heavy snowfall, snow-covered meadow, partially frozen lake, cold blue tones, soft overcast light, a crystal-clear alpine lake reflecting the sky, wildflower meadow foreground, horses grazing midground, snow-capped mountains on the horizon, cumulus clouds, strong foreground-midground-background layering, key light from upper left, cinematic wide shot 16:9, masterpiece, best quality, ultra detailed, 4k wallpaper"
   },
   {
-    "out": "tools/prompts/candidates/S2/TF08.png",
+    "out": "studio/frames/candidates/S2/TF08.png",
     "seed": 101,
     "width": 1344,
     "height": 768,
@@ -160,7 +160,7 @@
     "prompt": "epic fantasy landscape concept art, painterly oil brushwork, rich color grading, thunderstorm at dusk, lightning bolt, wind-blown grass, dark dramatic clouds, high contrast, a crystal-clear alpine lake reflecting the sky, wildflower meadow foreground, horses grazing midground, snow-capped mountains on the horizon, cumulus clouds, strong foreground-midground-background layering, key light from upper left, cinematic wide shot 16:9, masterpiece, best quality, ultra detailed, 4k wallpaper"
   },
   {
-    "out": "tools/prompts/candidates/S3/TF01_v1.png",
+    "out": "studio/frames/candidates/S3/TF01_v1.png",
     "seed": 101,
     "width": 1344,
     "height": 768,
@@ -168,7 +168,7 @@
     "prompt": "award-winning landscape photography, cinematic color grading, layered atmospheric perspective, shot on ARRI Alexa 35mm, deep depth of field, golden sunrise light, soft mist over lake, long soft shadows, fresh green tones, a crystal-clear alpine lake reflecting the sky, wildflower meadow foreground, horses grazing midground, snow-capped mountains on the horizon, cumulus clouds, strong foreground-midground-background layering, key light from upper left, cinematic wide shot 16:9, masterpiece, best quality, ultra detailed, 4k wallpaper"
   },
   {
-    "out": "tools/prompts/candidates/S3/TF01_v2.png",
+    "out": "studio/frames/candidates/S3/TF01_v2.png",
     "seed": 202,
     "width": 1344,
     "height": 768,
@@ -176,7 +176,7 @@
     "prompt": "award-winning landscape photography, cinematic color grading, layered atmospheric perspective, shot on ARRI Alexa 35mm, deep depth of field, golden sunrise light, soft mist over lake, long soft shadows, fresh green tones, a crystal-clear alpine lake reflecting the sky, wildflower meadow foreground, horses grazing midground, snow-capped mountains on the horizon, cumulus clouds, strong foreground-midground-background layering, key light from upper left, cinematic wide shot 16:9, masterpiece, best quality, ultra detailed, 4k wallpaper"
   },
   {
-    "out": "tools/prompts/candidates/S3/TF01_v3.png",
+    "out": "studio/frames/candidates/S3/TF01_v3.png",
     "seed": 303,
     "width": 1344,
     "height": 768,
@@ -184,7 +184,7 @@
     "prompt": "award-winning landscape photography, cinematic color grading, layered atmospheric perspective, shot on ARRI Alexa 35mm, deep depth of field, golden sunrise light, soft mist over lake, long soft shadows, fresh green tones, a crystal-clear alpine lake reflecting the sky, wildflower meadow foreground, horses grazing midground, snow-capped mountains on the horizon, cumulus clouds, strong foreground-midground-background layering, key light from upper left, cinematic wide shot 16:9, masterpiece, best quality, ultra detailed, 4k wallpaper"
   },
   {
-    "out": "tools/prompts/candidates/S3/TF02.png",
+    "out": "studio/frames/candidates/S3/TF02.png",
     "seed": 101,
     "width": 1344,
     "height": 768,
@@ -192,7 +192,7 @@
     "prompt": "award-winning landscape photography, cinematic color grading, layered atmospheric perspective, shot on ARRI Alexa 35mm, deep depth of field, bright midday sun, vivid blue sky, crisp shadows, vivid greens, a crystal-clear alpine lake reflecting the sky, wildflower meadow foreground, horses grazing midground, snow-capped mountains on the horizon, cumulus clouds, strong foreground-midground-background layering, key light from upper left, cinematic wide shot 16:9, masterpiece, best quality, ultra detailed, 4k wallpaper"
   },
   {
-    "out": "tools/prompts/candidates/S3/TF03.png",
+    "out": "studio/frames/candidates/S3/TF03.png",
     "seed": 101,
     "width": 1344,
     "height": 768,
@@ -200,7 +200,7 @@
     "prompt": "award-winning landscape photography, cinematic color grading, layered atmospheric perspective, shot on ARRI Alexa 35mm, deep depth of field, golden hour, orange and pink sky, sun low on horizon, long dramatic shadows, warm rim light, a crystal-clear alpine lake reflecting the sky, wildflower meadow foreground, horses grazing midground, snow-capped mountains on the horizon, cumulus clouds, strong foreground-midground-background layering, key light from upper left, cinematic wide shot 16:9, masterpiece, best quality, ultra detailed, 4k wallpaper"
   },
   {
-    "out": "tools/prompts/candidates/S3/TF04.png",
+    "out": "studio/frames/candidates/S3/TF04.png",
     "seed": 101,
     "width": 1344,
     "height": 768,
@@ -208,7 +208,7 @@
     "prompt": "award-winning landscape photography, cinematic color grading, layered atmospheric perspective, shot on ARRI Alexa 35mm, deep depth of field, deep blue night, starry sky with milky way, full moon, moonlight path on the lake, cool tones, a crystal-clear alpine lake reflecting the sky, wildflower meadow foreground, horses grazing midground, snow-capped mountains on the horizon, cumulus clouds, strong foreground-midground-background layering, key light from upper left, cinematic wide shot 16:9, masterpiece, best quality, ultra detailed, 4k wallpaper"
   },
   {
-    "out": "tools/prompts/candidates/S3/TF05.png",
+    "out": "studio/frames/candidates/S3/TF05.png",
     "seed": 101,
     "width": 1344,
     "height": 768,
@@ -216,7 +216,7 @@
     "prompt": "award-winning landscape photography, cinematic color grading, layered atmospheric perspective, shot on ARRI Alexa 35mm, deep depth of field, thick morning fog, ethereal atmosphere, muted desaturated colors, soft diffused light, a crystal-clear alpine lake reflecting the sky, wildflower meadow foreground, horses grazing midground, snow-capped mountains on the horizon, cumulus clouds, strong foreground-midground-background layering, key light from upper left, cinematic wide shot 16:9, masterpiece, best quality, ultra detailed, 4k wallpaper"
   },
   {
-    "out": "tools/prompts/candidates/S3/TF06.png",
+    "out": "studio/frames/candidates/S3/TF06.png",
     "seed": 101,
     "width": 1344,
     "height": 768,
@@ -224,7 +224,7 @@
     "prompt": "award-winning landscape photography, cinematic color grading, layered atmospheric perspective, shot on ARRI Alexa 35mm, deep depth of field, overcast rain, dark heavy clouds, rain streaks, wet reflective surfaces, moody grey-green palette, a crystal-clear alpine lake reflecting the sky, wildflower meadow foreground, horses grazing midground, snow-capped mountains on the horizon, cumulus clouds, strong foreground-midground-background layering, key light from upper left, cinematic wide shot 16:9, masterpiece, best quality, ultra detailed, 4k wallpaper"
   },
   {
-    "out": "tools/prompts/candidates/S3/TF07.png",
+    "out": "studio/frames/candidates/S3/TF07.png",
     "seed": 101,
     "width": 1344,
     "height": 768,
@@ -232,7 +232,7 @@
     "prompt": "award-winning landscape photography, cinematic color grading, layered atmospheric perspective, shot on ARRI Alexa 35mm, deep depth of field, heavy snowfall, snow-covered meadow, partially frozen lake, cold blue tones, soft overcast light, a crystal-clear alpine lake reflecting the sky, wildflower meadow foreground, horses grazing midground, snow-capped mountains on the horizon, cumulus clouds, strong foreground-midground-background layering, key light from upper left, cinematic wide shot 16:9, masterpiece, best quality, ultra detailed, 4k wallpaper"
   },
   {
-    "out": "tools/prompts/candidates/S3/TF08.png",
+    "out": "studio/frames/candidates/S3/TF08.png",
     "seed": 101,
     "width": 1344,
     "height": 768,

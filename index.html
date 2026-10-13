@@ -14,6 +14,8 @@
   a.btn{display:inline-block;padding:10px 18px;border:1px solid #2c3a55;border-radius:10px;
         color:#8fc2ff;text-decoration:none}
   a.btn:hover{border-color:#8fc2ff;background:#0d1526}
+  .shots{display:grid;gap:10px;margin-top:30px}
+  .shots img{width:100%;border-radius:10px;border:1px solid #1b2740;display:block}
   small{color:#5c6b84;display:block;margin-top:34px;line-height:1.8}
 </style>
 </head>
@@ -21,16 +23,21 @@
 <main>
   <h1>至日 Solstice</h1>
   <p class="lead">
-    会"活着"的环境感知动态壁纸：真实时辰光照（按你的纬度计算日出日落）·
+    会"活着"的环境感知场景：真实时辰光照（按你的纬度计算日出日落）·
     深度视差 · 精灵宠物（开发中）。AI 仅用于离线生成素材，运行时零 AI 调用。
-    当前为 T0 程序化占位场景，正式素材接入后自动切换"图片 + 深度图"视差模式。
+    当前为 M1 程序化 / 简笔画场景；优美线素材按目标帧合同生产落地后，自动切换为"图片 + 深度图"视差模式。
   </p>
   <div class="links">
-    <a class="btn" href="src/wallpaper/index.html">打开原型（跟随系统时间）</a>
-    <a class="btn" href="src/wallpaper/index.html?hour=12">正午</a>
-    <a class="btn" href="src/wallpaper/index.html?hour=21">夜晚</a>
-    <a class="btn" href="src/wallpaper/index.html?hour=6.2">黎明</a>
+    <a class="btn" href="app/index.html">打开场景（跟随系统时间）</a>
+    <a class="btn" href="app/index.html?hour=12">正午</a>
+    <a class="btn" href="app/index.html?hour=21">夜晚</a>
+    <a class="btn" href="app/index.html?hour=6.2">黎明</a>
     <a class="btn" href="docs/DESIGN.md">设计文档</a>
+  </div>
+  <div class="shots">
+    <img src="site/shots/day.png" alt="白昼场景">
+    <img src="site/shots/night.png" alt="夜晚场景">
+    <img src="site/shots/panel.png" alt="场景设置面板">
   </div>
   <small>
     移动鼠标体验深度视差；闲置 4 秒场景自主缓漂。<br>

@@ -2,17 +2,17 @@
 
 > **工作流（v5.1 定稿）：混合分层路线**——2026-10-13 用户裁决：CC0 双源 + 元素级 AI 生图产出"简陋难看"，素材生产切换为混合分层。
 > 三层分工：**远景整图分层**（云端顶级模型直出）/ **前景 sprite**（本地 FLUX + 参考图锁风格）/ **天气昼夜**（渲染叠加，不重绘素材）。
-> **总入口：`tools/prompts/target-frames.md`（目标帧合同）——没有锁定目标帧，不开工任何优美线素材。**
+> **总入口：`studio/contract/target-frames.md`（目标帧合同）——没有锁定目标帧，不开工任何优美线素材。**
 > CC0 双源（Quaternius/Kenney）**降级为开发期占位与工具资产**，不再作官方画面主力。
 
 ---
 
 ## 0. 生产总流程
 
-1. **目标帧合同**：按 `tools/prompts/target-frames.md` 出 11 张（3 风格裁决 + 8 关键帧）→ 用户裁决锁定 → TF01 兼作黄金帧基准
+1. **目标帧合同**：按 `studio/contract/target-frames.md` 出 11 张（3 风格裁决 + 8 关键帧）→ 用户裁决锁定 → TF01 兼作黄金帧基准
 2. **远景/主视觉**：以 TF01 为参考图出 16:9 ≥4K 整图 → 深度带拆层（3–5 层：天空/远山/中景/近岸/前景）→ HF Spaces **Depth-Anything V2** 生成深度图
 3. **前景/交互元素**：本地 FLUX klein 4B（5060 8GB fp8 可跑）+ **TF01 垫图/IP-Adapter** + 统一中性顶光 → **BiRefNet** 抠图 → 透明 PNG
-4. **打包**：`tools/pack_builder.py` → pack 目录（manifest.json + credits.txt）
+4. **打包**：`studio/tools/pack.py` → pack 目录（manifest.json + credits.txt）
 5. **验收**：与目标帧比对，显著偏离退回；素材留档 prompt+来源（Steam AI 披露）
 
 ## 1. pack 目录结构（一个素材包 = 一个文件夹）
@@ -74,15 +74,15 @@ app/assets/packs/
 
 1. 成图丢 HF Spaces **Depth-Anything V2**（免费、无本地安装；本地可用 Depth Anything 3）
 2. 导出灰度深度图（近白远黑），命名 `depth.png` 与原图同目录
-3. `tools/pack_builder.py` 打包时校验尺寸一致
+3. `studio/tools/pack.py` 打包时校验尺寸一致
 
 ## 4. 打包器
 
 ```
-python tools/pack_builder.py --out app/assets/packs/mountains ^
+python studio/tools/pack.py --out app/assets/packs/mountains ^
   --id pack.mountains --name-zh "中景山峦" --name-en "Mountains" --slot mid ^
   --image scene.png --depth depth.png ^
-  --credit "Seedream 5.0 Pro | prompt: see tools/prompts | 2026-10-13"
+  --credit "Seedream 5.0 Pro | prompt: studio/contract/sets/SET-01 | 2026-10-13"
 ```
 
 自动校验 PNG 格式、长边 ≥2048（警告）、深度图尺寸一致；生成 `manifest.json` + `credits.txt` 并拷贝文件。

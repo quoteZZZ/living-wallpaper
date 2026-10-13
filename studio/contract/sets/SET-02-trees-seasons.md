@@ -46,11 +46,11 @@ masterpiece, best quality, ultra detailed
 ## 4. 打包（素材机本机执行）
 
 ```powershell
-python tools/pack_builder.py --out app/assets/packs/trees `
+python studio/tools/pack.py --out app/assets/packs/trees `
   --id pack.trees --name-zh "前景树 · 四季" --name-en "Trees · Seasons" --slot near `
   --variant spring:spring.png --variant summer:summer.png `
   --variant autumn:autumn.png --variant winter:winter.png `
-  --credit "FLUX.2-klein 4B fp8 + BiRefNet | prompt: tools/prompts/sets/SET-02 | <日期>"
+  --credit "FLUX.2-klein 4B fp8 + BiRefNet | prompt: studio/contract/sets/SET-02 | <日期>"
 ```
 
 （覆盖现有 `app/assets/packs/trees/` 占位包；manifest 会按四变体重写。）
