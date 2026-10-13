@@ -12,6 +12,8 @@
 //     xiaodiyan.translator-helper、k--kato.intellij-idea-keybindings、orionunique.troll
 // 注：openai.chatgpt、openai.codex-audio 已于 2026-10-13 卸载；本项目唯一 AI 助手 = CodeBuddy
 //     （tencent-cloud.coding-copilot）。详见 docs\VSCODE.md §3.6。
+// 注：VSCode **无官方 UE 扩展**，也没有任何插件能操作蓝图编辑器；UE 相关候选的
+//     市场核实记录（采纳 / 条件性 / 不采纳）见 docs\VSCODE.md §3.8（2026-10-14）。
 {
   "recommendations": [
     // ---- 必需：C++ / 虚幻引擎 ----
@@ -31,6 +33,7 @@
     "davidanson.vscode-markdownlint", // 文档规范（✅ 已装）
 
     // ---- 高价值：开发体验 ----
+    "jeff-hykin.better-cpp-syntax", // C++ 语法高亮增强（UE 反射宏密集代码可读性更好）（✅ 已装 2026-10-14）
     "usernamehw.errorlens", // 行内显示 C++ 错误（✅ 已装）
     "gruntfuggly.todo-tree", // 汇总 TODO/FIXME（✅ 已装）
     "streetsidesoftware.code-spell-checker", // 中英拼写检查（已配 cSpell.words）（✅ 已装）

@@ -50,12 +50,12 @@
 `solstice.code-workspace` 里**刻意不再写 `extensions` 段**——工作区文件中的该段会与 `extensions.json` 叠加，
 容易出现两份清单不一致（改了一处忘另一处）。扩展的一切增删请只改 `extensions.json`。
 
-### 3.2 本机现状（2026-10-13 核实）
+### 3.2 本机现状（2026-10-14 核实）
 
 - VSCode **1.119.0**，CLI：`D:\Microsoft VS Code\bin\code.cmd`
-- 已装扩展：**61 → 25 个**（本轮卸载 34 个无关扩展，见 §3.5；另清理 2 个其他 AI 助手，见 §3.6）
+- 已装扩展：**61 → 26 个**（2026-10-13 卸载 34 个无关扩展，见 §3.5；另清理 2 个其他 AI 助手，见 §3.6；2026-10-14 补装 `eamodio.gitlens`、新增 `jeff-hykin.better-cpp-syntax`）
 
-### 3.3 保留并使用（25 个中的 19 个）
+### 3.3 保留并使用（26 个中的 21 个）
 
 | 类别 | 扩展 | 为什么需要 |
 |---|---|---|
@@ -69,6 +69,7 @@
 | | `davidanson.vscode-markdownlint` | 文档规范 |
 | | `bierner.markdown-mermaid` | 文档里的流程图 |
 | 开发体验 | `usernamehw.errorlens` | C++ 报错直接显示在行尾 |
+| | `jeff-hykin.better-cpp-syntax` | C++ 语法高亮增强——UE 反射宏密集的代码可读性明显更好（2026-10-14 补装） |
 | | `gruntfuggly.todo-tree` | 汇总 TODO / FIXME / 待裁决点 |
 | | `wayou.vscode-todo-highlight` | TODO 高亮（与 todo-tree 互补） |
 | | `streetsidesoftware.code-spell-checker` | 中英拼写检查（已配 `cSpell.words`） |
@@ -134,6 +135,36 @@ powershell -ExecutionPolicy Bypass -File tools\vscode-extensions.ps1 -RemoveUnwa
 
 > **卸载会按依赖关系自动多轮重试**：扩展之间存在依赖（例：`vscjava.vscode-java-test` → `redhat.java`），
 > 脚本会先卸依赖方、再卸被依赖方，最后报告仍无法卸载的残留项，不会因单个失败而中断整批。
+
+### 3.8 UE 相关扩展候选核实（2026-10-14）
+
+用 VSCode 市场 API 按 `unreal engine` / `unreal blueprint` / `uproject` / `unreal` / `ue5` 检索后的结论：
+
+**① 事实前提**：VSCode **没有官方虚幻引擎扩展**，也**没有任何插件能操作蓝图编辑器**。
+所以"尽量让 AI 开发"的杠杆在 CodeBuddy 的权限模式（§8），不在插件数量。
+
+**② 已采纳**
+
+| 扩展 | 安装量 | 判断 |
+|---|---|---|
+| `eamodio.gitlens` | — | 2026-10-14 补装；提交历史 / blame，双机同步场景有用 |
+| `jeff-hykin.better-cpp-syntax` | 12.78M | 纯语法高亮，零风险；UE 反射宏密集的代码可读性明显更好 |
+
+**③ 条件性候选（暂不安装）**
+
+| 扩展 | 安装量 | 何时才值得装 |
+|---|---|---|
+| `NilsSoderman.ue-python` | 63.4k | 等 P3 真的用官方编辑器 Python 做资产批处理、且需要在 VSCode 里编辑/执行这些脚本时 |
+
+**④ 明确不采纳**
+
+| 扩展 | 安装量 | 原因 |
+|---|---|---|
+| `CAPTNCAPS.ue4-snippets` | 147.3k | UE4 时代，API 与语法已过期 |
+| `openpixel.unreal-engine-4-helper` | 29.5k | 同上 |
+| `WholeTomatoSoftware.VisualAssist` | 635.2k | 商业付费 C++ 扩展，与 cpptools 功能重叠 |
+| `AgitoReiKen.GenerateProjectFilesUE` | 2.8k | 本仓库 `tools\gen-projectfiles.ps1` 已覆盖 |
+| `Hazelight.unreal-angelscript` / `-clang-format` | 25.3k / 4.1k | AngelScript，与本项目无关 |
 
 ---
 

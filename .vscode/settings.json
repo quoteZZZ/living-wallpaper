@@ -191,7 +191,8 @@
     "MD013": false, // 文档里有长表格与长句，不强制换行
     "MD033": false, // 允许内联 HTML
     "MD041": false,
-    "MD024": { "siblings_only": true }
+    "MD024": { "siblings_only": true },
+    "MD060": false // 仓库全量采用紧凑分隔行 |---|（75 处 / 带空格 0 处），该规则与既有惯例冲突，关掉降噪
   },
   "markdown.extension.toc.levels": "2..3",
   "markdown.extension.toc.updateOnSave": false,
