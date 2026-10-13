@@ -18,7 +18,7 @@
 ## 1. pack 目录结构（一个素材包 = 一个文件夹）
 
 ```
-src/wallpaper/assets/packs/
+app/assets/packs/
 └─ mountains/                    # 包 id（小写字母/数字/点/横线）
    ├─ manifest.json
    ├─ scene.png                  # 整图层（远景主视觉）
@@ -79,7 +79,7 @@ src/wallpaper/assets/packs/
 ## 4. 打包器
 
 ```
-python tools/pack_builder.py --out src/wallpaper/assets/packs/mountains ^
+python tools/pack_builder.py --out app/assets/packs/mountains ^
   --id pack.mountains --name-zh "中景山峦" --name-en "Mountains" --slot mid ^
   --image scene.png --depth depth.png ^
   --credit "Seedream 5.0 Pro | prompt: see tools/prompts | 2026-10-13"

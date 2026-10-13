@@ -5,12 +5,12 @@ Builds an assets pack folder (manifest.json + credits.txt + copied images)
 from source images + depth map + meta.  See docs/PACKS_GUIDE.md section 4.
 
 Usage (PowerShell):
-  python tools/pack_builder.py --out src/wallpaper/assets/packs/mountains `
+  python tools/pack_builder.py --out app/assets/packs/mountains `
     --id pack.mountains --name-zh "中景山峦" --name-en "Mountains" --slot mid `
     --image scene.png --depth depth.png `
     --credit "Seedream 5.0 Pro | prompt: see tools/prompts | 2026-10-13"
 
-  python tools/pack_builder.py --out src/wallpaper/assets/packs/trees `
+  python tools/pack_builder.py --out app/assets/packs/trees `
     --id pack.trees --name-zh "四季树" --name-en "Trees" --slot near `
     --variant spring:spring.png --variant summer:summer.png `
     --credit "FLUX.2 klein + BiRefNet | 2026-10-13"
