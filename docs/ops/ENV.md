@@ -1,7 +1,7 @@
 ---
 id: ops/ENV
 title: 开发环境搭建
-version: 1.1
+version: 1.2
 date: 2026-10-14
 status: active
 truth: nav
@@ -16,7 +16,7 @@ owner: both
 > GPU NVIDIA RTX 5060 8GB（Blackwell sm_120，驱动 610.74）· D 盘剩余约 370GB ·
 > 本地生图 ComfyUI 便携版在 `D:\ComfyUI`（torch 2.14.0+cu130，已支持 sm_120）。
 >
-> **安装现状**（2026-10-14 实测，核对自 `README.md` §二）：**Epic Games Launcher ✅ 已安装**；**虚幻引擎 ❌ 未安装**（`D:\Epic Games\UE_5.8` 是 15.67 GB 未登记下载残件，需清除后重装）；**VS2022 C++ 生成工具 ❌ 未安装**。
+> **安装现状**（2026-10-14 实测）：**Epic Games Launcher ✅ 已安装**；**虚幻引擎 ❌ 未安装**（`D:\Epic Games\UE_5.8` 是 15.67 GB 未登记下载残件，需清除后重装）；**VS2022 C++ 生成工具 ❌ 未安装**。
 
 ---
 
@@ -33,9 +33,24 @@ owner: both
 | 7 | `tools\gen-projectfiles.ps1` 生成工程文件 | — | 1–3 分钟 | AI / 用户 | — |
 | 8 | VSCode 打开 `.vscode\solstice.code-workspace` | — | — | 用户 | — |
 
-**磁盘预算**：UE(60GB) + VS(20GB) + 工程 `Intermediate`/`DerivedDataCache`(20–40GB) ≈ **100–120GB**；D 盘 370GB 充足（**结论：不需要清理 C 盘**，见 [`../plan/ROADMAP.md`](../plan/ROADMAP.md) §3）。
+### 1.1 本机实测（`tools\check-env.ps1`，2026-10-13 首测 / 2026-10-14 复核）
 
-### AI 能做 / 用户必须做
+| 项 | 状态 | 实测值 |
+|---|---|---|
+| winget | ✅ | v1.29.380 |
+| Git | ✅ | 2.53.0.windows.1 |
+| Python | ✅ | 3.12.10 |
+| GPU（NVIDIA） | ✅ | RTX 5060，8151 MiB，驱动 610.74 |
+| 磁盘 D: | ✅ | 剩余 354.3 GB —— **不需要清理 C 盘** |
+| 磁盘 C: | ⚠ | 剩余 77.4 GB；实际需求约 10–15 GB（`check-env.ps1` 的 120 GB 是保守阈值） |
+| ComfyUI | ✅ | `D:\ComfyUI` 就绪，FLUX.2 Klein 4B FP8 已装 |
+| Epic Games Launcher | ✅ | 已安装 |
+| 虚幻引擎 UE5 | ❌ | 未找到 `UnrealEditor.exe`；`D:\Epic Games\UE_5.8` 是 15.67 GB **未登记残件**（只有 `.egstore`，无 `Engine/`、无 `Manifests`），需清除重装 |
+| VS2022 生成工具（C++） | ❌ | 未找到 `vswhere.exe` |
+
+**磁盘预算**：UE(60GB) + VS(20GB) + 工程 `Intermediate`/`DerivedDataCache`(20–40GB) ≈ **100–120GB**；D 盘充足。
+
+### 1.2 AI 能做 / 用户必须做
 
 - **AI 能做**：全部 C++ 与配置、所有脚本、文档、生图线、跑体检/工程生成/编译。
 - **用户必须做**：① 批准并运行安装脚本；② **手动登录 Epic 账号**；③ 在 Launcher GUI 里选 UE 版本/路径/组件；④ 在 UE 编辑器里连蓝图（薄表现层）。职责边界见 [`WORKFLOW.md`](WORKFLOW.md) §1。
@@ -151,7 +166,7 @@ powershell -ExecutionPolicy Bypass -File tools\launch-editor.ps1
 | 改动类型 | 必须同次更新 |
 |---|---|
 | 新增 / 修改工具脚本 | 本文件 §1 / §5 + `tools/README.md` |
-| 引擎或生成工具版本、安装路径变化 | 本文件顶部"安装现状" + [`../plan/ROADMAP.md`](../plan/ROADMAP.md) §3 |
+| 引擎或生成工具版本、安装路径变化 | 本文件顶部"安装现状"与 §1.1 + [`../plan/ROADMAP.md`](../plan/ROADMAP.md) §3 |
 | 生图模型 / 采样参数变化 | 本文件 §3 + [`../art/ASSETS.md`](../art/ASSETS.md) §3 |
 | VSCode 配置变化 | [`VSCODE.md`](VSCODE.md)（真源是 `.vscode/` 实文件） |
 
@@ -163,3 +178,4 @@ powershell -ExecutionPolicy Bypass -File tools\launch-editor.ps1
 |---|---|---|
 | 1.0 | 2026-10-14 | 补统一文档头；真源指针从已作废的 `DESIGN.md` 改为 `charter/GDD.md`；Epic Launcher 状态更正为已安装 |
 | 1.1 | 2026-10-14 | 迁入 `docs/ops/`；修正链接与 §3.1 层级错误（改为 §4）；生图调用说明移交 `art/ASSETS.md` |
+| 1.2 | 2026-10-14 | 补 §1.1 本机实测表（从 `README.md` 迁入，含 C/D 盘与残件结论）；§1.2 分工小节补编号 |

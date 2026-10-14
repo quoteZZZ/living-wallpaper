@@ -1,0 +1,48 @@
+---
+description: Solstice 项目核心约束（现行形态）——真源位置、硬约束、禁止事项
+globs:
+alwaysApply: true
+---
+
+# Solstice · 核心约束（改动前必读）
+
+**当前形态**：**UE5 + C++ 的全 3D 纸雕微缩「永续生态界」**——上帝沙盒，无失败、无数值成长、无目标系统。
+（本项目曾经历 动态壁纸 → 场景引擎 → 卡牌收集 → 自走棋 等形态，**均已作废**。）
+
+## 1. 唯一真源与入口
+
+| 要什么 | 读哪 |
+|---|---|
+| **开工先读** | `docs/INDEX.md`（全仓唯一索引 + 状态矩阵 + 更新触发矩阵） |
+| 设计真源（全仓唯一 `truth: owner`） | `docs/charter/GDD.md`（冲突以它为准，并在同一次改动内同步修正对方） |
+| 卡片子系统 | `docs/content/CARDS.md` |
+| 世界观叙事 / 术语 / 文案规范 | `docs/content/WORLD.md` |
+| 风格规范 / 资产生产 | `docs/art/ART-STYLE.md` · `docs/art/ASSETS.md` |
+| 架构与性能 / 目录与命名 | `docs/tech/ARCHITECTURE.md` · `docs/tech/STRUCTURE.md` |
+| 里程碑与执行计划 | `docs/plan/ROADMAP.md` |
+| 待裁决问题 / 裁决沿革 | `docs/charter/OPEN-QUESTIONS.md` · `docs/charter/DECISIONS.md` |
+| 协作、提交、评审闸门 | `docs/ops/WORKFLOW.md` |
+
+## 2. 硬约束
+
+1. **技术栈锁定**：UE5（最新稳定版）+ C++ 为主 + 蓝图 / UMG 混合。**不引入计划外的第三方插件或中间件**。
+2. **`Sim/` 零渲染依赖**：世界钟 / 生态演化 / 模拟 LOD 是纯逻辑，可 headless 跑；不依赖 Tick / 渲染 / 蓝图。
+3. **逻辑在 C++，表现层在蓝图**；游戏逻辑**不使用 Python**（编辑器资产批处理可用官方 ScriptPlugin）。
+4. **写入前先查归位**：`docs/tech/STRUCTURE.md` §8 归位决策表 + §0 状态列（🟡 = 计划中、**尚未落地**，不要按存在去写代码或脚本）。
+5. **内容数据驱动**：物种 / 卡池 / 法则 / 预设全 JSON，运行时读取。
+6. **默认中英双语**；文案规范见 `docs/content/WORLD.md` §3。
+7. **提交与文档纪律**：提交信息英文、简短祈使句；文档与代码**同次提交**；任何文档增删改（含版本、状态）必须**同次更新 `docs/INDEX.md`**。
+
+## 3. 禁止事项（历史踩坑清单）
+
+- **不要把已作废形态带回**方案或文档：**Tauri / WebGL / Vite / TypeScript / 2.5D / 自走棋 / 卡牌收集**；`app/` 与旧 `studio/`、旧 `shared/` 已删除或为计划中。
+- **不要把 `docs/archive/**` 当依据**——归档稿无约束力（见 `docs/archive/README.md`）。
+- **不要把计划中的目录当已存在**（`game/`、`studio/`、`shared/` 目前为 🟡）。
+- **不要凭印象写规格或数字**——一切以 `docs/charter/GDD.md` 为准，数字必须可核对。
+- **不在运行期调用 AI**、不做服务端 / 账号 / 云同步、不做 macOS / Linux（明确非目标，GDD §2）。
+
+## 4. 协作
+
+- 分工：**AI ≈ 85%**（代码 / 脚本 / 文档 / 数据 / 生图调度）；**用户 ≈ 15%**（安装、GUI 操作、审美裁决、挑图、立项与数值拍板）。
+- 只在五处评审闸门停下来等用户裁决（风格定标、素材挑图、里程碑验收、立项规格变更、开放问题）——其余自己查证、自己定。
+- 闸门清单见 `docs/ops/WORKFLOW.md` §4；新会话进入方式与禁止事项见同文 §6。
