@@ -1,7 +1,17 @@
+---
+id: ops/VSCODE
+title: VSCode 工作区配置说明
+version: 1.0
+date: 2026-10-14
+status: active
+truth: nav
+owner: ai
+---
+
 # VSCode 工作区配置说明（VSCODE）
 
-> 面向《至日 · 岁局》的 VSCode 开发环境。**唯一真源是 `.vscode/` 下的实际文件**，本文档只做导航与说明。
-> 相关：`docs/ENV.md`（引擎与工具链安装）、`.editorconfig`（跨编辑器编码规范）、`.clang-format`（C++ 格式）。
+> 面向 Solstice（UE5 + C++）的 VSCode 开发环境。**唯一真源是 `.vscode/` 下的实际文件**，本文档只做导航与说明。
+> 相关：[`ops/ENV.md`](ENV.md)（引擎与工具链安装）、`.editorconfig`（跨编辑器编码规范）、`.clang-format`（C++ 格式）。
 
 ---
 

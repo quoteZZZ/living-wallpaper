@@ -1,9 +1,19 @@
+---
+id: archive/ART-STYLE-v1
+title: 《至日 · 岁局》美术风格规范（部分作废）
+version: 1.0
+date: 2026-10-13
+status: deprecated
+truth: history
+owner: both
+superseded-by: art/ART-STYLE.md
+---
+
 # 《至日 · 岁局》美术风格规范
 
-> ⚠️ **本稿已作废（2026-10-14），降级为参考。** 当前唯一真源是 [`GDD.md`](./GDD.md)。其中**卡面/卡牌版式规范全部作废**；墨线 + 平涂 + 纸颗粒的风格定义部分仍可继承。
-
-> 版本：v1.0（2026-10-13） · 随 `DESIGN.md` v3.0 同步
-> **本文档是 [`DESIGN.md`](./DESIGN.md) §9「素材线」的展开。** 冲突以 `DESIGN.md` 为准。
+> ⚠️ **本稿已作废（2026-10-14），无约束力。** 现行唯一真源是 [`../charter/GDD.md`](../charter/GDD.md)；作废原因与可继承项见 [`README.md`](README.md)。
+> **卡面 / 卡牌版式规范全部作废**；**墨线 + 平涂 + 纸颗粒**的风格定义与四季色板取色思路可继承，已摘入现行 [`../art/ART-STYLE.md`](../art/ART-STYLE.md)。
+> 本稿原为 `DESIGN.md` v3.0 §9「素材线」的展开，而**父源 DESIGN v3.0 亦已作废**（见 [`DESIGN-v3.md`](DESIGN-v3.md)），引用链一并失效。
 > 风格锚定名：**C1「纸墨卡通」（Ink & Paper Cartoon）**。
 
 ---

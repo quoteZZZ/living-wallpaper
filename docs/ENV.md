@@ -1,12 +1,22 @@
+---
+id: ops/ENV
+title: 开发环境搭建
+version: 1.0
+date: 2026-10-14
+status: active
+truth: nav
+owner: both
+---
+
 # 开发环境搭建（ENV）
 
-> 真源：`docs/DESIGN.md` v3.0 §8/§12。本文件只描述**环境与工具链**，不重复设计规格。
+> 本文件只描述**环境与工具链**（装什么、装在哪、实测结果），不重复设计规格；规格真源见 [`charter/GDD.md`](charter/GDD.md)。
 >
 > **本机已核实事实**：Windows / PowerShell（用户 `Administrator`）· `winget` 可用 · Python 3.12.10 ·
 > GPU NVIDIA RTX 5060 8GB（Blackwell sm_120，驱动 610.74）· D 盘剩余约 370GB ·
 > 本地生图 ComfyUI 便携版在 `D:\ComfyUI`（torch 2.14.0+cu130，已支持 sm_120）。
 >
-> **尚未安装**：Epic Games Launcher 与虚幻引擎。
+> **安装现状**（2026-10-14 实测，核对自 `README.md` §二）：**Epic Games Launcher ✅ 已安装**；**虚幻引擎 ❌ 未安装**（`D:\Epic Games\UE_5.8` 是 15.67 GB 未登记下载残件，需清除后重装）；**VS2022 C++ 生成工具 ❌ 未安装**。
 
 ---
 

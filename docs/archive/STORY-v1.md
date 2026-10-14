@@ -1,9 +1,18 @@
+---
+id: archive/STORY-v1
+title: 《至日 · 岁局》世界观与叙事（已作废）
+version: 1.0
+date: 2026-10-13
+status: deprecated
+truth: history
+owner: both
+superseded-by: charter/GDD.md
+---
+
 # 《至日 · 岁局》世界观与叙事
 
-> ⚠️ **本稿已作废（2026-10-14），降级为参考。** 当前唯一真源是 [`GDD.md`](./GDD.md)。
-
-> 版本：v1.0（2026-10-13） · 随 `DESIGN.md` v3.0 同步
-> **本文档是 [`DESIGN.md`](./DESIGN.md) §3 的展开，不是平行真源。** 冲突以 `DESIGN.md` 为准。
+> ⚠️ **本稿已作废（2026-10-14），无约束力。** 现行唯一真源是 [`../charter/GDD.md`](../charter/GDD.md)；作废原因与可继承项见 [`README.md`](README.md)。
+> 本稿原为 `DESIGN.md` v3.0 §3 的展开，而**父源 DESIGN v3.0 亦已作废**（见 [`DESIGN-v3.md`](DESIGN-v3.md)），因此本稿的引用链一并失效；其中「语料与命名规范」「叙事设计原则」已迁入现行 [`../content/WORLD.md`](../content/WORLD.md)。
 > 叙事形态：**碎片化、事件驱动**（非章节线性）。承载于岁局地图的「奇遇」节点与节气主对话。
 
 ---

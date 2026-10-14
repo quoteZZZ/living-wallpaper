@@ -1,6 +1,16 @@
+---
+id: tech/STRUCTURE
+title: 目录与命名唯一真源
+version: 2.0
+date: 2026-10-14
+status: active
+truth: subsystem
+owner: ai
+---
+
 # 目录与命名唯一真源（STRUCTURE）
 
-> 版本：**v2.0（2026-10-14）** · 状态：**已按 GDD v5.0 重写**
+> 状态：**已按 GDD v6.0 对齐**（版本 2.0，2026-10-14）
 > **本文档是"新文件放哪、叫什么"的唯一真源。** 与 `GDD.md` 冲突时以 GDD 为准，并在同一次改动内同步修正本文。
 > 旧稿（v1.0）的 `app/` `studio/` `shared/` 三分法已作废——`app/` 随旧形态删除，`studio/` 与 `shared/` 按本文重建。
 

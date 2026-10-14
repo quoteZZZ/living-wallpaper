@@ -1,3 +1,13 @@
+---
+id: ops/SYNC
+title: 双机 git 同步
+version: 1.0
+date: 2026-10-14
+status: active
+truth: nav
+owner: both
+---
+
 # 双机 git 同步（SYNC）
 
 > 约定：**git 是唯一真源** + 计划任务定时 `pull` / `push`。大二进制资产不进 git（见 §4）。
