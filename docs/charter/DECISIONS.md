@@ -1,7 +1,7 @@
 ---
 id: charter/DECISIONS
 title: 裁决沿革与调研记录
-version: 1.4
+version: 1.5
 date: 2026-10-14
 status: active
 truth: history
