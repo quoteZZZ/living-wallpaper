@@ -1,7 +1,7 @@
 ---
 id: archive/README
 title: 归档说明
-version: 1.0
+version: 1.1
 date: 2026-10-14
 status: active
 truth: nav
@@ -25,22 +25,21 @@ owner: ai
 |---|---|---|---|
 | [`DESIGN-v3.md`](DESIGN-v3.md) | `docs/DESIGN.md` | v3.0 / 2026-10-13 | 描述《至日·岁局》单机肉鸽自走棋卡牌（2.5D 固定斜俯视、`shared/` 契约、`studio/` 生图线），形态已被否决，整体降级为参考 |
 | [`STORY-v1.md`](STORY-v1.md) | `docs/STORY.md` | v1.0 / 2026-10-13 | 是 DESIGN v3.0 §3 的展开（父源已作废），四时界叙事设定不再适用于「界 / 界外 / 七原质」世界观 |
-| [`ART-STYLE-v1.md`](ART-STYLE-v1.md) | `docs/ART-STYLE.md` | v1.0 / 2026-10-13 | 卡面与卡牌版式规范全部作废；八系属性语言（含日/月系）与现行七元素不符；§5 为 2.5D 相机规范 |
+| [`ART-STYLE-v1.md`](ART-STYLE-v1.md) | `docs/ART-STYLE.md` | v1.0 / 2026-10-13 | 卡面与卡牌版式规范全部作废；八系属性语言（含日/月/灵）与现行七元素不符；§5 为 2.5D 相机规范 |
 
-**作废宣布时间**：2026-10-14（随 `README.md`「文档索引」状态列与本文档一并落档）。
+**作废宣布时间**：2026-10-14（随 `README.md` 与本文档一并落档）。
 
 ---
 
 ## 2 可继承项（已被现行文档吸收，不需要再读归档稿）
 
-| 归档稿 | 可继承的部分 | 现承载位置 |
-|---|---|---|
-| `ART-STYLE-v1.md` | 墨线 + 平涂 + 纸颗粒的画面语言 | [`../art/ART-STYLE.md`](../art/ART-STYLE.md)（v2 重写时摘取） |
-| `ART-STYLE-v1.md` | 四季色板的取色思路 | [`../art/ART-STYLE.md`](../art/ART-STYLE.md) |
-| `STORY-v1.md` | 语料与命名规范（词汇表、命名禁忌） | [`../content/WORLD.md`](../content/WORLD.md)（有效条目迁入） |
-| `STORY-v1.md` | 叙事设计原则（"事件驱动、不写对白剧本"） | [`../content/WORLD.md`](../content/WORLD.md) |
-
-> 上表右侧文件由 P2 / P3 批次落地；落地前以 [`../INDEX.md`](../INDEX.md) 的状态矩阵为准。
+| 归档稿 | 可继承的部分 | 现承载位置 | 状态 |
+|---|---|---|---|
+| `ART-STYLE-v1.md` | 墨线 + 平涂 + 纸颗粒的画面语言 | [`../art/ART-STYLE.md`](../art/ART-STYLE.md) §3（作为 T3 基线） | ✅ 已迁入 |
+| `ART-STYLE-v1.md` | 四季色板与七元素视觉语言 | [`../art/ART-STYLE.md`](../art/ART-STYLE.md) §3.3 / §3.4（标为候选，待定标） | ✅ 已迁入 |
+| `ART-STYLE-v1.md` | 生图 Prompt 串、批次一致性、QC 清单、"避免人脸特写" | [`../art/ASSETS.md`](../art/ASSETS.md) §3 / §4 + [`../art/ART-STYLE.md`](../art/ART-STYLE.md) §5 | ✅ 已迁入 |
+| `STORY-v1.md` | 叙事设计原则（不写小说 / 不解释机制 / 真相靠拼接 / 原创零借名） | [`../content/WORLD.md`](../content/WORLD.md) §1 | ✅ 已迁入 |
+| `STORY-v1.md` | 语料与命名规范、对话写作规范 | [`../content/WORLD.md`](../content/WORLD.md) §2 / §3 | ✅ 已迁入并改写 |
 
 ---
 
@@ -48,4 +47,23 @@ owner: ai
 
 1. 不要把它们当"设计参考"来对齐新方案——**形态已换，参考价值只剩沿革**。
 2. 不要在现行文档里引用它们作为依据（唯一例外：`## 沿革` 章节里的历史叙述）。
-3. 不要把归档稿里的技术词（Tauri / WebGL / Vite / TS / 2.5D / 自走棋 / `shared/` / `studio/`）带回现行文档。
+3. 不要把归档稿里的技术词（Tauri / WebGL / Vite / TS / 2.5D / 自走棋 / `shared/` 旧契约 / `studio/` 旧管线）带回现行文档。
+
+---
+
+## 4 更新触发
+
+| 改动类型 | 必须同次更新 |
+|---|---|
+| 新文档作废 | 本文件 §1 增行（含作废原因）+ §2 列可继承项 + [`../INDEX.md`](../INDEX.md) 状态改 `deprecated` + [`../charter/DECISIONS.md`](../charter/DECISIONS.md) §4 |
+| 可继承项落地到现行文档 | 本文件 §2 的「状态」列改为 ✅ 并写清落点章节 |
+| 归档稿被彻底否定（连沿革价值也无） | 在本文件说明，并考虑直接删除（git 历史仍可找回） |
+
+---
+
+## 沿革
+
+| 版本 | 日期 | 变更 |
+|---|---|---|
+| 1.0 | 2026-10-14 | 建立归档说明：三份作废稿的清单、可继承项与引用禁令 |
+| 1.1 | 2026-10-14 | 可继承项已全部落地（P3）；补"更新触发"章节与统一骨架 |

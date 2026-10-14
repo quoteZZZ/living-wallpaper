@@ -1,7 +1,7 @@
 ---
 id: ops/ENV
 title: 开发环境搭建
-version: 1.0
+version: 1.1
 date: 2026-10-14
 status: active
 truth: nav
@@ -10,7 +10,7 @@ owner: both
 
 # 开发环境搭建（ENV）
 
-> 本文件只描述**环境与工具链**（装什么、装在哪、实测结果），不重复设计规格；规格真源见 [`charter/GDD.md`](charter/GDD.md)。
+> 本文件只描述**环境与工具链**（装什么、装在哪、实测结果），不重复设计规格；规格真源见 [`../charter/GDD.md`](../charter/GDD.md)，前置条件与磁盘结论见 [`../plan/ROADMAP.md`](../plan/ROADMAP.md) §3。
 >
 > **本机已核实事实**：Windows / PowerShell（用户 `Administrator`）· `winget` 可用 · Python 3.12.10 ·
 > GPU NVIDIA RTX 5060 8GB（Blackwell sm_120，驱动 610.74）· D 盘剩余约 370GB ·
@@ -20,29 +20,29 @@ owner: both
 
 ---
 
-## 1. 安装顺序与体积预期
+## 1 安装顺序与体积预期
 
-| 步骤 | 操作 | 体积 | 耗时 | 谁来做 |
-|---|---|---|---|---|
-| 1 | `tools\install-epic-launcher.ps1` | ~1GB | 几分钟 | **用户执行脚本** |
-| 2 | 打开 Launcher **登录 Epic 账号** | — | 几分钟 | **必须人工**（不可脚本化） |
-| 3 | Launcher 内安装**虚幻引擎最新稳定版**（建议 `D:\UE\UE_5.x`） | 30–60GB | 30–90 分钟 | **必须 GUI** |
-| 4 | `tools\install-vs-buildtools.ps1`（VS2022 生成工具 + C++ 负载） | 15–20GB | 20–60 分钟 | **用户执行脚本** |
-| 5 | `tools\check-env.ps1` 复检 | — | 秒级 | AI / 用户 |
-| 6 | `tools\configure-vscode.ps1` 写入引擎路径 | — | 秒级 | AI / 用户 |
-| 7 | `tools\gen-projectfiles.ps1` 生成工程文件 | — | 1–3 分钟 | AI / 用户 |
-| 8 | VSCode 打开 `.vscode\solstice.code-workspace` | — | — | 用户 |
+| 步骤 | 操作 | 体积 | 耗时 | 谁来做 | 状态 |
+|---|---|---|---|---|---|
+| 1 | `tools\install-epic-launcher.ps1` | ~1GB | 几分钟 | 用户执行脚本 | ✅ **已完成，无需再跑** |
+| 2 | 打开 Launcher **登录 Epic 账号** | — | 几分钟 | **必须人工**（不可脚本化） | ✅ 已登录 |
+| 3 | Launcher 内安装**虚幻引擎最新稳定版**（建议 `D:\Epic Games\UE_5.x`） | 30–60GB | 30–90 分钟 | **必须 GUI** | ❌ 待做（先清残件） |
+| 4 | `tools\install-vs-buildtools.ps1`（VS2022 生成工具 + C++ 负载） | 15–20GB | 20–60 分钟 | **用户执行脚本** | ❌ 待做 |
+| 5 | `tools\check-env.ps1` 复检 | — | 秒级 | AI / 用户 | — |
+| 6 | `tools\configure-vscode.ps1` 写入引擎路径 | — | 秒级 | AI / 用户 | — |
+| 7 | `tools\gen-projectfiles.ps1` 生成工程文件 | — | 1–3 分钟 | AI / 用户 | — |
+| 8 | VSCode 打开 `.vscode\solstice.code-workspace` | — | — | 用户 | — |
 
-**磁盘预算**：UE(60GB) + VS(20GB) + 工程 `Intermediate`/`DerivedDataCache`(20–40GB) ≈ **100–120GB**；D 盘 370GB 充足。
+**磁盘预算**：UE(60GB) + VS(20GB) + 工程 `Intermediate`/`DerivedDataCache`(20–40GB) ≈ **100–120GB**；D 盘 370GB 充足（**结论：不需要清理 C 盘**，见 [`../plan/ROADMAP.md`](../plan/ROADMAP.md) §3）。
 
 ### AI 能做 / 用户必须做
 
 - **AI 能做**：全部 C++ 与配置、所有脚本、文档、生图线、跑体检/工程生成/编译。
-- **用户必须做**：① 批准并运行 winget 安装；② **手动登录 Epic 账号**；③ 在 Launcher GUI 里选 UE 版本/路径/组件；④ 在 UE 编辑器里连蓝图（薄表现层）。
+- **用户必须做**：① 批准并运行安装脚本；② **手动登录 Epic 账号**；③ 在 Launcher GUI 里选 UE 版本/路径/组件；④ 在 UE 编辑器里连蓝图（薄表现层）。职责边界见 [`WORKFLOW.md`](WORKFLOW.md) §1。
 
 ---
 
-## 2. 用 VSCode 开发虚幻 C++ —— 完整方案
+## 2 用 VSCode 开发虚幻 C++ —— 完整方案
 
 ### 2.1 为什么可行
 
@@ -99,7 +99,7 @@ UE 内置 **`VSCodeSourceCodeAccess`** 插件。启用后，在编辑器里双�
 
 ---
 
-## 3. 本地生图环境（已就绪，无需额外下载）
+## 3 本地生图环境（已就绪，无需额外下载）
 
 | 项 | 值 |
 |---|---|
@@ -111,14 +111,14 @@ UE 内置 **`VSCodeSourceCodeAccess`** 插件。启用后，在编辑器里双�
 | 超分 | `models\upscale_models\RealESRGAN_x2plus.pth`（**x2**，非 x4） |
 | 实测可用参数 | `steps=4` `cfg=1.0` `sampler=euler` + `Flux2Scheduler` |
 
-> 详细调用方式与脚本见 `studio/README.md`。**CFG=1 时负向串不参与采样**（走 zero-out），仅作留档。
+> 调用方式、批次规范与 manifest 登记见 [`../art/ASSETS.md`](../art/ASSETS.md) §3。**CFG=1 时负向串不参与采样**（走 zero-out），仅作留档。
 
 ---
 
-## 3.1 VSCode 工作区配置
+## 4 VSCode 工作区配置
 
 `.vscode/` 下的全部配置（settings / extensions / tasks / launch / c_cpp_properties / code-workspace / code-snippets）
-以及根目录的 `.editorconfig`、`.clang-format` 已经就绪，**逐项说明见 [`VSCODE.md`](./VSCODE.md)**。
+以及根目录的 `.editorconfig`、`.clang-format` 已经就绪，**逐项说明见 [`VSCODE.md`](VSCODE.md)**。
 
 扩展清单的唯一真源是 `.vscode/extensions.json`；用 `tools\vscode-extensions.ps1` 做体检与增删：
 
@@ -133,7 +133,7 @@ powershell -ExecutionPolicy Bypass -File tools\vscode-extensions.ps1 -RemoveUnwa
 
 ---
 
-## 4. 速查命令
+## 5 速查命令
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File tools\check-env.ps1
@@ -143,3 +143,23 @@ powershell -ExecutionPolicy Bypass -File tools\gen-projectfiles.ps1 -Mode Soluti
 powershell -ExecutionPolicy Bypass -File tools\build.ps1
 powershell -ExecutionPolicy Bypass -File tools\launch-editor.ps1
 ```
+
+---
+
+## 6 更新触发
+
+| 改动类型 | 必须同次更新 |
+|---|---|
+| 新增 / 修改工具脚本 | 本文件 §1 / §5 + `tools/README.md` |
+| 引擎或生成工具版本、安装路径变化 | 本文件顶部"安装现状" + [`../plan/ROADMAP.md`](../plan/ROADMAP.md) §3 |
+| 生图模型 / 采样参数变化 | 本文件 §3 + [`../art/ASSETS.md`](../art/ASSETS.md) §3 |
+| VSCode 配置变化 | [`VSCODE.md`](VSCODE.md)（真源是 `.vscode/` 实文件） |
+
+---
+
+## 沿革
+
+| 版本 | 日期 | 变更 |
+|---|---|---|
+| 1.0 | 2026-10-14 | 补统一文档头；真源指针从已作废的 `DESIGN.md` 改为 `charter/GDD.md`；Epic Launcher 状态更正为已安装 |
+| 1.1 | 2026-10-14 | 迁入 `docs/ops/`；修正链接与 §3.1 层级错误（改为 §4）；生图调用说明移交 `art/ASSETS.md` |

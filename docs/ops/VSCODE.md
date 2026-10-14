@@ -1,7 +1,7 @@
 ---
 id: ops/VSCODE
 title: VSCode 工作区配置说明
-version: 1.0
+version: 1.1
 date: 2026-10-14
 status: active
 truth: nav
@@ -36,7 +36,7 @@ owner: ai
 
 **推荐**：`文件 → 打开工作区 → .vscode\solstice.code-workspace`
 
-或直接打开文件夹 `d:\GitCode\solstice`（`.vscode/settings.json` 同样生效，效果一致）。
+或直接打开**本机仓库根文件夹**（本机为 `E:\solstice`，另一台按实际填写；`.vscode/settings.json` 同样生效，效果一致）。
 
 首次打开后建议按顺序执行（`Ctrl+Shift+P → Tasks: Run Task`）：
 
@@ -102,17 +102,13 @@ owner: ai
   ```
 - 该扩展**刻意不写进 `extensions.json` 的任何一张清单**，以免被 `-RemoveUnwanted` 一并卸掉。
 
-### 3.5 本轮已卸载（34 个，全局移除）
+### 3.5 已卸载的无关扩展（34 个，全局移除）
 
-| 类别 | 扩展 |
-|---|---|
-| Java / Spring / Maven（12） | `redhat.java`、`vscjava.vscode-java-pack`、`-java-debug`、`-java-dependency`、`-java-test`、`-maven`、`-spring-boot-dashboard`、`-spring-initializr`、`vmware.vscode-spring-boot`、`vmware.vscode-boot-dev-pack`、`oracle.oracle-java`、`caolin.java-run` |
-| 前端 Vue / JS / HTML / CSS（13） | `vue.volar`、`octref.vetur`、`hollowtree.vue-snippets`、`oysun.vuehelper`、`morningstart.vue3-snipptes`、`fallenmax.mithril-emmet`、`ecmel.vscode-html-css`、`ritwickdey.liveserver`、`techer.open-in-browser`、`formulahendry.auto-close-tag`、`formulahendry.auto-rename-tag`、`xabikos.javascriptsnippets`、`christian-kohler.npm-intellisense` |
-| 前端工具链（4） | `dbaeumer.vscode-eslint`、`esbenp.prettier-vscode`、`rvest.vs-code-prettier-eslint`、`orta.vscode-jest` |
-| 其他（5） | `mtxr.sqltools`、`johnstoncode.svn-scm`、`ms-azuretools.vscode-containers`、`formulahendry.code-runner`、`dotjoshjohnson.xml` |
+清掉的是**旧形态（Web / Java）的遗留**：**Java / Spring / Maven 12 个** · **前端 Vue / JS / HTML / CSS 13 个** · **前端工具链 4 个**（eslint / prettier / jest 等）· **其他 5 个**（sqltools / svn / containers / code-runner / xml）。
 
-> 这些扩展已从 `extensions.json` 的 `unwantedRecommendations` 中登记，抑制 VS Code 的推荐噪音。
-> 若日后确实需要某个，重装即可（本文档保留了清单）。
+- **完整清单的唯一真源**：`.vscode/extensions.json` 的 `unwantedRecommendations`（同时抑制 VS Code 的推荐噪音）。
+- **历史明细**：见 git 提交 `c58bc89`（`chore: prune legacy studio and app, vendor dev tooling`）改动前的本文档旧版。
+- 日后确实需要某个，重装即可；**不要**把旧形态的扩展重新写回推荐清单。
 
 ### 3.6 个人工具（未登记，随你保留）
 
@@ -236,7 +232,7 @@ powershell -ExecutionPolicy Bypass -File tools\vscode-extensions.ps1 -RemoveUnwa
 | 中文脚本在终端报语法错 | 脚本须为 **UTF-8 with BOM**。`.editorconfig` 已强制；现存脚本已批量补 BOM。若仍报错，检查该文件编码 |
 | tasks 找不到 `tools\*.ps1` | 确认打开的是**仓库根**（不是 `game/` 子目录） |
 | 终端里 `无法加载文件，因为在此系统上禁止运行脚本` | 用 tasks（已带 `-ExecutionPolicy Bypass`），或执行 `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned` |
-| 契约校验 / 生图任务报「文件不存在」 | `shared/` 与 `studio/` 目录尚未落地（规划见 `docs\STRUCTURE.md`），属预期行为 |
+| 契约校验 / 生图任务报「文件不存在」 | `shared/` 与 `studio/` 目录**尚未落地**（状态见 `docs\tech\STRUCTURE.md` §0），属预期行为 |
 | 搜索很慢 / 风扇狂转 | 确认 `files.watcherExclude` 生效；必要时关闭搜索中的 `game/Content` |
 
 ---
@@ -303,3 +299,23 @@ powershell -ExecutionPolicy Bypass -File tools\vscode-extensions.ps1 -RemoveUnwa
 - `deny` 规则**永远强于**模式；`allow` / `ask` 会改变模式的实际效果。
 - 真正的「任何危险命令都不问」需要进程环境变量 `CODEBUDDY_IS_SANDBOX=1` 配合 `-y`，
   文档明确其仅限隔离沙箱；本项目**未启用**，仅用 `bypassPermissions`。
+
+---
+
+## 9. 更新触发
+
+| 改动类型 | 必须同次更新 |
+|---|---|
+| `.vscode/**`、`.editorconfig`、`.clang-format` 变化 | 本文件 §1 / §4（**真源是实际文件**，本文只做导航） |
+| 扩展增删（`extensions.json`） | 本文件 §3 |
+| 引擎路径 / 构建方式变化 | 本文件 §2 / §6 + [`ENV.md`](ENV.md) §2 |
+| CodeBuddy 权限配置变化 | 本文件 §8 + [`WORKFLOW.md`](WORKFLOW.md) §1 |
+
+---
+
+## 10. 沿革
+
+| 版本 | 日期 | 变更 |
+|---|---|---|
+| 1.0 | 2026-10-14 | 补统一文档头；改去《至日 · 岁局》旧形态表述 |
+| 1.1 | 2026-10-14 | 迁入 `docs/ops/`；去掉他人机器的硬编码路径；§3.5 的 34 个扩展明细精简为摘要（明细见 `extensions.json` 与 git `c58bc89`）；把 `docs\STRUCTURE.md` 引用改为 `docs\tech\STRUCTURE.md` |

@@ -1,7 +1,7 @@
 ---
 id: tech/STRUCTURE
 title: 目录与命名唯一真源
-version: 2.0
+version: 2.1
 date: 2026-10-14
 status: active
 truth: subsystem
@@ -10,45 +10,49 @@ owner: ai
 
 # 目录与命名唯一真源（STRUCTURE）
 
-> 状态：**已按 GDD v6.0 对齐**（版本 2.0，2026-10-14）
 > **本文档是"新文件放哪、叫什么"的唯一真源。** 与 [`../charter/GDD.md`](../charter/GDD.md) 冲突时以 GDD 为准，并在同一次改动内同步修正本文。
-> 旧稿（v1.0）的 `app/` `studio/` `shared/` 三分法已作废——`app/` 随旧形态删除，`studio/` 与 `shared/` 按本文重建。
+> 版本 2.1（2026-10-14）：按 GDD v6.0 对齐；**为所有"计划中但尚未落地"的目录补状态列**，消除文档与仓库实际的矛盾。
+> 旧稿（v1.0）的 `app/` `studio/` `shared/` 三分法已作废——`app/` 随旧形态删除；`studio/` 与 `shared/` **按本文重建（尚未落地）**。
 
 ---
 
-## 0. 分层原则
+## 0 分层原则与状态
 
-| 层 | 定位 | 是否入 git |
-|---|---|---|
-| `game/` | **进发行包**：UE 工程、源码、配置 | 源码 / 配置 **入**；二进制资产 **不入** |
-| `studio/` | **产出素材**：ComfyUI 生图线、生成产物、风格锚与预设 | 工作流 / 任务 / 预设 / manifest **入**；产物 **不入** |
-| `shared/` | **双方共读的契约**：JSON Schema | **入** |
-| `tools/` | **开发期脚本**：环境、工程生成、构建、基准 | **入** |
-| `docs/` | 设计与约定文档 | **入** |
-| `.vscode/` `.codebuddy/` | IDE 与项目数据配置 | **入** |
+| 层 | 定位 | 入 git | **状态** |
+|---|---|---|---|
+| `game/` | **进发行包**：UE 工程、源码、配置 | 源码 / 配置 **入**；二进制资产 **不入** | 🟡 **计划中**（随 M0 建立，当前只有被忽略的本地缓存目录） |
+| `studio/` | **产出素材**：ComfyUI 生图线、生成产物、风格锚与预设 | 工作流 / 任务 / 预设 / manifest **入**；产物 **不入** | 🟡 **计划中**（当前不存在；生图能力在本机 `D:\ComfyUI`，见 [`../ops/ENV.md`](../ops/ENV.md) §3） |
+| `shared/` | **双方共读的契约**：JSON Schema | **入** | 🟡 **计划中**（当前不存在） |
+| `tools/` | **开发期脚本**：环境、工程生成、构建、基准 | **入** | ✅ **现状**（9 个 PowerShell + README） |
+| `docs/` | 设计与约定文档 | **入** | ✅ **现状**（结构见 [`../INDEX.md`](../INDEX.md)） |
+| `.vscode/` `.codebuddy/` | IDE 与项目数据配置 | **入** | ✅ **现状** |
 
 **核心不变量**：`game/Content/` 的二进制资产**不入 git**，因此必须**可由"种子 + 生成器 + 契约 + manifest"完整重建**。这是全部目录设计的出发点。
 
 ---
 
-## 1. 仓库总览
+## 1 仓库总览
 
 ```text
 solstice/
-├─ game/          虚幻引擎工程（进发行包）
-├─ studio/        本地生图线 + 程序化资产产物
-├─ shared/        契约：JSON Schema（引擎与生图线共读）
-├─ tools/         开发期脚本：环境 / 工程生成 / 构建 / 基准
-├─ docs/          GDD / CARDS / STRUCTURE / ENV / VSCODE / SYNC（+ 参考稿）
-├─ .vscode/       构建任务 / 调试 / cpptools / 代码片段
-├─ .codebuddy/    agents/ 子代理（项目数据，勿删）
-├─ .clang-format  .editorconfig  .gitignore
-└─ README.md
+├─ game/          🟡 计划中 —— 虚幻引擎工程（进发行包）
+├─ studio/        🟡 计划中 —— 本地生图线 + 程序化资产产物
+├─ shared/        🟡 计划中 —— 契约：JSON Schema（引擎与生图线共读）
+├─ tools/         ✅ 现状  —— 开发期脚本：环境 / 工程生成 / 构建 / 基准
+├─ docs/          ✅ 现状  —— 见 ../INDEX.md（charter / content / art / tech / plan / ops / archive）
+├─ .vscode/       ✅ 现状  —— 构建任务 / 调试 / cpptools / 代码片段
+├─ .codebuddy/    ✅ 现状  —— agents/ 与 rules/（项目数据，勿删）
+├─ .clang-format  ✅ 现状
+├─ .editorconfig  ✅ 现状
+├─ .gitignore     ✅ 现状
+└─ README.md      ✅ 现状  —— 入口页
 ```
+
+> **规则**：凡本文出现 `🟡 计划中` 的目录，**不要按其存在去写代码或脚本**；建立目录时把状态列改为 `✅ 现状`。
 
 ---
 
-## 2. `game/`（进发行包）
+## 2 `game/`（进发行包）🟡 计划中
 
 ```text
 game/
@@ -89,7 +93,7 @@ game/
 
 ---
 
-## 3. `Source/` 模块约定
+## 3 `Source/` 模块约定
 
 | 模块 | 依赖 | 说明 |
 |---|---|---|
@@ -101,7 +105,7 @@ game/
 
 ---
 
-## 4. `studio/`（产出素材，按本文重建）
+## 4 `studio/`（产出素材）🟡 计划中 —— 按本文重建
 
 ```text
 studio/
@@ -120,16 +124,17 @@ studio/
 ```
 
 **脚本语言**：`studio/scripts/` 与 `tools/` 一律 **PowerShell**（调 ComfyUI API）；**编辑器内的资产批处理**用官方 **Python（ScriptPlugin）** 或 `SolsticeEditor` 的 Commandlet。**游戏逻辑不使用 Python**。
+**登记规范**：manifest 字段、批次一致性、QC 与合规见 [`../art/ASSETS.md`](../art/ASSETS.md)。
 
 ---
 
-## 5. `shared/`（契约，按本文重建）
+## 5 `shared/`（契约）🟡 计划中 —— 按本文重建
 
 ```text
 shared/
 ├─ README.md
 └─ schema/
-   ├─ species.schema.json   物种模板（§GDD 13.3）
+   ├─ species.schema.json   物种模板（GDD §13.3）
    ├─ card.schema.json      干涉卡（元素 / 级 / 卡类 / 类别 / 卡型 / 作用域 / 参数）
    ├─ world.schema.json     界：尺寸 / 地形算法与种子 / 生态域 / 水体 / 大气 / 法则
    ├─ style.schema.json     风格主题参数（调色板 / 着色 / 后期 / 几何处理）
@@ -140,12 +145,12 @@ shared/
 
 ---
 
-## 6. 运行时文件位置（发行版）
+## 6 运行时文件位置（发行版）
 
 | 内容 | 位置 | 备注 |
 |---|---|---|
 | 契约数据 | `game/Config/Solstice/Data/*.json` | 随包发布，运行时直接读 |
-| 本地化 | `game/Config/Solstice/Localization/` | 中英双语 |
+| 本地化 | `game/Config/Solstice/Localization/` | 中英双语（文案规范见 [`../content/WORLD.md`](../content/WORLD.md) §3） |
 | 存档（每界一份） | `%LOCALAPPDATA%\Solstice\Saved\SaveGames\<realmId>.sav` | 键前缀 `solstice.save.v<n>` |
 | 导出的界 | `%USERPROFILE%\Documents\Solstice\Exports\<realmId>.solstice` | 导入 / 导出用 |
 | 日志 / 崩溃 | `Saved/Logs`、`Saved/Crashes` | 不入 git |
@@ -153,7 +158,7 @@ shared/
 
 ---
 
-## 7. 命名规范
+## 7 命名规范
 
 ### 7.1 C++
 
@@ -190,42 +195,69 @@ shared/
 - **风格主题 id**：`style.<名>` → `style.paper-diorama`
 - **预设 id**：`preset.<名>` → `preset.eternal-winter`
 - **C++ 文件**：`Solstice<Xxx>.h/.cpp`，与类名一致；`Sim/` 内允许 `WorldClock.h/.cpp` 形态
+- **文档 id**：与 `docs/` 下的相对路径一致（`charter/GDD`、`tech/STRUCTURE`…），见 [`../INDEX.md`](../INDEX.md)
+
+> 术语与命名的**语言层**规范（中英对照、文案禁忌）见 [`../content/WORLD.md`](../content/WORLD.md) §2。
 
 ---
 
-## 8. 归位决策表（新增东西放哪）
+## 8 归位决策表（新增东西放哪）
 
-| 我要新增 | 放哪 | 入 git |
-|---|---|---|
-| 一段游戏逻辑 | `game/Source/Solstice/<对应子目录>/` | ✅ |
-| 新干涉卡 | 数据 `game/Config/Solstice/Data/cards.*.json` + 卡面走 `studio/jobs/` | ✅ / 产物 ❌ |
-| 新物种 | `game/Config/Solstice/Data/species.json` + 几何生成器 `Source/Solstice/Gen/` | ✅ |
-| 新风格主题 | `shared/schema/style.schema.json` 参数 + `studio/presets/style.*.json` + `Content/Styles/<名>/` | 参数 ✅ / 资产 ❌ |
-| 美术素材（贴图 / 立牌 / 卡面） | 源与参数 `studio/`，产物 `Content/` 对应子目录 | 源 ✅ / 产物 ❌ |
-| 新控件 | C++ 优先（`Source/Solstice/UI/`）；可视化打磨放 `Content/UI/` | ✅ / ❌ |
-| 环境或构建脚本 | `tools/` | ✅ |
-| 设计文档 | `docs/` | ✅ |
-| 存档 / 日志 / 缓存 | `Saved/`、`D:\UE-DDC` | ❌ |
-| 临时试验 | `studio/work/`（已忽略） | ❌ |
+| 我要新增 | 放哪 | 入 git | 状态 |
+|---|---|---|---|
+| 一段游戏逻辑 | `game/Source/Solstice/<对应子目录>/` | ✅ | 🟡 |
+| 新干涉卡 | 数据 `game/Config/Solstice/Data/cards.*.json` + 卡面走 `studio/jobs/` | ✅ / 产物 ❌ | 🟡 |
+| 新物种 | `game/Config/Solstice/Data/species.json` + 几何生成器 `Source/Solstice/Gen/` | ✅ | 🟡 |
+| 新风格主题 | `shared/schema/style.schema.json` 参数 + `studio/presets/style.*.json` + `Content/Styles/<名>/` | 参数 ✅ / 资产 ❌ | 🟡 |
+| 美术素材（贴图 / 立牌 / 卡面） | 源与参数 `studio/`，产物 `Content/` 对应子目录 | 源 ✅ / 产物 ❌ | 🟡 |
+| 新控件 | C++ 优先（`Source/Solstice/UI/`）；可视化打磨放 `Content/UI/` | ✅ / ❌ | 🟡 |
+| 环境或构建脚本 | `tools/` | ✅ | ✅ |
+| 设计文档 | `docs/`（先读 [`../INDEX.md`](../INDEX.md) 的事务域表） | ✅ | ✅ |
+| 存档 / 日志 / 缓存 | `Saved/`、`D:\UE-DDC` | ❌ | 🟡 |
+| 临时试验 | `studio/work/`（已忽略）或仓库根 `tmp/`（已忽略） | ❌ | ✅ |
 
 ---
 
-## 9. git 与双机同步
+## 9 git 与双机同步
 
 **入 git**：`game/Source`、`game/Config`、`game/*.uproject`、`game/*.Target.cs`、`shared/`、`studio/{workflows,jobs,refs,presets,scripts,README.md}`、`studio/out/manifest.jsonl`、`tools/`、`docs/`、`.vscode/`、`.codebuddy/`。
 
-**不入 git**：`game/{Binaries,Intermediate,Saved,DerivedDataCache}`、`game/Content/**` 的二进制、`studio/out/**`（除 manifest）、`studio/work/**`、`.vs/`、`*.sln`。
+**不入 git**：`game/{Binaries,Intermediate,Saved,DerivedDataCache}`、`game/Content/**` 的二进制、`studio/out/**`（除 manifest）、`studio/work/**`、`.vs/`、`*.sln`、`tmp/`。
 
 **双机一致性的保证**：Content 不入 git ⇒ 两台机器用**同一套"种子 + 生成器 + 契约 + manifest"**独立重建。因此：
 1. 生成器与契约的改动必须与产物**同一次提交**；
 2. manifest 是产物的"身份证明"，缺 manifest 的素材视为**不可复现**，不得进游戏；
-3. 卡面 / 立绘类素材**单独提交**，先过用户裁决（沿用旧约定）。
+3. 卡面 / 立绘类素材**单独提交**，先过用户裁决。
+
+> **操作细节已移交**：[`../ops/SYNC.md`](../ops/SYNC.md)（定时同步、冲突处理、LFS 选项）与 [`../ops/WORKFLOW.md`](../ops/WORKFLOW.md) §3（提交规范）。本节只定义**哪些目录入 git**。
 
 ---
 
-## 10. 由本文带来的待办
+## 10 由本文带来的待办（随 M0 建立）
 
-1. **重建 `studio/`**：目录骨架 + README + 工作流与 job 占位（`.gitignore` 里 `studio/out`、`studio/work` 的规则仍然有效，直接生效）。
+1. **重建 `studio/`**：目录骨架 + README + 工作流与 job 占位（`.gitignore` 里 `studio/out`、`studio/work` 的规则仍然有效）。
 2. **重建 `shared/schema/`**：5 个 schema 占位。
-3. **`game/` 工程骨架**：`.uproject` + 三个 Target + 主模块（对应执行计划 P3）。
+3. **`game/` 工程骨架**：`.uproject` + 三个 Target + 主模块（对应 [`../plan/ROADMAP.md`](../plan/ROADMAP.md) §5 的 P3）。
 4. `tools/` 脚本按新结构复核：`gen-projectfiles.ps1`、`build.ps1`、`launch-editor.ps1` 已按 `Solstice` 命名，**无需改名**；新增 headless 基准脚本入口。
+5. **落地后回来改状态列**：§0 / §1 / §2 / §4 / §5 / §8 的 🟡 改为 ✅。
+
+---
+
+## 11 更新触发
+
+| 改动类型 | 必须同次更新 |
+|---|---|
+| 新增 / 移动目录、改命名 | 本文件对应章节（含 §8 归位表）+ `.gitignore` 注释 + [`../INDEX.md`](../INDEX.md) |
+| 目录从"计划"变为"现状" | 本文件所有 🟡 状态列 + 相关文档的存在性描述 |
+| 入 git 策略变化 | 本文件 §9 + [`../ops/SYNC.md`](../ops/SYNC.md) §3 / §4 |
+| 命名规范变化 | 本文件 §7 + [`../content/WORLD.md`](../content/WORLD.md) §2（如涉及文案用词） |
+
+---
+
+## 沿革
+
+| 版本 | 日期 | 变更 |
+|---|---|---|
+| 1.0 | 2026-10-13 | 旧三分法（`app/` / `studio/` / `shared/`）——**已作废** |
+| 2.0 | 2026-10-14 | 按 GDD 重写：`game/` / `studio/` / `shared/` 三分，模块约定、命名规范、归位决策表 |
+| 2.1 | 2026-10-14 | 补 🟡/✅ **状态列**（消除"文档说有、实际没有"）；git 操作细节移交 `ops/`；补文档 id 约定与更新触发；迁入 `docs/tech/` |
