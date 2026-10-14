@@ -1,7 +1,7 @@
 ---
 id: INDEX
 title: 文档索引与状态矩阵
-version: 1.0
+version: 1.1
 date: 2026-10-14
 status: active
 truth: nav
@@ -32,17 +32,19 @@ owner: ai
 
 ## 1 现行文档状态矩阵
 
-> 「最终路径」是本体系的目标位置；**P1 阶段被标记 `⏳` 的文件仍在 `docs/` 根目录**，由 P2 / P3 批次迁入。
-
 | 最终路径 | 事务域 | 版本 | 状态 | truth | 一句话职责 | 迁移 |
 |---|---|---|---|---|---|---|
-| [`charter/GDD.md`](charter/GDD.md) | 立项与定位 + 设计规格 | 6.0 | active | **owner** | 唯一真源：立项决策、定位、全部设计规格 | ⏳ P2 瘦身 |
-| [`content/CARDS.md`](content/CARDS.md) | 世界与内容设定 | 1.0 | active | subsystem | 卡片子系统真源（= GDD §10 细化） | ⏳ P2 迁入 |
-| [`tech/STRUCTURE.md`](tech/STRUCTURE.md) | 技术与架构 | 2.0 | active | subsystem | 目录与命名规则（含归位决策表） | ⏳ P2 迁入 |
-| [`ops/ENV.md`](ops/ENV.md) | 环境与工具链 | 1.0 | active | nav | 环境安装步骤与本机实测 | ⏳ P3 迁入 |
-| [`ops/VSCODE.md`](ops/VSCODE.md) | 环境与工具链 | 1.0 | active | nav | VSCode 工作区配置（真源是 `.vscode/` 实文件） | ⏳ P3 迁入 |
-| [`ops/SYNC.md`](ops/SYNC.md) | 协作与流程 | 1.0 | active | nav | 双机 git 同步约定 | ⏳ P3 迁入 |
-| [`INDEX.md`](INDEX.md) | 导航 | 1.0 | active | nav | 本文件 | — |
+| [`charter/GDD.md`](charter/GDD.md) | 立项与定位 + 设计规格 | 6.1 | active | **owner** | 唯一真源：立项决策、定位、全部设计规格 | ✅ P2 |
+| [`charter/DECISIONS.md`](charter/DECISIONS.md) | 计划与沿革 | 1.0 | active | history | 形态沿革、需求裁决表、外部调研、参考稿清单 | ✅ P2 |
+| [`charter/OPEN-QUESTIONS.md`](charter/OPEN-QUESTIONS.md) | 计划与沿革 | 1.0 | active | subsystem | 待用户裁决清单与我的建议 | ✅ P2 |
+| [`content/CARDS.md`](content/CARDS.md) | 世界与内容设定 | 1.0 | active | subsystem | 卡片子系统真源（= GDD §10 细化） | ✅ P2 |
+| [`tech/ARCHITECTURE.md`](tech/ARCHITECTURE.md) | 技术与架构 | 1.0 | active | subsystem | 性能预算、模块划分与硬约束（= 原 GDD §14 / §17） | ✅ P2 |
+| [`tech/STRUCTURE.md`](tech/STRUCTURE.md) | 技术与架构 | 2.0 | active | subsystem | 目录与命名规则（含归位决策表） | ✅ P2 |
+| [`plan/ROADMAP.md`](plan/ROADMAP.md) | 计划与里程碑 | 1.0 | active | subsystem | 三阶段切分、M0 验收、风险、执行计划（= 原 GDD §18–§20） | ✅ P2 |
+| [`ops/ENV.md`](ops/ENV.md) | 环境与工具链 | 1.0 | active | nav | 环境安装步骤与本机实测 | ⏳ P3 |
+| [`ops/VSCODE.md`](ops/VSCODE.md) | 环境与工具链 | 1.0 | active | nav | VSCode 工作区配置（真源是 `.vscode/` 实文件） | ⏳ P3 |
+| [`ops/SYNC.md`](ops/SYNC.md) | 协作与流程 | 1.0 | active | nav | 双机 git 同步约定 | ⏳ P3 |
+| [`INDEX.md`](INDEX.md) | 导航 | 1.1 | active | nav | 本文件 | — |
 
 **状态取值**：`active`（现行，可依据）· `reference`（参考，仅背景）· `deprecated`（已作废，无约束力）· `draft`（草案，待裁决）。
 **truth 取值**：`owner`（唯一真源，全仓只允许一个）· `subsystem`（子系统真源）· `nav`（导航/说明）· `history`（仅沿革）。
@@ -53,12 +55,12 @@ owner: ai
 
 ```text
 charter/GDD.md  (truth: owner)
-├─ content/CARDS.md       卡片子系统   = GDD §10 细化
-├─ tech/ARCHITECTURE.md   技术架构     = GDD §14 / §17 拆出
-├─ plan/ROADMAP.md        计划与里程碑 = GDD §18–§20 拆出
-├─ charter/DECISIONS.md   裁决沿革     = GDD §22 拆出
-├─ charter/OPEN-QUESTIONS.md 开放问题  = GDD §21 拆出
-└─ tech/STRUCTURE.md      目录与命名   (独立真源，受 GDD 约束)
+├─ content/CARDS.md          卡片子系统   = GDD §10 细化
+├─ tech/ARCHITECTURE.md      技术架构     = 原 GDD §14 / §17
+├─ plan/ROADMAP.md           计划与里程碑 = 原 GDD §18–§20
+├─ charter/DECISIONS.md      裁决沿革     = 原 GDD §22（truth: history，不构成规格）
+├─ charter/OPEN-QUESTIONS.md 开放问题     = 原 GDD §21
+└─ tech/STRUCTURE.md         目录与命名   (独立真源，受 GDD 约束)
 ```
 
 **规则**：子系统真源与 GDD 冲突时，以 GDD 为准，并在**同一次改动**内修正子系统文档与本文档。
@@ -69,7 +71,7 @@ charter/GDD.md  (truth: owner)
 
 1. 本文件（30 秒：现状、状态矩阵、禁止事项）
 2. [`charter/GDD.md`](charter/GDD.md) §0 立项决策 + §1 定位 + §2 非目标
-3. [`plan/ROADMAP.md`](plan/ROADMAP.md) 当前里程碑与执行计划
+3. [`plan/ROADMAP.md`](plan/ROADMAP.md) §1 三阶段切分 + §5 执行计划
 4. 按任务域读对应文档；需要"新东西放哪"时读 [`tech/STRUCTURE.md`](tech/STRUCTURE.md) §8 归位决策表
 
 ---
@@ -81,11 +83,12 @@ charter/GDD.md  (truth: owner)
 | 立项 / 定位裁决 | `charter/GDD.md` §0 + `charter/DECISIONS.md` + 本文件 |
 | 世界 / 卡 / 物种设定 | `content/*` + `charter/GDD.md` 对应规格节 + 本文件 |
 | 风格规范 / 资产管线 | `art/ART-STYLE.md` + `art/ASSETS.md` + 本文件 |
-| 模块 / 依赖 / 性能预算 | `tech/ARCHITECTURE.md` + `charter/GDD.md` §14 / §17 |
+| 模块 / 依赖 / 性能预算 | `tech/ARCHITECTURE.md` + `charter/GDD.md` 的相关指针 |
 | 目录 / 命名 | `tech/STRUCTURE.md` + `.gitignore` 注释 + 本文件 |
 | 里程碑 / 计划 | `plan/ROADMAP.md` + `README.md` §五 |
 | 环境 / 工具脚本 | `ops/ENV.md` + `tools/README.md` |
 | 协作 / 提交规范 | `ops/WORKFLOW.md` + `.codebuddy/rules/` + `README.md` §六 |
+| 新增待裁决问题 / 完成裁决 | `charter/OPEN-QUESTIONS.md` + `charter/DECISIONS.md` |
 | 文档作废 | 移入 `archive/` + `archive/README.md` 记时点与可继承项 + 本文件状态改 `deprecated` |
 
 **两条硬规则**：
@@ -94,16 +97,12 @@ charter/GDD.md  (truth: owner)
 
 ---
 
-## 5 规划中（由后续批次落地）
+## 5 规划中（由 P3 批次落地）
 
 | 文件 | 来源 | 批次 |
 |---|---|---|
-| `charter/DECISIONS.md` | GDD §22 沿革与裁决记录 | P2 |
-| `charter/OPEN-QUESTIONS.md` | GDD §21 开放问题 | P2 |
-| `content/WORLD.md` | 新建（吸收 `archive/STORY-v1.md` 的语料与叙事原则） | P2 |
-| `tech/ARCHITECTURE.md` | GDD §14 性能 + §17 技术架构 | P2 |
-| `plan/ROADMAP.md` | GDD §18 里程碑 + §19 风险 + §20 执行计划 | P2 |
-| `art/ART-STYLE.md` | 重写（仅保留 `archive/ART-STYLE-v1.md` 的墨线/平涂/纸颗粒） | P3 |
+| `content/WORLD.md` | 新建（吸收 `archive/STORY-v1.md` 的语料与叙事原则） | P3 |
+| `art/ART-STYLE.md` | 重写（仅保留 `archive/ART-STYLE-v1.md` 的墨线 / 平涂 / 纸颗粒） | P3 |
 | `art/ASSETS.md` | 新建（资产生产管线、manifest、命名、合规） | P3 |
 | `ops/WORKFLOW.md` | 新建（分工、提交、评审闸门、AI 规则） | P3 |
 
@@ -112,3 +111,12 @@ charter/GDD.md  (truth: owner)
 ## 6 归档
 
 作废稿与作废原因见 [`archive/README.md`](archive/README.md)。归档文档**无约束力**，不得作为任何实现依据。
+
+---
+
+## 沿革
+
+| 版本 | 日期 | 变更 |
+|---|---|---|
+| 1.0 | 2026-10-14 | 建立索引与状态矩阵；三份作废稿 `git mv` 入 `archive/`；全部文档补统一 frontmatter |
+| 1.1 | 2026-10-14 | GDD 拆分落地（P2）：新增 4 份文档，GDD/CARDS/STRUCTURE 迁入子目录 |
