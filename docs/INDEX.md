@@ -1,7 +1,7 @@
 ---
 id: INDEX
 title: 文档索引与状态矩阵
-version: 2.0
+version: 2.1
 date: 2026-10-14
 status: active
 truth: nav
@@ -20,8 +20,8 @@ owner: ai
 | # | 事务域 | 目录 | 管什么 | 明确不管 |
 |---|---|---|---|---|
 | 1 | **立项** | `charter/` | 为什么做、给谁、第一卖点、非目标、体验支柱、裁决沿革、待裁决 | 任何规格细节 |
-| 2 | **设定集** | `setting/` | **世界是什么样**：世界 / 卡片 / 物种 / 风格主题的设定 | 玩家怎么玩、怎么实现 |
-| 3 | **玩法** | `gameplay/` | **玩家怎么玩**：核心循环、时间、干涉与资源、自定义、界面 | 世界设定的内容 |
+| 2 | **设定集** | `setting/` | **世界是什么样**：世界 / 卡片 / 卡种清单 / 物种 / 风格主题的设定 | 玩家怎么玩、怎么实现 |
+| 3 | **玩法** | `gameplay/` | **玩家怎么玩**：核心循环、时间、手牌与干涉、自定义、界面 | 世界设定的内容 |
 | 4 | **美术与资产** | `art/` | 风格执行参数、素材规格、资产生产与登记 | 风格的设计取舍（在 setting） |
 | 5 | **技术与架构** | `tech/` | 引擎、模块依赖、性能预算、目录与命名 | 玩法与设定 |
 | 6 | **计划** | `plan/` | 里程碑、验收、风险、执行计划 | 规格正文 |
@@ -37,28 +37,29 @@ owner: ai
 
 | 路径 | 事务域 | 版本 | 状态 | truth | 一句话职责 |
 |---|---|---|---|---|---|
-| [`charter/GDD.md`](charter/GDD.md) | 立项 | 7.0 | active | **owner** | 立项决策、定位与卖点、非目标、体验支柱 + 文档地图 |
-| [`charter/DECISIONS.md`](charter/DECISIONS.md) | 立项 | 1.0 | active | history | 形态沿革、需求裁决表、外部调研、参考稿清单 |
-| [`charter/OPEN-QUESTIONS.md`](charter/OPEN-QUESTIONS.md) | 立项 | 1.0 | active | subsystem | 待用户裁决清单与建议 |
-| [`setting/WORLD.md`](setting/WORLD.md) | 设定集 | 2.0 | active | subsystem | 界 / 界外 / 七原质 / 环级与禁物 / 规模 / 世界模型 / 年表 / 叙事与命名 |
-| [`setting/CARDS.md`](setting/CARDS.md) | 设定集 | 2.0 | active | subsystem | 卡片三轴、231 矩阵、卡种清单、卡类与卡型、生克、命名 |
+| [`charter/GDD.md`](charter/GDD.md) | 立项 | 7.0 | active | **owner** | 立项决策、定位与卖点、非目标、体验支柱 + 文档地图 + 旧章节号对照 |
+| [`charter/DECISIONS.md`](charter/DECISIONS.md) | 立项 | 1.1 | active | history | 形态沿革、**28 轮**需求裁决表、外部调研、参考稿清单 |
+| [`charter/OPEN-QUESTIONS.md`](charter/OPEN-QUESTIONS.md) | 立项 | 1.1 | active | subsystem | 待用户裁决清单（38 条）与建议 |
+| [`setting/WORLD.md`](setting/WORLD.md) | 设定集 | 2.1 | active | subsystem | 界 / 界外 / 七原质 / 环级与禁物 / 规模 / 世界模型 / 年表 / 叙事与命名 |
+| [`setting/CARDS.md`](setting/CARDS.md) | 设定集 | 3.0 | active | subsystem | 卡片**规则**：三轴、矩阵、卡类与卡型、生克、字段、命名 |
+| [`setting/CARD-LIST.md`](setting/CARD-LIST.md) | 设定集 | 1.0 | active | subsystem | 卡片**内容**：36 格 M0 清单、价值表、240 功能位池、超环待裁决 |
 | [`setting/SPECIES.md`](setting/SPECIES.md) | 设定集 | 1.0 | active | subsystem | 物种模板、M0 五物种、种群动力、因果可读性 |
 | [`setting/STYLE.md`](setting/STYLE.md) | 设定集 | 1.0 | active | subsystem | 五个风格主题的定义、取舍、排期 |
 | [`gameplay/LOOP.md`](gameplay/LOOP.md) | 玩法 | 1.0 | active | subsystem | 核心循环、五个尺度的节奏、支柱→机制映射、无失败红线 |
 | [`gameplay/TIME.md`](gameplay/TIME.md) | 玩法 | 1.0 | active | subsystem | 现实的桥、双模式时间、昼夜形状、现实锚规格 |
-| [`gameplay/INTERVENTION.md`](gameplay/INTERVENTION.md) | 玩法 | 1.0 | active | subsystem | 一卡三用与施放规则、余响经济、扰动值、卡包获取、接管、倒带 |
+| [`gameplay/INTERVENTION.md`](gameplay/INTERVENTION.md) | 玩法 | 2.0 | active | subsystem | **手牌 / 实体池 / 释放与回收**、余响经济与回收定价、扰动值、卡包、接管、倒带 |
 | [`gameplay/CUSTOMIZE.md`](gameplay/CUSTOMIZE.md) | 玩法 | 1.0 | active | subsystem | 界创建向导 9 步、出厂预设、创世面板、存档与导入导出 |
-| [`gameplay/UI-UX.md`](gameplay/UI-UX.md) | 玩法 | 1.0 | active | subsystem | 界面区域、键位、极简原则、卡面版式待补 |
+| [`gameplay/UI-UX.md`](gameplay/UI-UX.md) | 玩法 | 2.0 | active | subsystem | 界面区域、**手牌区与拖拽手势**、键位、极简原则 |
 | [`art/ART-STYLE.md`](art/ART-STYLE.md) | 美术与资产 | 2.0 | active | subsystem | 渲染配方、色板、素材规格、QC、风格验收流程 |
 | [`art/ASSETS.md`](art/ASSETS.md) | 美术与资产 | 1.0 | active | subsystem | 资产去向、生产线、规模预算、manifest 登记、合规 |
 | [`tech/ARCHITECTURE.md`](tech/ARCHITECTURE.md) | 技术与架构 | 1.0 | active | subsystem | 性能预算、模块划分与硬约束 |
-| [`tech/STRUCTURE.md`](tech/STRUCTURE.md) | 技术与架构 | 2.1 | active | subsystem | 目录与命名（含 🟡/✅ 状态列与归位决策表） |
+| [`tech/STRUCTURE.md`](tech/STRUCTURE.md) | 技术与架构 | 2.2 | active | subsystem | 目录与命名（含 🟡/✅ 状态列与归位决策表） |
 | [`plan/ROADMAP.md`](plan/ROADMAP.md) | 计划 | 1.0 | active | subsystem | 三阶段切分、M0 验收、前置条件、风险、执行计划 |
 | [`ops/ENV.md`](ops/ENV.md) | 环境与工具链 | 1.2 | active | nav | 环境安装步骤与本机实测 |
 | [`ops/VSCODE.md`](ops/VSCODE.md) | 环境与工具链 | 1.1 | active | nav | VSCode 工作区配置（真源是 `.vscode/` 实文件） |
 | [`ops/WORKFLOW.md`](ops/WORKFLOW.md) | 协作与流程 | 1.0 | active | nav | 分工、文档纪律、提交规范、评审闸门、AI 进入清单 |
 | [`ops/SYNC.md`](ops/SYNC.md) | 协作与流程 | 1.1 | active | nav | 双机 git 同步约定 |
-| [`INDEX.md`](INDEX.md) | 导航 | 2.0 | active | nav | 本文件 |
+| [`INDEX.md`](INDEX.md) | 导航 | 2.1 | active | nav | 本文件 |
 
 **状态取值**：`active` · `reference` · `deprecated` · `draft`。
 **truth 取值**：`owner`（唯一真源，全仓只允许一个）· `subsystem`（子系统真源）· `nav`（导航/说明）· `history`（仅沿革）。
@@ -70,12 +71,13 @@ owner: ai
 ```text
 charter/GDD.md  (truth: owner) —— 立项书 + 文档地图
 ├─ setting/WORLD.md       世界设定      （界 / 原质 / 规模 / 世界模型 / 年表 / 命名）
-├─ setting/CARDS.md       卡片设定      （三轴 / 231 矩阵 / 卡种清单 / 生克）
+├─ setting/CARDS.md       卡片规则      （三轴 / 矩阵 / 生克 / 字段 / 命名）
+├─ setting/CARD-LIST.md   卡片内容      （清单 / 价值表 / 功能位池）
 ├─ setting/SPECIES.md     物种设定
 ├─ setting/STYLE.md       美术设定      （主题定义；执行参数在 art/ART-STYLE.md）
 ├─ gameplay/LOOP.md       玩法总纲
 ├─ gameplay/TIME.md       时间与现实耦合
-├─ gameplay/INTERVENTION.md 干涉流程与余响
+├─ gameplay/INTERVENTION.md 手牌 / 释放与回收 / 余响
 ├─ gameplay/CUSTOMIZE.md  自定义
 ├─ gameplay/UI-UX.md      界面与交互
 ├─ art/ART-STYLE.md       美术执行参数   = setting/STYLE.md 的执行层
@@ -107,10 +109,12 @@ charter/GDD.md  (truth: owner) —— 立项书 + 文档地图
 |---|---|
 | 立项 / 定位 / 非目标 / 支柱 | `charter/GDD.md` §0–§3 + `charter/DECISIONS.md` + 本文件 |
 | 世界观 / 世界模型 / 规模 | `setting/WORLD.md` + 受影响文档 |
-| 卡片体系（三轴 / 矩阵 / 清单 / 生克） | `setting/CARDS.md` + `gameplay/INTERVENTION.md`（若涉及用法） |
+| 卡片规则（三轴 / 生克 / 字段） | `setting/CARDS.md` |
+| 卡种清单 / 价值表 / 功能位 | `setting/CARD-LIST.md` + `gameplay/INTERVENTION.md`（**价值表变化必须回头验算经济红线**） |
+| 手牌 / 释放 / 回收 / 余响 | `gameplay/INTERVENTION.md` + `gameplay/UI-UX.md` |
 | 物种 | `setting/SPECIES.md` + `setting/WORLD.md` §2.2 |
 | 风格主题定义 | `setting/STYLE.md` + `art/ART-STYLE.md` |
-| 玩法机制（时间 / 干涉 / 自定义 / 界面） | 对应 `gameplay/*` + 受影响设定集 |
+| 玩法机制（时间 / 自定义 / 界面） | 对应 `gameplay/*` + 受影响设定集 |
 | 美术执行 / 资产管线 | `art/ART-STYLE.md` + `art/ASSETS.md` |
 | 模块 / 依赖 / 性能预算 | `tech/ARCHITECTURE.md` |
 | 目录 / 命名 | `tech/STRUCTURE.md` + `.gitignore` 注释 + 本文件 |
@@ -134,7 +138,7 @@ charter/GDD.md  (truth: owner) —— 立项书 + 文档地图
 - **新增文档**：先确定事务域（§0）与 `truth` 取值，写统一文档头（`id/title/version/date/status/truth/owner`），再登记到 §1。
 - **文档骨架**：正文首节写"本文件管什么 / 不管什么"，末节写"更新触发"与"沿革"。
 - **作废文档**：`git mv` 进 `archive/`，改名带版本（`XXX-v1.md`），在 `archive/README.md` 记时点与可继承项。
-- **拆分超长文档**：同时承载 ≥2 类事务、或超过约 600 行时按 §0 的事务域拆分，并在双方加"相关文档"指针。
+- **拆分超长文档**：同时承载 ≥2 类事务、或超过约 600 行时按 §0 的事务域拆分，并在双方加"相关文档"指针（**规则 vs 内容**的拆分范例见 `setting/CARDS.md` ⟷ `setting/CARD-LIST.md`）。
 - **提交前自检**：跑一遍链接校验（`tmp/check-links.py`，把所有相对链接解析一遍），**0 断链**才提交。
 
 ---
@@ -152,4 +156,5 @@ charter/GDD.md  (truth: owner) —— 立项书 + 文档地图
 | 1.0 | 2026-10-14 | 建立索引与状态矩阵；三份作废稿入 `archive/`；全部文档补统一 frontmatter |
 | 1.1 | 2026-10-14 | P2：新增 4 份文档，GDD/CARDS/STRUCTURE 迁入子目录 |
 | 1.2 | 2026-10-14 | P3：新增 WORLD / ART-STYLE(v2) / ASSETS / WORKFLOW，ENV/VSCODE/SYNC 迁入 `ops/` |
-| 2.0 | 2026-10-14 | **按"设定集 / 玩法"二次分域**：新增 `setting/`（WORLD 2.0 / CARDS 2.0 / SPECIES / STYLE）与 `gameplay/`（LOOP / TIME / INTERVENTION / CUSTOMIZE / UI-UX）；**GDD 瘦身为立项书 + 文档地图（7.0）**；事务域由 8 类改为 9 类 |
+| 2.0 | 2026-10-14 | 按"设定集 / 玩法"二次分域：新增 `setting/` 与 `gameplay/`；GDD 瘦身为立项书（7.0）；事务域由 8 类改为 9 类 |
+| 2.1 | 2026-10-14 | **手牌与回收机制落地**：`INTERVENTION` 2.0、`UI-UX` 2.0、`CARDS` 3.0 + 新增 `CARD-LIST`（规则与内容分家）；恢复"超环"档（待定义） |

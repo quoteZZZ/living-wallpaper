@@ -1,7 +1,7 @@
 ---
 id: tech/STRUCTURE
 title: 目录与命名唯一真源
-version: 2.1
+version: 2.2
 date: 2026-10-14
 status: active
 truth: subsystem
@@ -189,7 +189,7 @@ shared/
 ### 7.3 数据与目录
 
 - JSON 文件：小写下划线，`species.json`、`cards.terrain.json`、`styles.paper.json`
-- **卡 id**：`card.<元素>.<级>.<卡类>.<名>` → `card.water.3.rite.rain`、`card.earth.9.matter.mountain-range`（**多元素**用 `+`：`card.fire+wood.4.rite.wildfire`；**禁物**级 = `ban`）
+- **卡 id**：**唯一真源见 [`../setting/CARDS.md`](../setting/CARDS.md) §11**（示例 `card.water.3.rite.rain`、`card.fire+wood.4.rite.wildfire`；禁物 = `ban`，超环 = `over`）
 - **物种 id**：`sp.<名>` → `sp.moss-grass`
 - **界 id**：`realm.<slug>-<yyyymmdd>` → `realm.valley-20261014`
 - **风格主题 id**：`style.<名>` → `style.paper-diorama`

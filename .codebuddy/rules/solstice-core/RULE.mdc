@@ -15,8 +15,10 @@ alwaysApply: true
 |---|---|
 | **开工先读** | `docs/INDEX.md`（全仓唯一索引 + 状态矩阵 + 更新触发矩阵） |
 | 设计真源（全仓唯一 `truth: owner`） | `docs/charter/GDD.md`（冲突以它为准，并在同一次改动内同步修正对方） |
-| 卡片子系统 | `docs/content/CARDS.md` |
-| 世界观叙事 / 术语 / 文案规范 | `docs/content/WORLD.md` |
+| 世界设定（界 / 原质 / 规模 / 年表 / 命名） | `docs/setting/WORLD.md` |
+| 卡片规则 / 卡种清单 | `docs/setting/CARDS.md` · `docs/setting/CARD-LIST.md` |
+| 物种 / 风格主题 | `docs/setting/SPECIES.md` · `docs/setting/STYLE.md` |
+| 玩法（循环 / 时间 / 手牌与干涉 / 自定义 / 界面） | `docs/gameplay/`（LOOP · TIME · INTERVENTION · CUSTOMIZE · UI-UX） |
 | 风格规范 / 资产生产 | `docs/art/ART-STYLE.md` · `docs/art/ASSETS.md` |
 | 架构与性能 / 目录与命名 | `docs/tech/ARCHITECTURE.md` · `docs/tech/STRUCTURE.md` |
 | 里程碑与执行计划 | `docs/plan/ROADMAP.md` |
