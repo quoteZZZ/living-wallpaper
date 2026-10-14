@@ -65,7 +65,7 @@ VSCode 中 `Ctrl+Shift+B` 运行构建任务，`F5` 用 `cppvsdbg` 调试（配�
 
 ```text
 solstice/
-├─ docs/        ✅ 文档体系（charter / content / art / tech / plan / ops / archive）→ 入口 docs/INDEX.md
+├─ docs/        ✅ 文档体系（charter / setting / gameplay / art / tech / plan / ops / archive）→ 入口 docs/INDEX.md
 ├─ tools/       ✅ 环境与构建脚本（PowerShell）
 ├─ .vscode/     ✅ 构建任务 / 调试 / cpptools / 代码片段
 ├─ .codebuddy/  ✅ agents/ 与 rules/（项目数据，勿删）

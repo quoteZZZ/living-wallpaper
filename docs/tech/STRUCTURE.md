@@ -134,7 +134,7 @@ studio/
 shared/
 ├─ README.md
 └─ schema/
-   ├─ species.schema.json   物种模板（GDD §13.3）
+   ├─ species.schema.json   物种模板（[`../setting/SPECIES.md`](../setting/SPECIES.md) §1）
    ├─ card.schema.json      干涉卡（元素 / 级 / 卡类 / 类别 / 卡型 / 作用域 / 参数）
    ├─ world.schema.json     界：尺寸 / 地形算法与种子 / 生态域 / 水体 / 大气 / 法则
    ├─ style.schema.json     风格主题参数（调色板 / 着色 / 后期 / 几何处理）
@@ -150,7 +150,7 @@ shared/
 | 内容 | 位置 | 备注 |
 |---|---|---|
 | 契约数据 | `game/Config/Solstice/Data/*.json` | 随包发布，运行时直接读 |
-| 本地化 | `game/Config/Solstice/Localization/` | 中英双语（文案规范见 [`../content/WORLD.md`](../content/WORLD.md) §3） |
+| 本地化 | `game/Config/Solstice/Localization/` | 中英双语（文案规范见 [`../setting/WORLD.md`](../setting/WORLD.md) §3） |
 | 存档（每界一份） | `%LOCALAPPDATA%\Solstice\Saved\SaveGames\<realmId>.sav` | 键前缀 `solstice.save.v<n>` |
 | 导出的界 | `%USERPROFILE%\Documents\Solstice\Exports\<realmId>.solstice` | 导入 / 导出用 |
 | 日志 / 崩溃 | `Saved/Logs`、`Saved/Crashes` | 不入 git |
@@ -197,7 +197,7 @@ shared/
 - **C++ 文件**：`Solstice<Xxx>.h/.cpp`，与类名一致；`Sim/` 内允许 `WorldClock.h/.cpp` 形态
 - **文档 id**：与 `docs/` 下的相对路径一致（`charter/GDD`、`tech/STRUCTURE`…），见 [`../INDEX.md`](../INDEX.md)
 
-> 术语与命名的**语言层**规范（中英对照、文案禁忌）见 [`../content/WORLD.md`](../content/WORLD.md) §2。
+> 术语与命名的**语言层**规范（中英对照、文案禁忌）见 [`../setting/WORLD.md`](../setting/WORLD.md) §2。
 
 ---
 
@@ -250,7 +250,7 @@ shared/
 | 新增 / 移动目录、改命名 | 本文件对应章节（含 §8 归位表）+ `.gitignore` 注释 + [`../INDEX.md`](../INDEX.md) |
 | 目录从"计划"变为"现状" | 本文件所有 🟡 状态列 + 相关文档的存在性描述 |
 | 入 git 策略变化 | 本文件 §9 + [`../ops/SYNC.md`](../ops/SYNC.md) §3 / §4 |
-| 命名规范变化 | 本文件 §7 + [`../content/WORLD.md`](../content/WORLD.md) §2（如涉及文案用词） |
+| 命名规范变化 | 本文件 §7 + [`../setting/WORLD.md`](../setting/WORLD.md) §2（如涉及文案用词） |
 
 ---
 

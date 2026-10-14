@@ -15,7 +15,7 @@ owner: both
 - **管**：尚待用户裁决的问题清单 + 我的建议；裁决过程与结论见 [`DECISIONS.md`](DECISIONS.md)。
 - **不管**：已生效的规格（真源见 [`GDD.md`](GDD.md)）。
 - **标记约定**：`✅ 已确认` = 用户已拍板，仅留档；`~~删除线~~` = 该问法已作废；其余 = 仍待裁决。
-- **来源**：原 `GDD.md` §21 拆出（内容未改）。表中裸 `§x` 引用均指 [`GDD.md`](GDD.md)。
+- **来源**：原 `GDD.md` §21 拆出。**⚠️ 表中出现的 `GDD §x` 是历史引用**（立项书已瘦身），对照：`§1.3`→[`../setting/WORLD.md`](../setting/WORLD.md) §1 · `§2`→[`GDD.md`](GDD.md) §2 · `§10.x`→[`../setting/CARDS.md`](../setting/CARDS.md) · `§11.x`→[`../gameplay/INTERVENTION.md`](../gameplay/INTERVENTION.md)。
 
 ---
 

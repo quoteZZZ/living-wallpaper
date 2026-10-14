@@ -15,7 +15,7 @@ owner: ai
 - **管**：引擎与模块划分、依赖方向、硬约束、性能与优化预算。
 - **不管**：玩法与内容设定（真源见 [`../charter/GDD.md`](../charter/GDD.md)）、目录与命名（见 [`STRUCTURE.md`](STRUCTURE.md)）、里程碑与计划（见 [`../plan/ROADMAP.md`](../plan/ROADMAP.md)）。
 - **来源**：原 `GDD.md` §14（性能）+ §17（技术架构与硬约束）拆出；**内容未改，仅重编号**。
-- 文中的裸 `§x` 引用（如 §8、§13）均指 [`../charter/GDD.md`](../charter/GDD.md)。
+- 文中的裸 `§x` 引用按语境指 [`../setting/STYLE.md`](../setting/STYLE.md)（风格）/ [`../setting/WORLD.md`](../setting/WORLD.md)（世界）/ [`../setting/CARDS.md`](../setting/CARDS.md)（卡片）。
 
 ---
 
@@ -93,7 +93,7 @@ game/Source/Solstice/
 
 ## 3 更新触发
 
-- 模块划分、依赖方向、硬约束变化 → 改本文 §2，并在 `GDD.md` §17 的对应指针处同步（原 §17 已拆至本文）。
+- 模块划分、依赖方向、硬约束变化 → 改本文 §2，（原 `GDD.md` §17 已拆至本文，立项书不再持有副本）。
 - 性能预算变化 → 改本文 §1，并同步 `../plan/ROADMAP.md` 的验收指标。
 - 目录与命名变化 → 改 [`STRUCTURE.md`](STRUCTURE.md)，**不要**在本文件里写路径细节（只写模块逻辑目录）。
 

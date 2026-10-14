@@ -38,8 +38,8 @@ owner: ai
 | `ART-STYLE-v1.md` | 墨线 + 平涂 + 纸颗粒的画面语言 | [`../art/ART-STYLE.md`](../art/ART-STYLE.md) §3（作为 T3 基线） | ✅ 已迁入 |
 | `ART-STYLE-v1.md` | 四季色板与七元素视觉语言 | [`../art/ART-STYLE.md`](../art/ART-STYLE.md) §3.3 / §3.4（标为候选，待定标） | ✅ 已迁入 |
 | `ART-STYLE-v1.md` | 生图 Prompt 串、批次一致性、QC 清单、"避免人脸特写" | [`../art/ASSETS.md`](../art/ASSETS.md) §3 / §4 + [`../art/ART-STYLE.md`](../art/ART-STYLE.md) §5 | ✅ 已迁入 |
-| `STORY-v1.md` | 叙事设计原则（不写小说 / 不解释机制 / 真相靠拼接 / 原创零借名） | [`../content/WORLD.md`](../content/WORLD.md) §1 | ✅ 已迁入 |
-| `STORY-v1.md` | 语料与命名规范、对话写作规范 | [`../content/WORLD.md`](../content/WORLD.md) §2 / §3 | ✅ 已迁入并改写 |
+| `STORY-v1.md` | 叙事设计原则（不写小说 / 不解释机制 / 真相靠拼接 / 原创零借名） | [`../setting/WORLD.md`](../setting/WORLD.md) §1 | ✅ 已迁入 |
+| `STORY-v1.md` | 语料与命名规范、对话写作规范 | [`../setting/WORLD.md`](../setting/WORLD.md) §2 / §3 | ✅ 已迁入并改写 |
 
 ---
 
