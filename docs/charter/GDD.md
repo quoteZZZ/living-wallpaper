@@ -1,8 +1,8 @@
 ---
 id: charter/GDD
 title: 立项需求与设计真源
-version: 7.0
-date: 2026-10-14
+version: 7.1
+date: 2026-10-15
 status: active
 truth: owner
 owner: both
@@ -29,7 +29,7 @@ owner: both
 | 资源 | **「余响」**——干涉世界产出的唯一积累物；**只买选择与审美，不买强度** |
 | 世界规模 | **小 128² / 中 256² / 大 512²**（分块流式）+ **多界并存** |
 | 自定义 | **界创建向导 9 步** + 运行中"创世面板" + 出厂预设 8 个 + 导入导出 |
-| 世界形态 | **全 3D** 程序化几何世界（纸板块面） |
+| 世界形态 | **全 3D** 程序化几何世界（纸板块面）；**界壁 = 上半球穹顶罩**（天空 / 天气在罩内侧，卫星视角俯瞰）；**万物有物理属性**（全量定义 + 分级结算，见 [`../setting/PHYSICS.md`](../setting/PHYSICS.md)） |
 | 风格主题 | **多主题可选、随时可切**：T1 纸雕微缩（默认）· T2 剪纸立牌 · T3 手绘纸墨 · T4 木刻版画 · T5 粘土定格 |
 | 2D / 3D 分工 | 世界几何 = 3D；**卡面 / UI / 贴图 / 粒子 / 纸板立牌正面 = 2D 生图** |
 | 资产生产 | **程序化几何 + 纸板立牌（生图线主力）**；零建模、零人工动画 |
@@ -91,6 +91,7 @@ owner: both
 | | [`CARDS.md`](../setting/CARDS.md) | 卡片三轴、252 矩阵、**卡种清单**、12 卡类与卡型、三套生克、命名 |
 | | [`SPECIES.md`](../setting/SPECIES.md) | 物种模板、M0 五物种、种群动力、因果可读性 |
 | | [`STYLE.md`](../setting/STYLE.md) | 五个风格主题的定义、取舍与排期 |
+| | [`PHYSICS.md`](../setting/PHYSICS.md) | 物理属性系统：属性字典、七原质映射（暗 = 吸光）、分级结算、相变、卡的基础能力 |
 | **玩法**<br>`gameplay/` | [`LOOP.md`](../gameplay/LOOP.md) | 核心循环、五个尺度的节奏、无失败红线 |
 | | [`TIME.md`](../gameplay/TIME.md) | 现实的桥、双模式时间、昼夜形状、现实锚规格 |
 | | [`INTERVENTION.md`](../gameplay/INTERVENTION.md) | 一卡三用与施放规则、余响经济、扰动值、卡包与获取、接管与释放、倒带 |
@@ -155,3 +156,4 @@ owner: both
 | 6.0 | 2026-10-14 | 立项定稿 · 设计细化到规格级；确立为唯一真源 |
 | 6.1 | 2026-10-14 | 拆出 §14/§17（架构与性能）、§18–§20（计划）、§21（开放问题）、§22（沿革） |
 | 7.0 | 2026-10-14 | **瘦身为「立项书 + 文档地图」**：设计规格按事务域全部迁出——§1.3/§7/§13/§15 → `setting/WORLD.md`，§8 → `setting/STYLE.md`，§9 → `art/ASSETS.md`，§10/§11 → `setting/CARDS.md` + `gameplay/INTERVENTION.md`，§5/§6 → `gameplay/TIME.md`，§3/§4 → `gameplay/LOOP.md`，§12 → `gameplay/CUSTOMIZE.md`，§16 → `gameplay/UI-UX.md`，§13.3–13.6 → `setting/SPECIES.md` |
+| 7.1 | 2026-10-15 | §0 世界形态补**界壁 = 上半球穹顶罩**与**万物有物理属性**（第 36 轮）；§4 文档地图新增 `setting/PHYSICS.md` |
