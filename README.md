@@ -86,7 +86,8 @@ solstice/
 ├─ tools/       ✅ 环境 / 工程 / 构建 / 内容生成 / 回归脚本（PowerShell，11 个）
 ├─ docs/        ✅ 文档体系（charter / setting / gameplay / art / tech / plan / ops / archive）→ 入口 docs/INDEX.md
 ├─ .vscode/     ✅ 构建任务 / 调试 / cpptools / 代码片段
-└─ .codebuddy/  ✅ agents/ 与 rules/（项目数据，勿删）
+├─ .codebuddy/  ✅ agents/ 与 rules/（项目数据，勿删）
+└─ .workbuddy/  ✅ memory/（工作日志与长期项目笔记；项目数据，勿删）
 ```
 
 > 定义与状态列见 [`docs/tech/STRUCTURE.md`](docs/tech/STRUCTURE.md) §0（含"新增东西放哪"的归位决策表）。

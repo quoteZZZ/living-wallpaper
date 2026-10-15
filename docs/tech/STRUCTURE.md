@@ -25,7 +25,7 @@ owner: ai
 | `shared/` | **双方共读的契约**：JSON Schema | **入** | ✅ **现状**（`schema/` 3 个：`card` / `species` / `world`；`style` 与 `save` 待 M1） |
 | `tools/` | **开发期脚本**：环境、工程生成、构建、内容生成、基准 | **入** | ✅ **现状**（11 个 PowerShell + README） |
 | `docs/` | 设计与约定文档 | **入** | ✅ **现状**（结构见 [`../INDEX.md`](../INDEX.md)） |
-| `.vscode/` `.codebuddy/` | IDE 与项目数据配置 | **入** | ✅ **现状** |
+| `.vscode/` `.codebuddy/` `.workbuddy/` | IDE 与项目数据配置 | **入** | ✅ **现状** |
 
 **核心不变量**：`game/Content/` 的二进制资产**不入 git**，因此必须**可由"种子 + 生成器 + 契约 + manifest"完整重建**。这是全部目录设计的出发点。
 
@@ -44,6 +44,7 @@ solstice/
 ├─ docs/          ✅ 现状  —— 见 ../INDEX.md（charter / setting / gameplay / art / tech / plan / ops / archive）
 ├─ .vscode/       ✅ 现状  —— 构建任务 / 调试 / cpptools / 代码片段
 ├─ .codebuddy/    ✅ 现状  —— agents/ 与 rules/（项目数据，勿删）
+├─ .workbuddy/    ✅ 现状  —— memory/：工作日志与长期项目笔记（项目数据，勿删）
 ├─ .clang-format  ✅ 现状
 ├─ .editorconfig  ✅ 现状
 ├─ .gitignore     ✅ 现状
@@ -219,7 +220,7 @@ shared/
 
 ## 9 git 与双机同步
 
-**入 git**：`game/Source`、`game/Config`、`game/Solstice.uproject`、`game/Content/README.md` 与 `.gitkeep`、`shared/`、`studio/{workflows,jobs,presets,tools,README.md}`、`studio/out/manifest.jsonl`、`tools/`、`docs/`、`.vscode/`、`.codebuddy/`。
+**入 git**：`game/Source`、`game/Config`、`game/Solstice.uproject`、`game/Content/README.md` 与 `.gitkeep`、`shared/`、`studio/{workflows,jobs,presets,tools,README.md}`、`studio/out/manifest.jsonl`、`tools/`、`docs/`、`.vscode/`、`.codebuddy/`、`.workbuddy/`。
 
 **不入 git**：`game/{Binaries,Intermediate,Saved,DerivedDataCache}`、`game/Content/**` 的二进制（含生成的 `M_Paper.uasset` / `M_Ink.uasset`）、`studio/out/**`（除 manifest）、`studio/work/**`、`.vs/`、`*.sln`、`tmp/`。
 
@@ -265,4 +266,4 @@ shared/
 | 2.2 | 2026-10-14 | 版本号对齐（内容无变更记录） |
 | 2.3 | 2026-10-15 | `card.schema.json` 注记去「类别」（第 42 轮：类别维度删除） |
 | 2.4 | 2026-10-15 | `card.schema.json` 注记「卡型」改「持续性」（第 43 轮） |
-| 3.0 | 2026-10-16 | M0 落地：`game/` `studio/` `shared/` 转 ✅；`Source/` 结构按实测修正（`.Target.cs` 在 `Source/` 下）；`SolsticeSim` 模块与目标取消，无头回归改 `SolsticeBench` Commandlet；补 `SOLSTICE_API` 跨 DLL 导出规则与 `LoadingPhase: Default` 的成因 |
+| 3.0 | 2026-10-16 | M0 落地：`game/` `studio/` `shared/` 转 ✅；`Source/` 结构按实测修正（`.Target.cs` 在 `Source/` 下）；`SolsticeSim` 模块与目标取消，无头回归改 `SolsticeBench` Commandlet；补 `SOLSTICE_API` 跨 DLL 导出规则与 `LoadingPhase: Default` 的成因；`.workbuddy/`（工具侧项目数据）按 `.codebuddy/` 同一约定入库 |

@@ -108,7 +108,11 @@ venv/
 .idea/
 
 # ---------- 5. 项目数据目录（必须保留，勿忽略）----------
-# .codebuddy 是项目数据目录，不可删除、不应被忽略。
+# .codebuddy / .workbuddy 都是项目数据目录，不可删除、不应被忽略。
 # 显式反向声明，防止被上游或全局 gitignore 误伤。
+# .workbuddy/ 是当前工具的项目数据（含 memory/ 的工作日志与长期项目笔记），
+# 与 .codebuddy/ 同类，按同一约定入库 —— 双机同步时它也要跟过来。
 !.codebuddy/
 !.codebuddy/**
+!.workbuddy/
+!.workbuddy/**
