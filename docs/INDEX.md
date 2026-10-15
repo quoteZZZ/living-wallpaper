@@ -1,7 +1,7 @@
 ---
 id: INDEX
 title: 文档索引与状态矩阵
-version: 2.11
+version: 2.12
 date: 2026-10-15
 status: active
 truth: nav
@@ -38,8 +38,8 @@ owner: ai
 | 路径 | 事务域 | 版本 | 状态 | truth | 一句话职责 |
 |---|---|---|---|---|---|
 | [`charter/GDD.md`](charter/GDD.md) | 立项 | 7.1 | active | **owner** | 立项决策、定位与卖点、非目标、体验支柱 + 文档地图 + 旧章节号对照 |
-| [`charter/DECISIONS.md`](charter/DECISIONS.md) | 立项 | 1.11 | active | history | 形态沿革、**38 轮**需求裁决表、外部调研、参考稿清单 |
-| [`charter/OPEN-QUESTIONS.md`](charter/OPEN-QUESTIONS.md) | 立项 | 1.5 | active | subsystem | 待用户裁决清单（40 条；#38–#40 已按建议关闭） |
+| [`charter/DECISIONS.md`](charter/DECISIONS.md) | 立项 | 2.0 | active | history | 裁决沿革**摘要式日志**（38 轮，含存废标注；不保留对话原文） |
+| [`charter/OPEN-QUESTIONS.md`](charter/OPEN-QUESTIONS.md) | 立项 | 2.0 | active | subsystem | **开放清单（6 项真待裁决）+ 已裁决一行索引** |
 | [`setting/WORLD.md`](setting/WORLD.md) | 设定集 | 3.6 | active | subsystem | 界 / **界壁（穹顶罩 + 形态语言）** / 界外 / 七原质（叙事层）/ 环级（含超环）与禁物 / 规模 / 世界模型（**五轴** / 天气转移矩阵 / **山的解剖** / **混沌初态**）/ 年表 / 叙事与命名 |
 | [`setting/CARDS.md`](setting/CARDS.md) | 设定集 | 3.5 | active | subsystem | 卡片**规则**：三轴、252 卡池矩阵、卡类与卡型、生克（物理涌现）、字段（模拟效果 = 逐卡逻辑）、命名；禁物逐件自由设计 |
 | [`setting/CARD-LIST.md`](setting/CARD-LIST.md) | 设定集 | 1.4 | active | subsystem | 卡片**内容**：M0 36 格（范围框架，**逐卡制作**）、价值表、240 功能位池、超环（21 张） |
@@ -48,8 +48,8 @@ owner: ai
 | [`setting/STYLE.md`](setting/STYLE.md) | 设定集 | 1.0 | active | subsystem | 五个风格主题的定义、取舍、排期 |
 | [`gameplay/LOOP.md`](gameplay/LOOP.md) | 玩法 | 1.1 | active | subsystem | 核心循环、五个尺度的节奏、支柱→机制映射、无失败红线（含**个体不可控**） |
 | [`gameplay/TIME.md`](gameplay/TIME.md) | 玩法 | 1.0 | active | subsystem | 现实的桥、双模式时间、昼夜形状、现实锚规格 |
-| [`gameplay/INTERVENTION.md`](gameplay/INTERVENTION.md) | 玩法 | 2.4 | active | subsystem | **手牌 / 实体池（含开局池）/ 释放与回收（无撤销 + 3 秒未干期）**、余响规则、扰动值、卡包、接管、倒带 |
-| [`gameplay/ECONOMY.md`](gameplay/ECONOMY.md) | 玩法 | 2.1 | active | subsystem | **全部经济数值**：三源产出（含 **offset 测量公式**、**势能三因子定义**）、价值与回收返还、包价、掉落权重、六条红线验算 |
+| [`gameplay/INTERVENTION.md`](gameplay/INTERVENTION.md) | 玩法 | 2.5 | active | subsystem | **手牌 / 实体池（含开局池）/ 释放与回收（无撤销 + 3 秒未干期）**、余响规则、扰动值、卡包（禁物不进包）、接管、倒带 |
+| [`gameplay/ECONOMY.md`](gameplay/ECONOMY.md) | 玩法 | 2.2 | active | subsystem | **全部经济数值**：三源产出（含 **offset 测量公式**、**势能三因子定义**）、价值与回收返还、包价、掉落权重、六条红线验算 |
 | [`gameplay/TRIGGERS.md`](gameplay/TRIGGERS.md) | 玩法 | 1.0 | active | subsystem | **触发规则语法（WHEN-THEN 有限词表 DSL）**：条件 / 动作词表、12 条上限、后写覆盖 |
 | [`gameplay/CUSTOMIZE.md`](gameplay/CUSTOMIZE.md) | 玩法 | 1.3 | active | subsystem | **首次启动流程（穹顶开场 + 首启问卷 + 直入）**、界创建向导 9 步、出厂预设、创世面板、存档与导入导出 |
 | [`gameplay/UI-UX.md`](gameplay/UI-UX.md) | 玩法 | 2.3 | active | subsystem | 界面区域、**手牌区与拖拽手势**、键位、**相机（上半球环绕 + 4 预设机位）**、极简原则 |
@@ -57,7 +57,7 @@ owner: ai
 | [`art/ASSETS.md`](art/ASSETS.md) | 美术与资产 | 1.0 | active | subsystem | 资产去向、生产线、规模预算、manifest 登记、合规 |
 | [`tech/ARCHITECTURE.md`](tech/ARCHITECTURE.md) | 技术与架构 | 1.0 | active | subsystem | 性能预算、模块划分与硬约束 |
 | [`tech/STRUCTURE.md`](tech/STRUCTURE.md) | 技术与架构 | 2.2 | active | subsystem | 目录与命名（含 🟡/✅ 状态列与归位决策表） |
-| [`plan/ROADMAP.md`](plan/ROADMAP.md) | 计划 | 1.1 | active | subsystem | 三阶段切分（音频挂 M1）、M0 验收、前置条件、风险、执行计划 |
+| [`plan/ROADMAP.md`](plan/ROADMAP.md) | 计划 | 1.2 | active | subsystem | 三阶段切分（混沌初态 / 音频挂 M1 / 逐卡制作口径）、M0 验收、前置条件、风险、执行计划 |
 | [`ops/ENV.md`](ops/ENV.md) | 环境与工具链 | 1.2 | active | nav | 环境安装步骤与本机实测 |
 | [`ops/VSCODE.md`](ops/VSCODE.md) | 环境与工具链 | 1.1 | active | nav | VSCode 工作区配置（真源是 `.vscode/` 实文件） |
 | [`ops/WORKFLOW.md`](ops/WORKFLOW.md) | 协作与流程 | 1.0 | active | nav | 分工、文档纪律、提交规范、评审闸门、AI 进入清单 |
@@ -174,3 +174,4 @@ charter/GDD.md  (truth: owner) —— 立项书 + 文档地图
 | 2.9 | 2026-10-15 | **第 36 轮世界形态与物理**：**界壁 = 上半球穹顶罩**（WORLD 3.4）、新建 **`setting/PHYSICS.md` 1.0**（万物有物理属性：全量定义 + 分级结算、七原质映射含**暗 = 吸光**、相变表、卡的 7 类基础能力）、CARDS 3.4（模拟效果 = 逐卡逻辑；生克涌现化）、GDD 7.1（世界形态行 + 文档地图）；扰动值 = 配比失衡 |
 | 2.10 | 2026-10-15 | **第 37 轮**：**元素与世界模拟分层**（第一原则，PHYSICS 1.1 翻译表 / WORLD 3.5 层次澄清；**暗 = 纯效果**）、CUSTOMIZE 1.3（**首启流程**：穹顶开场 + ≤5 问问卷 + 直入；界名生成器；设置页最小集）、INTERVENTION 2.4（**开局实体池** + **无撤销 + 3 秒未干期**）、LOOP 1.1（个体不可控红线）、ECONOMY 2.1（**offset 公式 + 势能三因子**初值提案）、WORLD 3.5（**天气转移概率初值表**） |
 | 2.11 | 2026-10-15 | **第 38 轮设定七件**：PHYSICS 1.2（**材质表 15 材质**，UE/PBR 调研后丰富）、WORLD 3.6（**混沌初态** / **山的解剖** / 穹顶形态语言）、SPECIES 2.2（物种数值改**模板初值** + 五物种初值表 + 种子雨）、**新建 `gameplay/TRIGGERS.md` 1.0**（WHEN-THEN 有限词表 DSL）、CARDS 3.5（禁物逐件自由设计）、ART-STYLE 2.1（**卡面版式 + 字体**思源黑/宋） |
+| 2.12 | 2026-10-15 | **日志清理**：DECISIONS 2.0（改写为摘要式日志，删对话原文，第 1–26 轮压缩并标注存废）、OPEN-QUESTIONS 2.0（只留 6 项真开放 + 已裁决一行索引）；修矛盾：**元素包含禁物 vs 禁物不随机出**（ECONOMY 2.2 / INTERVENTION 2.5 → 池 = 0–9 环 30 卡种）、INTERVENTION 三处过期"待裁决 / 待定"、ROADMAP 1.2（"卡库直取"旧口径 → 只读 + 免费补池；补混沌初态与逐卡口径） |
