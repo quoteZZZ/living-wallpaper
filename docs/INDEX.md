@@ -1,7 +1,7 @@
 ---
 id: INDEX
 title: 文档索引与状态矩阵
-version: 2.7
+version: 2.8
 date: 2026-10-15
 status: active
 truth: nav
@@ -40,7 +40,7 @@ owner: ai
 | [`charter/GDD.md`](charter/GDD.md) | 立项 | 7.0 | active | **owner** | 立项决策、定位与卖点、非目标、体验支柱 + 文档地图 + 旧章节号对照 |
 | [`charter/DECISIONS.md`](charter/DECISIONS.md) | 立项 | 1.7 | active | history | 形态沿革、**34 轮**需求裁决表、外部调研、参考稿清单 |
 | [`charter/OPEN-QUESTIONS.md`](charter/OPEN-QUESTIONS.md) | 立项 | 1.5 | active | subsystem | 待用户裁决清单（40 条；#38–#40 已按建议关闭） |
-| [`setting/WORLD.md`](setting/WORLD.md) | 设定集 | 3.2 | active | subsystem | 界 / 界外 / 七原质 / 环级（含超环）与禁物 / 规模 / 世界模型（生态域**五轴**含光照）/ 年表 / 叙事与命名 |
+| [`setting/WORLD.md`](setting/WORLD.md) | 设定集 | 3.3 | active | subsystem | 界 / 界外 / 七原质 / 环级（含超环）与禁物 / 规模 / 世界模型（生态域**五轴**含光照）/ 年表 / 叙事与命名；相机约束 = 上半球 |
 | [`setting/CARDS.md`](setting/CARDS.md) | 设定集 | 3.3 | active | subsystem | 卡片**规则**：三轴、252 卡池矩阵、卡类与卡型、生克、字段、命名 |
 | [`setting/CARD-LIST.md`](setting/CARD-LIST.md) | 设定集 | 1.4 | active | subsystem | 卡片**内容**：M0 36 格（范围框架，**逐卡制作**）、价值表、240 功能位池、超环（21 张） |
 | [`setting/SPECIES.md`](setting/SPECIES.md) | 设定集 | 2.1 | active | subsystem | 物种模板、M0 五物种、种群动力、因果可读性 |
@@ -50,7 +50,7 @@ owner: ai
 | [`gameplay/INTERVENTION.md`](gameplay/INTERVENTION.md) | 玩法 | 2.3 | active | subsystem | **手牌 / 实体池 / 释放与回收**、余响规则、扰动值（已补完）、卡包、接管、倒带（范围已定案） |
 | [`gameplay/ECONOMY.md`](gameplay/ECONOMY.md) | 玩法 | 2.0 | active | subsystem | **全部经济数值**：三源产出、价值与回收返还、包价、掉落权重、六条红线验算 |
 | [`gameplay/CUSTOMIZE.md`](gameplay/CUSTOMIZE.md) | 玩法 | 1.2 | active | subsystem | 界创建向导 9 步、出厂预设、创世面板、存档与导入导出（含世界故事摘要） |
-| [`gameplay/UI-UX.md`](gameplay/UI-UX.md) | 玩法 | 2.2 | active | subsystem | 界面区域、**手牌区与拖拽手势**、键位、**相机（固定俯视角）**、极简原则 |
+| [`gameplay/UI-UX.md`](gameplay/UI-UX.md) | 玩法 | 2.3 | active | subsystem | 界面区域、**手牌区与拖拽手势**、键位、**相机（上半球环绕 + 4 预设机位）**、极简原则 |
 | [`art/ART-STYLE.md`](art/ART-STYLE.md) | 美术与资产 | 2.0 | active | subsystem | 渲染配方、色板、素材规格、QC、风格验收流程 |
 | [`art/ASSETS.md`](art/ASSETS.md) | 美术与资产 | 1.0 | active | subsystem | 资产去向、生产线、规模预算、manifest 登记、合规 |
 | [`tech/ARCHITECTURE.md`](tech/ARCHITECTURE.md) | 技术与架构 | 1.0 | active | subsystem | 性能预算、模块划分与硬约束 |
@@ -167,3 +167,4 @@ charter/GDD.md  (truth: owner) —— 立项书 + 文档地图
 | 2.5 | 2026-10-14 | **小世界细化（WORLD 3.0 / SPECIES 2.0）**：物理尺度（1 格 = 1 m）、水体模型（湖/河/海/湿地/潮汐）、`地力` 与生态域四轴阈值表、环境曲线与天气状态机、世界生成流程 6 阶段、分块世界语义、年表双时间戳；修正三处自相矛盾（水体表达、分解回地力、"整界"相对化） |
 | 2.6 | 2026-10-15 | **第 33 轮批量采纳**：INTERVENTION 2.3（扰动值补完 + 倒带回滚定案）、WORLD 3.1（多界 3 座 / 禁物获取方向 / 潮汐初值 / 异质留档保留）、CUSTOMIZE 1.2（世界故事摘要）、SPECIES 2.1（物种集与承载力）、UI-UX 2.1（生效规则清单落创世面板 / 手牌固定 10 格；**登记相机操作缺口**）、CARDS 3.3（配额按 252 重算）、OPEN-QUESTIONS 1.5（#38–#40 关闭）、DECISIONS 1.6 |
 | 2.7 | 2026-10-15 | **第 34 轮 P1 前置**：UI-UX 2.2（**相机定案：固定俯视角 45–75°**）、ROADMAP 1.1（**音频挂 M1** + M0 预留音频总线占位）、CARD-LIST 1.4（**卡逐张制作**，36 格仅范围框架）、WORLD 3.2（**生态域五轴 + 光照**）、DECISIONS 1.7 |
+| 2.8 | 2026-10-15 | **第 35 轮相机修订**（用户纠正"世界是全 3D"）：UI-UX 2.3 + WORLD 3.3——撤销固定俯视角，改**上半球全角度环绕 + 4 预设机位**（F1 全景 / F2 特写 / F3 低角 / F4 顶视）；登记 T2 立牌低角侧视线注意项 |
