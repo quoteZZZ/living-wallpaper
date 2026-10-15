@@ -1,7 +1,7 @@
 ---
 id: tech/STRUCTURE
 title: 目录与命名唯一真源
-version: 2.2
+version: 2.3
 date: 2026-10-14
 status: active
 truth: subsystem
@@ -261,3 +261,5 @@ shared/
 | 1.0 | 2026-10-13 | 旧三分法（`app/` / `studio/` / `shared/`）——**已作废** |
 | 2.0 | 2026-10-14 | 按 GDD 重写：`game/` / `studio/` / `shared/` 三分，模块约定、命名规范、归位决策表 |
 | 2.1 | 2026-10-14 | 补 🟡/✅ **状态列**（消除"文档说有、实际没有"）；git 操作细节移交 `ops/`；补文档 id 约定与更新触发；迁入 `docs/tech/` |
+| 2.2 | 2026-10-14 | 版本号对齐（内容无变更记录） |
+| 2.3 | 2026-10-15 | `card.schema.json` 注记去「类别」（第 42 轮：类别维度删除） |
