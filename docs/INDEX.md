@@ -54,7 +54,7 @@ owner: ai
 | [`gameplay/SCREENS.md`](gameplay/SCREENS.md) | 玩法 | 1.2 | active | subsystem | **屏幕清单与线框原型（界面蓝图）**：九屏、导航流（S1 唯一根屏）、**穹顶可见性 / 混沌空态 / 开包五帧分镜**、释放三态 |
 | [`gameplay/CUSTOMIZE.md`](gameplay/CUSTOMIZE.md) | 玩法 | 1.3 | active | subsystem | **首次启动流程（穹顶开场 + 首启问卷 + 直入）**、界创建向导 9 步、出厂预设、创世面板、存档与导入导出 |
 | [`gameplay/UI-UX.md`](gameplay/UI-UX.md) | 玩法 | 2.4 | active | subsystem | 界面区域、**手牌区与拖拽手势**、键位、**相机（上半球环绕 + 4 预设机位）**、极简原则 |
-| [`art/ART-STYLE.md`](art/ART-STYLE.md) | 美术与资产 | 2.3 | active | subsystem | 渲染配方、色板、素材规格、**卡面区域级版式（无类别图标）+ 花纹系统 + 统一牌背 + 字体（§4）**、QC、风格验收流程 |
+| [`art/ART-STYLE.md`](art/ART-STYLE.md) | 美术与资产 | 2.4 | active | subsystem | 渲染配方、色板、素材规格、**卡面区域级版式 + 花纹系统 + 统一牌背 + 字体（§4）**、QC、风格验收流程 |
 | [`art/ASSETS.md`](art/ASSETS.md) | 美术与资产 | 1.0 | active | subsystem | 资产去向、生产线、规模预算、manifest 登记、合规 |
 | [`tech/ARCHITECTURE.md`](tech/ARCHITECTURE.md) | 技术与架构 | 1.0 | active | subsystem | 性能预算、模块划分与硬约束 |
 | [`tech/STRUCTURE.md`](tech/STRUCTURE.md) | 技术与架构 | 2.2 | active | subsystem | 目录与命名（含 🟡/✅ 状态列与归位决策表） |
