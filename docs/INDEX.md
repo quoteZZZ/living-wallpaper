@@ -1,7 +1,7 @@
 ---
 id: INDEX
 title: 文档索引与状态矩阵
-version: 2.16
+version: 2.17
 date: 2026-10-15
 status: active
 truth: nav
@@ -37,20 +37,20 @@ owner: ai
 
 | 路径 | 事务域 | 版本 | 状态 | truth | 一句话职责 |
 |---|---|---|---|---|---|
-| [`charter/GDD.md`](charter/GDD.md) | 立项 | 7.2 | active | **owner** | 立项决策、定位与卖点、非目标、体验支柱 + 文档地图 + 旧章节号对照 |
-| [`charter/DECISIONS.md`](charter/DECISIONS.md) | 立项 | 2.4 | active | history | 裁决沿革**摘要式日志**（42 轮，含存废标注；不保留对话原文） |
-| [`charter/OPEN-QUESTIONS.md`](charter/OPEN-QUESTIONS.md) | 立项 | 2.2 | active | subsystem | **开放清单（5 项待裁决）+ 已裁决一行索引** |
-| [`setting/WORLD.md`](setting/WORLD.md) | 设定集 | 3.7 | active | subsystem | 界 / **界壁（穹顶罩 + 形态语言）** / 界外 / 七原质（叙事层）/ 环级（含超环）与禁物 / 规模 / 世界模型（**五轴** / 天气转移矩阵 / **山的解剖** / **混沌初态**）/ 年表 / 叙事与命名 |
-| [`setting/CARDS.md`](setting/CARDS.md) | 设定集 | 3.6 | active | subsystem | 卡片**规则**：三轴、252 卡池矩阵、卡类与卡型（**类别维度已删除**）、生克（物理涌现）、字段（模拟效果 = 逐卡逻辑）、命名 |
-| [`setting/CARD-LIST.md`](setting/CARD-LIST.md) | 设定集 | 1.5 | active | subsystem | 卡片**内容**：M0 36 格（范围框架，**逐卡制作**）、价值表、**240 功能位池（平铺）**、超环（21 张） |
+| [`charter/GDD.md`](charter/GDD.md) | 立项 | 7.3 | active | **owner** | 立项决策、定位与卖点、非目标、体验支柱 + 文档地图 + 旧章节号对照 |
+| [`charter/DECISIONS.md`](charter/DECISIONS.md) | 立项 | 2.5 | active | history | 裁决沿革**摘要式日志**（43 轮，含存废标注；不保留对话原文） |
+| [`charter/OPEN-QUESTIONS.md`](charter/OPEN-QUESTIONS.md) | 立项 | 2.3 | active | subsystem | **开放清单（4 项待裁决）+ 已裁决一行索引** |
+| [`setting/WORLD.md`](setting/WORLD.md) | 设定集 | 3.8 | active | subsystem | 界 / **界壁（穹顶罩 + 形态语言）** / 界外 / 七原质（叙事层）/ 环级（含超环）与禁物 / 规模 / 世界模型（**五轴** / 天气转移矩阵 / **山的解剖** / **混沌初态**）/ 年表 / 叙事与命名 |
+| [`setting/CARDS.md`](setting/CARDS.md) | 设定集 | 3.7 | active | subsystem | 卡片**规则**：三轴、252 卡池矩阵、卡类 + **持续性字段**（类别与卡型维度均已删除）、生克（物理涌现）、字段（模拟效果 = 逐卡逻辑）、命名 |
+| [`setting/CARD-LIST.md`](setting/CARD-LIST.md) | 设定集 | 1.6 | active | subsystem | 卡片**内容**：M0 36 格（范围框架，**逐卡制作**）、价值表、**240 功能位池（平铺）**、超环（21 张） |
 | [`setting/PHYSICS.md`](setting/PHYSICS.md) | 设定集 | 1.2 | active | subsystem | **物理属性系统**：第一原则（元素≠世界实体）、**材质表（15 材质）**、七原质↔物理量**翻译表**（暗 = 纯效果）、分级结算、相变、卡的基础能力 |
 | [`setting/SPECIES.md`](setting/SPECIES.md) | 设定集 | 2.2 | active | subsystem | 物种模板、M0 五物种（尺寸 + **模板初值表**）、种群动力、因果可读性；世界初始**混沌无生命** |
 | [`setting/STYLE.md`](setting/STYLE.md) | 设定集 | 1.0 | active | subsystem | 五个风格主题的定义、取舍、排期 |
 | [`gameplay/LOOP.md`](gameplay/LOOP.md) | 玩法 | 1.1 | active | subsystem | 核心循环、五个尺度的节奏、支柱→机制映射、无失败红线（含**个体不可控**） |
 | [`gameplay/TIME.md`](gameplay/TIME.md) | 玩法 | 1.0 | active | subsystem | 现实的桥、双模式时间、昼夜形状、现实锚规格 |
-| [`gameplay/INTERVENTION.md`](gameplay/INTERVENTION.md) | 玩法 | 2.6 | active | subsystem | **手牌 / 实体池（含开局池）/ 释放与回收（无撤销 + 3 秒未干期）**、余响规则、扰动值、卡包（禁物不进包）、卡库筛选（无类别）、接管、倒带 |
+| [`gameplay/INTERVENTION.md`](gameplay/INTERVENTION.md) | 玩法 | 2.7 | active | subsystem | **手牌 / 实体池（含开局池）/ 释放与回收（无撤销 + 3 秒未干期）**、余响规则、扰动值、卡包（禁物不进包）、卡库筛选（无类别 / 卡型）、接管、倒带 |
 | [`gameplay/ECONOMY.md`](gameplay/ECONOMY.md) | 玩法 | 2.2 | active | subsystem | **全部经济数值**：三源产出（含 **offset 测量公式**、**势能三因子定义**）、价值与回收返还、包价、掉落权重、六条红线验算 |
-| [`gameplay/TRIGGERS.md`](gameplay/TRIGGERS.md) | 玩法 | 1.0 | active | subsystem | **触发规则语法（WHEN-THEN 有限词表 DSL）**：条件 / 动作词表、12 条上限、后写覆盖 |
+| [`gameplay/TRIGGERS.md`](gameplay/TRIGGERS.md) | 玩法 | 1.1 | active | subsystem | **触发规则语法（WHEN-THEN 有限词表 DSL）**：条件 / 动作词表、12 条上限、后写覆盖（触发 = 律类 + 持续性取值） |
 | [`gameplay/SCREENS.md`](gameplay/SCREENS.md) | 玩法 | 1.2 | active | subsystem | **屏幕清单与线框原型（界面蓝图）**：九屏、导航流（S1 唯一根屏）、**穹顶可见性 / 混沌空态 / 开包五帧分镜**、释放三态 |
 | [`gameplay/CUSTOMIZE.md`](gameplay/CUSTOMIZE.md) | 玩法 | 1.3 | active | subsystem | **首次启动流程（穹顶开场 + 首启问卷 + 直入）**、界创建向导 9 步、出厂预设、创世面板、存档与导入导出 |
 | [`gameplay/UI-UX.md`](gameplay/UI-UX.md) | 玩法 | 2.4 | active | subsystem | 界面区域、**手牌区与拖拽手势**、键位、**相机（上半球环绕 + 4 预设机位）**、极简原则 |
@@ -180,3 +180,4 @@ charter/GDD.md  (truth: owner) —— 立项书 + 文档地图
 | 2.14 | 2026-10-15 | **原型第二轮（第 40 轮）**：ART-STYLE 2.2（**卡面区域级版式 + 花纹系统（物回纹/术云水纹/律封印菱纹）+ 统一牌背**；字体移 §4.5）、SCREENS 1.1（穹顶可见性 / 混沌空态 / 开包五帧分镜）；新增四张概念图（穹顶卫星视角 / 卡面 v2 / 牌背 / 三卡类花纹对比）；DECISIONS 2.2 |
 | 2.15 | 2026-10-15 | **原型第三轮（第 41 轮）**：四张概念图（**超环卡面**金框缠枝 / **禁物卡面**撕裂黑框 / **S3 卡库** / **S2 创世面板**蜡球滑轨）；登记 **#42 十二类存废**质询（待裁决）；DECISIONS 2.3 / OPEN-QUESTIONS 2.1 |
 | 2.16 | 2026-10-15 | **第 42 轮：删除「类别」维度**——卡 =「元素 × 环级 × 卡类 × 卡型」四项描述；GDD 7.2、CARDS 3.6（§5 作废）、CARD-LIST 1.5（功能位池平铺）、WORLD 3.7、UI-UX 2.4、SCREENS 1.2、INTERVENTION 2.6、ART-STYLE 2.3、STRUCTURE（schema 注记）；OPEN-QUESTIONS 2.2（#42 关闭）、DECISIONS 2.4 |
+| 2.17 | 2026-10-15 | **第 43 轮：删除「卡型」维度**——持续性改为枚举字段（瞬时 / 持续 / 永久 / 触发）；合契 / 仪轨降为可选参数；触发 = 律类 + 持续性取值（TRIGGERS / 地脉包不变）；卡面身份行只剩回收价值；GDD 7.3、CARDS 3.7（§6 作废）、CARD-LIST 1.6、WORLD 3.8、UI-UX 2.5、SCREENS 1.3、INTERVENTION 2.7、ART-STYLE 2.4、STRUCTURE 2.4、ROADMAP 1.3、TRIGGERS 1.1；OPEN-QUESTIONS 2.3（#19 关闭）、DECISIONS 2.5 |

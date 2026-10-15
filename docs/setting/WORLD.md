@@ -1,7 +1,7 @@
 ---
 id: setting/WORLD
 title: 世界设定集
-version: 3.7
+version: 3.8
 date: 2026-10-15
 status: active
 truth: subsystem
@@ -391,7 +391,8 @@ owner: both
 | 水体类型 | Water Body | `none`/`lake`/`river`/`sea`/`wetland` | 见 §3.1 |
 | 生态域 | Biome | `biome.` | 四轴阈值判定的区域类型（§2.2） |
 | 余响 | Echo | — | 干涉世界产出的唯一积累物（[`../gameplay/INTERVENTION.md`](../gameplay/INTERVENTION.md) §2） |
-| 卡类 / 卡型 | Class / Form | `matter`·`rite`·`law` / `form.` | [`CARDS.md`](CARDS.md) §4 / §6 |
+| 卡类 | Class | `matter`·`rite`·`law` | [`CARDS.md`](CARDS.md) §4 |
+| 持续性 | Duration | `instant`·`sustain`·`perm`·`trigger` | [`CARDS.md`](CARDS.md) §6 |
 | 扰动值 | Disturbance | — | 世界的状态读数（[`../gameplay/INTERVENTION.md`](../gameplay/INTERVENTION.md) §3） |
 | 年表 | Chronicle | — | 世界史记录，双时间戳（§4） |
 | 世界钟 | World Clock | — | 双模式时间系统（[`../gameplay/TIME.md`](../gameplay/TIME.md) §1） |
@@ -492,3 +493,4 @@ owner: both
 | 3.5 | 2026-10-15 | §1.2 补**层次澄清**（第 37 轮：原质是叙事语言，模拟层只认物理量）；§3.2 补**天气状态机转移概率初值表**（提案值可调） |
 | 3.6 | 2026-10-15 | **混沌初态**（第 38 轮）：生成流程第⑤步默认跳过——世界初始无生命，生命由向导第 8 步或生命类卡引入；§3.1 新增**山的解剖**（外壳 / 岩芯 / 矿脉）；§1.1 穹顶补**形态语言**（分瓣纸壳 / 蜡封印记 / 界名基座） |
 | 3.7 | 2026-10-15 | §6.1 术语表随「类别」维度删除（第 42 轮）：去 Category / `cat.` |
+| 3.8 | 2026-10-15 | §6.1 术语表随「卡型」维度删除（第 43 轮）：去 Form / `form.`，加持续性（Duration） |

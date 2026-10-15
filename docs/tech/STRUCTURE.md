@@ -1,7 +1,7 @@
 ---
 id: tech/STRUCTURE
 title: 目录与命名唯一真源
-version: 2.3
+version: 2.4
 date: 2026-10-14
 status: active
 truth: subsystem
@@ -135,7 +135,7 @@ shared/
 ├─ README.md
 └─ schema/
    ├─ species.schema.json   物种模板（[`../setting/SPECIES.md`](../setting/SPECIES.md) §1）
-   ├─ card.schema.json      干涉卡（元素 / 级 / 卡类 / 卡型 / 作用域 / 参数）
+   ├─ card.schema.json      干涉卡（元素 / 级 / 卡类 / 持续性 / 作用域 / 参数）
    ├─ world.schema.json     界：尺寸 / 地形算法与种子 / 生态域 / 水体 / 大气 / 法则
    ├─ style.schema.json     风格主题参数（调色板 / 着色 / 后期 / 几何处理）
    └─ save.schema.json      存档：元数据 + 快照 + 卡池历史 + 年表
@@ -263,3 +263,4 @@ shared/
 | 2.1 | 2026-10-14 | 补 🟡/✅ **状态列**（消除"文档说有、实际没有"）；git 操作细节移交 `ops/`；补文档 id 约定与更新触发；迁入 `docs/tech/` |
 | 2.2 | 2026-10-14 | 版本号对齐（内容无变更记录） |
 | 2.3 | 2026-10-15 | `card.schema.json` 注记去「类别」（第 42 轮：类别维度删除） |
+| 2.4 | 2026-10-15 | `card.schema.json` 注记「卡型」改「持续性」（第 43 轮） |
