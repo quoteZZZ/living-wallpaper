@@ -1,7 +1,7 @@
 ---
 id: INDEX
 title: 文档索引与状态矩阵
-version: 2.9
+version: 2.10
 date: 2026-10-15
 status: active
 truth: nav
@@ -38,19 +38,19 @@ owner: ai
 | 路径 | 事务域 | 版本 | 状态 | truth | 一句话职责 |
 |---|---|---|---|---|---|
 | [`charter/GDD.md`](charter/GDD.md) | 立项 | 7.1 | active | **owner** | 立项决策、定位与卖点、非目标、体验支柱 + 文档地图 + 旧章节号对照 |
-| [`charter/DECISIONS.md`](charter/DECISIONS.md) | 立项 | 1.7 | active | history | 形态沿革、**34 轮**需求裁决表、外部调研、参考稿清单 |
+| [`charter/DECISIONS.md`](charter/DECISIONS.md) | 立项 | 1.10 | active | history | 形态沿革、**37 轮**需求裁决表、外部调研、参考稿清单 |
 | [`charter/OPEN-QUESTIONS.md`](charter/OPEN-QUESTIONS.md) | 立项 | 1.5 | active | subsystem | 待用户裁决清单（40 条；#38–#40 已按建议关闭） |
-| [`setting/WORLD.md`](setting/WORLD.md) | 设定集 | 3.4 | active | subsystem | 界 / **界壁（穹顶罩）** / 界外 / 七原质 / 环级（含超环）与禁物 / 规模 / 世界模型（生态域**五轴**含光照）/ 年表 / 叙事与命名 |
+| [`setting/WORLD.md`](setting/WORLD.md) | 设定集 | 3.5 | active | subsystem | 界 / **界壁（穹顶罩）** / 界外 / 七原质（叙事层）/ 环级（含超环）与禁物 / 规模 / 世界模型（**五轴**含光照 / 天气转移矩阵）/ 年表 / 叙事与命名 |
 | [`setting/CARDS.md`](setting/CARDS.md) | 设定集 | 3.4 | active | subsystem | 卡片**规则**：三轴、252 卡池矩阵、卡类与卡型、生克（物理涌现）、字段（模拟效果 = 逐卡逻辑）、命名 |
 | [`setting/CARD-LIST.md`](setting/CARD-LIST.md) | 设定集 | 1.4 | active | subsystem | 卡片**内容**：M0 36 格（范围框架，**逐卡制作**）、价值表、240 功能位池、超环（21 张） |
-| [`setting/PHYSICS.md`](setting/PHYSICS.md) | 设定集 | 1.0 | active | subsystem | **物理属性系统**：属性字典、七原质映射（暗 = 吸光）、分级结算、相变、卡的基础能力 |
+| [`setting/PHYSICS.md`](setting/PHYSICS.md) | 设定集 | 1.1 | active | subsystem | **物理属性系统**：第一原则（元素≠世界实体）、属性字典、七原质↔物理量**翻译表**（暗 = 纯效果）、分级结算、相变、卡的基础能力 |
 | [`setting/SPECIES.md`](setting/SPECIES.md) | 设定集 | 2.1 | active | subsystem | 物种模板、M0 五物种、种群动力、因果可读性 |
 | [`setting/STYLE.md`](setting/STYLE.md) | 设定集 | 1.0 | active | subsystem | 五个风格主题的定义、取舍、排期 |
-| [`gameplay/LOOP.md`](gameplay/LOOP.md) | 玩法 | 1.0 | active | subsystem | 核心循环、五个尺度的节奏、支柱→机制映射、无失败红线 |
+| [`gameplay/LOOP.md`](gameplay/LOOP.md) | 玩法 | 1.1 | active | subsystem | 核心循环、五个尺度的节奏、支柱→机制映射、无失败红线（含**个体不可控**） |
 | [`gameplay/TIME.md`](gameplay/TIME.md) | 玩法 | 1.0 | active | subsystem | 现实的桥、双模式时间、昼夜形状、现实锚规格 |
-| [`gameplay/INTERVENTION.md`](gameplay/INTERVENTION.md) | 玩法 | 2.3 | active | subsystem | **手牌 / 实体池 / 释放与回收**、余响规则、扰动值（已补完）、卡包、接管、倒带（范围已定案） |
-| [`gameplay/ECONOMY.md`](gameplay/ECONOMY.md) | 玩法 | 2.0 | active | subsystem | **全部经济数值**：三源产出、价值与回收返还、包价、掉落权重、六条红线验算 |
-| [`gameplay/CUSTOMIZE.md`](gameplay/CUSTOMIZE.md) | 玩法 | 1.2 | active | subsystem | 界创建向导 9 步、出厂预设、创世面板、存档与导入导出（含世界故事摘要） |
+| [`gameplay/INTERVENTION.md`](gameplay/INTERVENTION.md) | 玩法 | 2.4 | active | subsystem | **手牌 / 实体池（含开局池）/ 释放与回收（无撤销 + 3 秒未干期）**、余响规则、扰动值、卡包、接管、倒带 |
+| [`gameplay/ECONOMY.md`](gameplay/ECONOMY.md) | 玩法 | 2.1 | active | subsystem | **全部经济数值**：三源产出（含 **offset 测量公式**、**势能三因子定义**）、价值与回收返还、包价、掉落权重、六条红线验算 |
+| [`gameplay/CUSTOMIZE.md`](gameplay/CUSTOMIZE.md) | 玩法 | 1.3 | active | subsystem | **首次启动流程（穹顶开场 + 首启问卷 + 直入）**、界创建向导 9 步、出厂预设、创世面板、存档与导入导出 |
 | [`gameplay/UI-UX.md`](gameplay/UI-UX.md) | 玩法 | 2.3 | active | subsystem | 界面区域、**手牌区与拖拽手势**、键位、**相机（上半球环绕 + 4 预设机位）**、极简原则 |
 | [`art/ART-STYLE.md`](art/ART-STYLE.md) | 美术与资产 | 2.0 | active | subsystem | 渲染配方、色板、素材规格、QC、风格验收流程 |
 | [`art/ASSETS.md`](art/ASSETS.md) | 美术与资产 | 1.0 | active | subsystem | 资产去向、生产线、规模预算、manifest 登记、合规 |
@@ -171,3 +171,4 @@ charter/GDD.md  (truth: owner) —— 立项书 + 文档地图
 | 2.7 | 2026-10-15 | **第 34 轮 P1 前置**：UI-UX 2.2（**相机定案：固定俯视角 45–75°**）、ROADMAP 1.1（**音频挂 M1** + M0 预留音频总线占位）、CARD-LIST 1.4（**卡逐张制作**，36 格仅范围框架）、WORLD 3.2（**生态域五轴 + 光照**）、DECISIONS 1.7 |
 | 2.8 | 2026-10-15 | **第 35 轮相机修订**（用户纠正"世界是全 3D"）：UI-UX 2.3 + WORLD 3.3——撤销固定俯视角，改**上半球全角度环绕 + 4 预设机位**（F1 全景 / F2 特写 / F3 低角 / F4 顶视）；登记 T2 立牌低角侧视线注意项 |
 | 2.9 | 2026-10-15 | **第 36 轮世界形态与物理**：**界壁 = 上半球穹顶罩**（WORLD 3.4）、新建 **`setting/PHYSICS.md` 1.0**（万物有物理属性：全量定义 + 分级结算、七原质映射含**暗 = 吸光**、相变表、卡的 7 类基础能力）、CARDS 3.4（模拟效果 = 逐卡逻辑；生克涌现化）、GDD 7.1（世界形态行 + 文档地图）；扰动值 = 配比失衡 |
+| 2.10 | 2026-10-15 | **第 37 轮**：**元素与世界模拟分层**（第一原则，PHYSICS 1.1 翻译表 / WORLD 3.5 层次澄清；**暗 = 纯效果**）、CUSTOMIZE 1.3（**首启流程**：穹顶开场 + ≤5 问问卷 + 直入；界名生成器；设置页最小集）、INTERVENTION 2.4（**开局实体池** + **无撤销 + 3 秒未干期**）、LOOP 1.1（个体不可控红线）、ECONOMY 2.1（**offset 公式 + 势能三因子**初值提案）、WORLD 3.5（**天气转移概率初值表**） |
