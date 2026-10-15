@@ -1,8 +1,8 @@
 ---
 id: tech/STRUCTURE
 title: 目录与命名唯一真源
-version: 2.4
-date: 2026-10-14
+version: 3.0
+date: 2026-10-16
 status: active
 truth: subsystem
 owner: ai
@@ -11,8 +11,8 @@ owner: ai
 # 目录与命名唯一真源（STRUCTURE）
 
 > **本文档是"新文件放哪、叫什么"的唯一真源。** 与 [`../charter/GDD.md`](../charter/GDD.md) 冲突时以 GDD 为准，并在同一次改动内同步修正本文。
-> 版本 2.1（2026-10-14）：按 GDD v6.0 对齐；**为所有"计划中但尚未落地"的目录补状态列**，消除文档与仓库实际的矛盾。
-> 旧稿（v1.0）的 `app/` `studio/` `shared/` 三分法已作废——`app/` 随旧形态删除；`studio/` 与 `shared/` **按本文重建（尚未落地）**。
+> 版本 3.0（2026-10-16）：M0 工程落地，`game/` `studio/` `shared/` 三个目录由"计划中"转为"现状"，**全文状态列据实改写**；`Source/` 结构按实际编译通过的工程修正（`.Target.cs` 在 `Source/` 下，不在工程根）。
+> 旧稿（v1.0）的 `app/` `studio/` `shared/` 三分法已作废——`app/` 随旧形态删除。
 
 ---
 
@@ -20,14 +20,16 @@ owner: ai
 
 | 层 | 定位 | 入 git | **状态** |
 |---|---|---|---|
-| `game/` | **进发行包**：UE 工程、源码、配置 | 源码 / 配置 **入**；二进制资产 **不入** | 🟡 **计划中**（随 M0 建立，当前只有被忽略的本地缓存目录） |
-| `studio/` | **产出素材**：ComfyUI 生图线、生成产物、风格锚与预设 | 工作流 / 任务 / 预设 / manifest **入**；产物 **不入** | 🟡 **计划中**（当前不存在；生图能力在本机 `D:\ComfyUI`，见 [`../ops/ENV.md`](../ops/ENV.md) §3） |
-| `shared/` | **双方共读的契约**：JSON Schema | **入** | 🟡 **计划中**（当前不存在） |
-| `tools/` | **开发期脚本**：环境、工程生成、构建、基准 | **入** | ✅ **现状**（9 个 PowerShell + README） |
+| `game/` | **进发行包**：UE 工程、源码、配置 | 源码 / 配置 **入**；二进制资产 **不入** | ✅ **现状**（`.uproject` + 2 个 Target + 主模块 `Solstice` + 编辑器模块 `SolsticeEditor`；M0 目标已编译通过并实测运行） |
+| `studio/` | **产出素材**：ComfyUI 生图线、生成产物、风格锚与预设 | 工作流 / 任务 / 预设 / manifest **入**；产物 **不入** | ✅ **现状**（工作流 / jobs / 预设 / 驱动脚本已落地；`out/` 产物尚未生成，`manifest.jsonl` 仅表头） |
+| `shared/` | **双方共读的契约**：JSON Schema | **入** | ✅ **现状**（`schema/` 3 个：`card` / `species` / `world`；`style` 与 `save` 待 M1） |
+| `tools/` | **开发期脚本**：环境、工程生成、构建、内容生成、基准 | **入** | ✅ **现状**（11 个 PowerShell + README） |
 | `docs/` | 设计与约定文档 | **入** | ✅ **现状**（结构见 [`../INDEX.md`](../INDEX.md)） |
 | `.vscode/` `.codebuddy/` | IDE 与项目数据配置 | **入** | ✅ **现状** |
 
 **核心不变量**：`game/Content/` 的二进制资产**不入 git**，因此必须**可由"种子 + 生成器 + 契约 + manifest"完整重建**。这是全部目录设计的出发点。
+
+M0 的两个纸材质主材质（`/Game/Core/M_Paper`、`M_Ink`）是这条不变量的第一个真实样本：它们不存在于 git，由 `tools\gen-assets.ps1` 调 `SolsticeEditor` 的生成器按代码建图后写出。
 
 ---
 
@@ -35,11 +37,11 @@ owner: ai
 
 ```text
 solstice/
-├─ game/          🟡 计划中 —— 虚幻引擎工程（进发行包）
-├─ studio/        🟡 计划中 —— 本地生图线 + 程序化资产产物
-├─ shared/        🟡 计划中 —— 契约：JSON Schema（引擎与生图线共读）
-├─ tools/         ✅ 现状  —— 开发期脚本：环境 / 工程生成 / 构建 / 基准
-├─ docs/          ✅ 现状  —— 见 ../INDEX.md（charter / content / art / tech / plan / ops / archive）
+├─ game/          ✅ 现状  —— 虚幻引擎工程（进发行包）
+├─ studio/        ✅ 现状  —— 本地生图线 + 程序化资产产物
+├─ shared/        ✅ 现状  —— 契约：JSON Schema（引擎与生图线共读）
+├─ tools/         ✅ 现状  —— 开发期脚本：环境 / 工程生成 / 构建 / 内容生成 / 基准
+├─ docs/          ✅ 现状  —— 见 ../INDEX.md（charter / setting / gameplay / art / tech / plan / ops / archive）
 ├─ .vscode/       ✅ 现状  —— 构建任务 / 调试 / cpptools / 代码片段
 ├─ .codebuddy/    ✅ 现状  —— agents/ 与 rules/（项目数据，勿删）
 ├─ .clang-format  ✅ 现状
@@ -52,43 +54,34 @@ solstice/
 
 ---
 
-## 2 `game/`（进发行包）🟡 计划中
+## 2 `game/`（进发行包）✅ 现状
 
 ```text
 game/
 ├─ Solstice.uproject
 ├─ Config/
-│  ├─ DefaultEngine.ini  DefaultGame.ini  DefaultInput.ini  DefaultEditor.ini
+│  ├─ DefaultEngine.ini  DefaultGame.ini  DefaultInput.ini
 │  └─ Solstice/
-│     ├─ Data/                  ★ 运行时契约 JSON（species / cards / world / style / preset）
-│     └─ Localization/          ★ 中英双语文本（zh-Hans / en）
+│     ├─ Data/                  ★ 运行时契约 JSON（cards.earth / cards.fire / cards.metal / species / world）
+│     └─ Localization/          ★ 中英双语文本（zh-Hans.json / en.json）
 ├─ Content/                     ⚠ 二进制资产，不入 git（可由管线重建）
-│  ├─ Core/                     母材质、渲染管线参数、基础蓝图
-│  ├─ Styles/                   ★ 风格主题资产：每个主题一个子目录（材质实例、后期、调色板）
-│  ├─ World/                    地形纸板模板、岩石、水体、植被
-│  ├─ Creatures/                动物部件集（几何生成器模板）
-│  ├─ Cards/                    卡面贴图（游戏用；源与 manifest 在 studio/）
-│  ├─ UI/                       UMG 控件蓝图、九宫格、图标
-│  ├─ FX/                       Niagara 系统与粒子贴图
-│  ├─ Data/                     生成的 DataTable / DataAsset（由脚本灌入）
-│  └─ Levels/                   `L_Solstice`（单一空关卡）
+│  └─ Core/                     两个纸材质主材质：M_Paper.uasset / M_Ink.uasset（由 gen-assets.ps1 生成）
 ├─ Source/
+│  ├─ Solstice.Target.cs            游戏目标（无编辑器依赖，产出 Solstice.exe）
+│  ├─ SolsticeEditor.Target.cs      编辑器目标（产出 UnrealEditor-SolsticeEditor.dll）
 │  ├─ Solstice/                 ★ 主模块
-│  │  ├─ Core/   启动、存档与多界、现实锚、事件总线、数据加载
-│  │  ├─ Sim/    世界钟（双模式）+ 生态演化 + 模拟 LOD（纯逻辑，零渲染依赖）
-│  │  ├─ World/  地形分块、水体、种群、生态域、脏标记重建
-│  │  ├─ God/    卡池与指令系统、接管与释放
-│  │  ├─ Gen/    程序化几何生成器（纸板层、岩石、植物、动物部件）
-│  │  ├─ UI/     HUD（默认 C++ 构建控件树）
-│  │  └─ Render/ 纸雕渲染管线：Cel LUT、描边、硬阴影、移轴、实例化
-│  ├─ SolsticeEditor/           编辑器模块：Commandlet、资产生成、卡面导入
-│  └─ SolsticeSim/              ★ headless 目标：基准与回归测试入口
-├─ Plugins/
-├─ Solstice.Target.cs          游戏目标
-├─ SolsticeEditor.Target.cs    编辑器目标
-└─ SolsticeSim.Target.cs       headless 目标（无渲染依赖）
+│  │  ├─ Core/   启动（GameInstance）、现实锚、数据加载、本地化
+│  │  ├─ Sim/    世界钟（双模式）+ 地形 / 生态域 / 天气 / 生态 / 卡指令 / 余响 / 编年史（纯逻辑，零渲染依赖）
+│  │  ├─ Gen/    程序化几何生成器（纸板层 / 描边卡 / 轮廓带）
+│  │  ├─ World/  分块网格构建与脏标记重建（`ASolsticeRealm`）
+│  │  ├─ God/    观察者、玩家控制器、游戏模式
+│  │  ├─ UI/     HUD（纯 Slate，无 UMG 资产）
+│  │  └─ Render/ 纸雕渲染：主材质解析、Cel 分带、天空调色
+│  └─ SolsticeEditor/           编辑器模块：Commandlet（资产生成 / 无头基准）
+└─ (无 Plugins/ —— 尚未需要；ProceduralMeshComponent 直接启用引擎自带插件)
 ```
 
+> **`.Target.cs` 放在 `Source/` 下，不是工程根**：UE 5.8 的 `ProjectRulesAssembly` 只 glob `Source/*.Target.cs`，放根目录会报 `Couldn't find target rules file`。
 > `Binaries/`、`Intermediate/`、`Saved/`、`DerivedDataCache/` 由引擎生成，已在 `.gitignore` 忽略。
 
 ---
@@ -97,49 +90,53 @@ game/
 
 | 模块 | 依赖 | 说明 |
 |---|---|---|
-| `Solstice` | 引擎（Core / UMG / Niagara / **无** Lumen / Nanite 依赖） | 主模块，`Sim` 子目录**禁止** include 渲染相关头 |
-| `SolsticeEditor` | `Solstice` + UnrealEd | Commandlet：生成材质、设置导入参数、灌 DataTable、批量导入卡面 |
-| `SolsticeSim` | `Solstice` | **不带 UMG / Niagara / Render 依赖**，可在无窗口环境跑基准 |
+| `Solstice` | `Core` `CoreUObject` `Engine` `ProceduralMeshComponent` `HTTP` `Json`（**无** UMG / Niagara / Lumen / Nanite） | 主模块。`Sim/` 子目录**禁止** include 渲染 / 输入 / UObject 头 |
+| `SolsticeEditor` | `Solstice` + `UnrealEd` `MaterialEditor` `AssetTools` `AssetRegistry` `RenderCore` `RHI` | 类型 `Editor`，`LoadingPhase: Default`。两个 Commandlet：`SolsticeGenAssets`（生成主材质）、`SolsticeBench`（无头确定性回归） |
 
-**目标与模块同名不同物**：`.Target.cs` 是构建目标，`Source/Solstice/` 是模块。新增能力优先落在主模块的对应子目录，**不要新建模块**，除非确实有编辑器 / headless 隔离需求。
+**主材质是靠代码建图生成的**：`UnrealEd` 只在编辑器模块里，而运行模块不能链接它，所以运行模块把"怎么生成"这件事抽象成一个 `TFunction`（`Solstice::GBuildPaperMaterials`），编辑器模块在 `StartupModule` 里把它的实现塞进去。运行模块在 `/Game/Core/M_Paper` 缺失时才调它一次——这就是新克隆自愈的机制。
+
+**`LoadingPhase` 必须是 `Default`，不能是 `PostEngineInit`**：`-run=XxxCommandlet` 的类解析发生在 `LaunchEngineLoop.cpp:3931`，而 `PostEngineInit` 阶段的项目模块加载在同文件 `4861` ——命令行解析时模块还没加载，会直接报 `looked like a commandlet, but we could not find the class`（实测踩过）。`Default` 阶段加载在 `3896`，早于解析。`-game` 下 `GIsEditor` 为假，`EHostType::Editor` 模块仍然不会加载（`ModuleDescriptor.cpp:730`），所以这条改动不影响发行路径。
+
+**目标与模块同名不同物**：`.Target.cs` 是构建目标，`Source/Solstice/` 是模块。新增能力优先落在主模块的对应子目录，**不要新建模块**。M0 曾计划独立 `SolsticeSim` 模块 / 目标，实测下来 `Solstice` 目标本身就是无编辑器依赖的可执行文件，再加一个完全相同的 Game 目标只会让人困惑，故删除；无头回归改为 `SolsticeEditor` 的 `SolsticeBench` Commandlet（同样不碰 RHI / World / GameMode，足以证明 `Sim/` 可无头运行）。真正零引擎依赖的独立 Sim 模块留到 M1 存档格式需要它时再做。
 
 ---
 
-## 4 `studio/`（产出素材）🟡 计划中 —— 按本文重建
+## 4 `studio/`（产出素材）✅ 现状
 
 ```text
 studio/
 ├─ README.md
-├─ workflows/      ComfyUI 工作流 JSON：卡面 / 纸板立牌 / 纸纹 / 粒子贴图 / 载入图
-├─ jobs/           批量任务清单（jsonl）：模型、prompt、seed、尺寸、输出名
-├─ refs/           ★ 风格锚图（入 git）：每个风格主题的对照基准
-├─ presets/        ★ 风格主题参数（入 git，与 shared/schema/style.schema.json 对齐）
+├─ workflows/      ComfyUI 工作流 JSON（当前：paper-texture）
+├─ jobs/           批量任务清单（jsonl）：模型、prompt、seed、尺寸、输出名（当前：paper-textures.jsonl）
+├─ presets/        ★ 风格主题参数（入 git，当前：paper-diorama.json）
+├─ tools/          ★ 驱动脚本：调 ComfyUI HTTP API 跑 jobs、写 manifest（当前：comfy_batch.py）
 ├─ out/            ⚠ 生成产物（不入 git，manifest 入 git）
 │  ├─ cards/        卡面（3:4）
 │  ├─ cutouts/      纸板立牌贴图（纯色底，供抠图）
 │  ├─ textures/     纸纹 / 地表 / 水纹 / 苔藓
-│  ├─ fx/           粒子贴图（雨滴、雪花、落叶、光斑）
 │  └─ manifest.jsonl  ★ 逐张留档：模型 / prompt / seed / 日期（Steam AI 披露用）
-└─ scripts/        ★ PowerShell：调 ComfyUI HTTP API 跑 jobs、写 manifest、导出到 game/Content
+└─ work/           ⚠ 临时试验（不入 git）
 ```
 
-**脚本语言**：`studio/scripts/` 与 `tools/` 一律 **PowerShell**（调 ComfyUI API）；**编辑器内的资产批处理**用官方 **Python（ScriptPlugin）** 或 `SolsticeEditor` 的 Commandlet。**游戏逻辑不使用 Python**。
+> **与 v2.4 的差异**：原定 `refs/`（风格锚图）与 `scripts/`（PowerShell）实测未按原计划建立——驱动脚本落在 `studio/tools/comfy_batch.py`。`refs/` 待第一批风格锚图产出时再建（留档要求仍见 [`../art/ASSETS.md`](../art/ASSETS.md)）。
+
+**脚本语言**：`studio/tools/` 与 `tools/` 调外部 HTTP 服务用 **PowerShell 或 Python**均可（当前 `comfy_batch.py` 是 Python，因为要复用 ComfyUI 的 JSON 工作流结构）；**编辑器内的资产批处理**用 `SolsticeEditor` 的 Commandlet。**游戏逻辑不使用 Python**。
 **登记规范**：manifest 字段、批次一致性、QC 与合规见 [`../art/ASSETS.md`](../art/ASSETS.md)。
 
 ---
 
-## 5 `shared/`（契约）🟡 计划中 —— 按本文重建
+## 5 `shared/`（契约）✅ 现状
 
 ```text
 shared/
 ├─ README.md
 └─ schema/
    ├─ species.schema.json   物种模板（[`../setting/SPECIES.md`](../setting/SPECIES.md) §1）
-   ├─ card.schema.json      干涉卡（元素 / 级 / 卡类 / 持续性 / 作用域 / 参数）
-   ├─ world.schema.json     界：尺寸 / 地形算法与种子 / 生态域 / 水体 / 大气 / 法则
-   ├─ style.schema.json     风格主题参数（调色板 / 着色 / 后期 / 几何处理）
-   └─ save.schema.json      存档：元数据 + 快照 + 卡池历史 + 年表
+   ├─ card.schema.json      干涉卡（元素 / 级 / 卡型 / 持续性 / 作用域 / 参数）
+   └─ world.schema.json     界：尺寸 / 地形算法与种子 / 生态域 / 水体 / 大气 / 法则
 ```
+
+**待 M1**：`style.schema.json`（风格主题参数）、`save.schema.json`（存档：元数据 + 快照 + 卡池历史 + 年表）。
 
 契约是 `game/Config/Solstice/Data/` 与 `studio/presets/` 的**共同校验源**：改契约必须同步改两边数据。
 
@@ -164,21 +161,22 @@ shared/
 
 | 类型 | 前缀 | 示例 |
 |---|---|---|
-| UObject / UActorComponent | `U` | `USolsticeSimSubsystem` |
-| AActor | `A` | `ASolsticeTerrainChunk` |
-| 结构体 | `F` | `FSolsticeTile` |
-| 枚举 | `E` | `ESolsticeTimeMode` |
+| UObject / UActorComponent | `U` | `USolsticeGameInstance` |
+| AActor | `A` | `ASolsticeRealm` |
+| 结构体 | `F` | `FTile`、`FCatalog` |
+| 枚举 | `E` | `ETimeMode`、`EBiome` |
 | 接口 | `I` | `ISolsticeTickable` |
-| 纯逻辑类（`Sim/` 内） | `F` + 无 UObject | `FWorldClock`、`FEcoStep` |
+| 纯逻辑类（`Sim/` 内） | `F` + 无 UObject | `FSimKernel`、`FRngBank` |
 
-规则：`Solstice` 作为名词中缀；**`Sim/` 内不出现 `UObject` 派生**（保持零引擎依赖可测）。
+规则：**`Sim/` 内不出现 `UObject` 派生**（保持零引擎依赖可测）。
+**跨 DLL 可见的公共类型必须标 `SOLSTICE_API`**：`UnrealEditor-Solstice.dll` 与 `UnrealEditor-SolsticeEditor.dll` 是两个 DLL，未标注的符号不会导出，编辑器模块会在链接期报 `LNK2019`（实测踩过两次：`FPaperMaterials`、`FSimKernel`/`FDataLoader`）。
 
 ### 7.2 资产
 
 | 类型 | 前缀 | 示例 |
 |---|---|---|
 | 静态网格 | `SM_` | `SM_PaperRock_A` |
-| 材质 / 实例 | `M_` / `MI_` | `M_Paper_Base` / `MI_Style_Woodcut` |
+| 材质 / 实例 | `M_` / `MI_` | `M_Paper` / `MI_Style_Woodcut` |
 | 贴图 | `T_` | `T_Card_WeatherRain` |
 | Niagara | `NS_` | `NS_Rain_Light` |
 | 控件蓝图 | `WBP_` | `WBP_RealmHud` |
@@ -188,13 +186,13 @@ shared/
 
 ### 7.3 数据与目录
 
-- JSON 文件：小写下划线，`species.json`、`cards.terrain.json`、`styles.paper.json`
+- JSON 文件：小写下划线，`species.json`、`cards.earth.json`、`styles.paper.json`
 - **卡 id**：**唯一真源见 [`../setting/CARDS.md`](../setting/CARDS.md) §11**（示例 `card.water.3.rite.rain`、`card.fire+wood.4.rite.wildfire`；禁物 = `ban`，超环 = `over`）
 - **物种 id**：`sp.<名>` → `sp.moss-grass`
-- **界 id**：`realm.<slug>-<yyyymmdd>` → `realm.valley-20261014`
+- **界 id**：`realm.<slug>-<yyyymmdd>` → `realm.valley-20261016`
 - **风格主题 id**：`style.<名>` → `style.paper-diorama`
 - **预设 id**：`preset.<名>` → `preset.eternal-winter`
-- **C++ 文件**：`Solstice<Xxx>.h/.cpp`，与类名一致；`Sim/` 内允许 `WorldClock.h/.cpp` 形态
+- **C++ 文件**：`Solstice<Xxx>.h/.cpp`，与类名一致
 - **文档 id**：与 `docs/` 下的相对路径一致（`charter/GDD`、`tech/STRUCTURE`…），见 [`../INDEX.md`](../INDEX.md)
 
 > 术语与命名的**语言层**规范（中英对照、文案禁忌）见 [`../setting/WORLD.md`](../setting/WORLD.md) §2。
@@ -205,24 +203,25 @@ shared/
 
 | 我要新增 | 放哪 | 入 git | 状态 |
 |---|---|---|---|
-| 一段游戏逻辑 | `game/Source/Solstice/<对应子目录>/` | ✅ | 🟡 |
-| 新干涉卡 | 数据 `game/Config/Solstice/Data/cards.*.json` + 卡面走 `studio/jobs/` | ✅ / 产物 ❌ | 🟡 |
-| 新物种 | `game/Config/Solstice/Data/species.json` + 几何生成器 `Source/Solstice/Gen/` | ✅ | 🟡 |
-| 新风格主题 | `shared/schema/style.schema.json` 参数 + `studio/presets/style.*.json` + `Content/Styles/<名>/` | 参数 ✅ / 资产 ❌ | 🟡 |
+| 一段游戏逻辑 | `game/Source/Solstice/<对应子目录>/` | ✅ | ✅ |
+| 新干涉卡 | 数据 `game/Config/Solstice/Data/cards.*.json` + 卡面走 `studio/jobs/` | ✅ / 产物 ❌ | ✅ |
+| 新物种 | `game/Config/Solstice/Data/species.json` + 几何生成器 `Source/Solstice/Gen/` | ✅ | ✅ |
+| 新风格主题 | `shared/schema/style.schema.json` 参数（待 M1）+ `studio/presets/style.*.json` + `Content/Styles/<名>/` | 参数 ✅ / 资产 ❌ | 🟡 |
 | 美术素材（贴图 / 立牌 / 卡面） | 源与参数 `studio/`，产物 `Content/` 对应子目录 | 源 ✅ / 产物 ❌ | 🟡 |
-| 新控件 | C++ 优先（`Source/Solstice/UI/`）；可视化打磨放 `Content/UI/` | ✅ / ❌ | 🟡 |
+| 新控件 | C++ 优先（`Source/Solstice/UI/` Slate）；可视化打磨放 `Content/UI/` | ✅ / ❌ | ✅ |
+| 新的无头检查 / 批处理 | `Source/SolsticeEditor/` 增 Commandlet，并在 `tools/` 加同名薄包装脚本 | ✅ | ✅ |
 | 环境或构建脚本 | `tools/` | ✅ | ✅ |
 | 设计文档 | `docs/`（先读 [`../INDEX.md`](../INDEX.md) 的事务域表） | ✅ | ✅ |
-| 存档 / 日志 / 缓存 | `Saved/`、`D:\UE-DDC` | ❌ | 🟡 |
+| 存档 / 日志 / 缓存 | `Saved/`、`D:\UE-DDC` | ❌ | ✅ |
 | 临时试验 | `studio/work/`（已忽略）或仓库根 `tmp/`（已忽略） | ❌ | ✅ |
 
 ---
 
 ## 9 git 与双机同步
 
-**入 git**：`game/Source`、`game/Config`、`game/*.uproject`、`game/*.Target.cs`、`shared/`、`studio/{workflows,jobs,refs,presets,scripts,README.md}`、`studio/out/manifest.jsonl`、`tools/`、`docs/`、`.vscode/`、`.codebuddy/`。
+**入 git**：`game/Source`、`game/Config`、`game/Solstice.uproject`、`game/Content/README.md` 与 `.gitkeep`、`shared/`、`studio/{workflows,jobs,presets,tools,README.md}`、`studio/out/manifest.jsonl`、`tools/`、`docs/`、`.vscode/`、`.codebuddy/`。
 
-**不入 git**：`game/{Binaries,Intermediate,Saved,DerivedDataCache}`、`game/Content/**` 的二进制、`studio/out/**`（除 manifest）、`studio/work/**`、`.vs/`、`*.sln`、`tmp/`。
+**不入 git**：`game/{Binaries,Intermediate,Saved,DerivedDataCache}`、`game/Content/**` 的二进制（含生成的 `M_Paper.uasset` / `M_Ink.uasset`）、`studio/out/**`（除 manifest）、`studio/work/**`、`.vs/`、`*.sln`、`tmp/`。
 
 **双机一致性的保证**：Content 不入 git ⇒ 两台机器用**同一套"种子 + 生成器 + 契约 + manifest"**独立重建。因此：
 1. 生成器与契约的改动必须与产物**同一次提交**；
@@ -233,13 +232,14 @@ shared/
 
 ---
 
-## 10 由本文带来的待办（随 M0 建立）
+## 10 由本文带来的待办
 
-1. **重建 `studio/`**：目录骨架 + README + 工作流与 job 占位（`.gitignore` 里 `studio/out`、`studio/work` 的规则仍然有效）。
-2. **重建 `shared/schema/`**：5 个 schema 占位。
-3. **`game/` 工程骨架**：`.uproject` + 三个 Target + 主模块（对应 [`../plan/ROADMAP.md`](../plan/ROADMAP.md) §5 的 P3）。
-4. `tools/` 脚本按新结构复核：`gen-projectfiles.ps1`、`build.ps1`、`launch-editor.ps1` 已按 `Solstice` 命名，**无需改名**；新增 headless 基准脚本入口。
-5. **落地后回来改状态列**：§0 / §1 / §2 / §4 / §5 / §8 的 🟡 改为 ✅。
+1. ~~重建 `studio/`~~ ✅ 已落地（工作流 / jobs / 预设 / 驱动脚本）。
+2. ~~重建 `shared/schema/`~~ ✅ 已落地 3 个；`style` 与 `save` 待 M1。
+3. ~~`game/` 工程骨架~~ ✅ 已落地（`.uproject` + 2 个 Target + 2 个模块，编译并运行通过）。
+4. ~~`tools/` 新增 headless 基准脚本入口~~ ✅ `tools/bench.ps1`；另加 `tools/gen-assets.ps1`。
+5. ~~落地后回来改状态列~~ ✅ 本文 v3.0 已改。
+6. **待 M1**：`studio/refs/`（风格锚图）、`shared/schema/{style,save}.schema.json`、独立零依赖 Sim 模块。
 
 ---
 
@@ -250,6 +250,7 @@ shared/
 | 新增 / 移动目录、改命名 | 本文件对应章节（含 §8 归位表）+ `.gitignore` 注释 + [`../INDEX.md`](../INDEX.md) |
 | 目录从"计划"变为"现状" | 本文件所有 🟡 状态列 + 相关文档的存在性描述 |
 | 入 git 策略变化 | 本文件 §9 + [`../ops/SYNC.md`](../ops/SYNC.md) §3 / §4 |
+| 模块 / Target / Commandlet 增删 | 本文件 §2 / §3 + [`../ops/ENV.md`](../ops/ENV.md) §2.6 |
 | 命名规范变化 | 本文件 §7 + [`../setting/WORLD.md`](../setting/WORLD.md) §2（如涉及文案用词） |
 
 ---
@@ -264,3 +265,4 @@ shared/
 | 2.2 | 2026-10-14 | 版本号对齐（内容无变更记录） |
 | 2.3 | 2026-10-15 | `card.schema.json` 注记去「类别」（第 42 轮：类别维度删除） |
 | 2.4 | 2026-10-15 | `card.schema.json` 注记「卡型」改「持续性」（第 43 轮） |
+| 3.0 | 2026-10-16 | M0 落地：`game/` `studio/` `shared/` 转 ✅；`Source/` 结构按实测修正（`.Target.cs` 在 `Source/` 下）；`SolsticeSim` 模块与目标取消，无头回归改 `SolsticeBench` Commandlet；补 `SOLSTICE_API` 跨 DLL 导出规则与 `LoadingPhase: Default` 的成因 |

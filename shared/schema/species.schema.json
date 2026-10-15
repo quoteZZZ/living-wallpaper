@@ -1,0 +1,76 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"$id": "https://solstice.local/schema/species.schema.json",
+	"title": "Solstice species contract",
+	"description": "Species template fields. Truth: docs/setting/SPECIES.md SS1 (fields) and SS2.1 (M0 initial values). Read at runtime from game/Config/Solstice/Data/species.json. Every size is metres; every rate is per world hour unless the key says otherwise.",
+	"type": "object",
+	"required": ["species"],
+	"properties": {
+		"_comment": { "type": "string" },
+		"_note": { "type": "string" },
+		"species": {
+			"type": "array",
+			"items": { "$ref": "#/definitions/species" }
+		}
+	},
+	"definitions": {
+		"biText": {
+			"type": "object",
+			"properties": {
+				"zh": { "type": "string" },
+				"en": { "type": "string" }
+			},
+			"additionalProperties": false
+		},
+		"species": {
+			"type": "object",
+			"required": ["id", "name", "kind", "role"],
+			"properties": {
+				"id": {
+					"type": "string",
+					"pattern": "^sp\\.[a-z-]+$",
+					"description": "sp.<name>, e.g. sp.moss-grass"
+				},
+				"name": { "$ref": "#/definitions/biText" },
+				"kind": {
+					"type": "string",
+					"enum": ["moss-grass", "shrub", "grazer", "raptor", "stream-fish"],
+					"description": "The M0 species set. Must match ESpeciesKind in SolsticeTypes.h."
+				},
+				"role": {
+					"type": "integer",
+					"minimum": 0,
+					"maximum": 2,
+					"description": "0 cover producer, 1 standing producer, 2 consumer."
+				},
+				"height_m": { "type": "number", "minimum": 0, "description": "Body height in metres (1 tile = 1 m)." },
+				"length_m": { "type": "number", "minimum": 0, "description": "Body or wingspan length in metres." },
+				"lifespan_days": { "type": "number", "minimum": 0, "description": "In world days." },
+				"maturity_days": { "type": "number", "minimum": 0 },
+				"energy_max": { "type": "number", "minimum": 0 },
+				"energy_drain_per_hour": { "type": "number", "minimum": 0, "description": "Energy spent per world hour." },
+				"eat_vegetation_per_hour": { "type": "number", "minimum": 0, "description": "Vegetation eaten per world hour." },
+				"breed_energy_fraction": { "type": "number", "minimum": 0, "maximum": 1 },
+				"breed_vegetation": { "type": "number", "minimum": 0, "maximum": 1, "description": "Vegetation on the tile required to breed." },
+				"breed_cost_energy": { "type": "number", "minimum": 0 },
+				"move_cells_per_hour": { "type": "number", "minimum": 0, "description": "Tiles per world hour; consumers never path globally." },
+				"temp_min_c": { "type": "number" },
+				"temp_max_c": { "type": "number" },
+				"water_reach_cells": { "type": "number", "minimum": 0, "description": "Distance the species will travel to drink." },
+				"predation_success": { "type": "number", "minimum": 0, "maximum": 1 },
+				"starvation_days": { "type": "number", "minimum": 0, "description": "Days at zero energy before starving." },
+				"growth_per_hour": { "type": "number", "minimum": 0, "description": "Vegetation added per world hour (cover producers)." },
+				"fertility_cost_per_hour": { "type": "number", "minimum": 0 },
+				"carry_capacity_per_tile": { "type": "integer", "minimum": 1 },
+				"aquatic": { "type": "boolean", "default": false },
+				"flying": { "type": "boolean", "default": false },
+				"cover": {
+					"type": "boolean",
+					"default": false,
+					"description": "True for moss-grass: it is a coverage layer expressed through the tile's vegetation field, not a placed individual."
+				}
+			},
+			"additionalProperties": false
+		}
+	}
+}

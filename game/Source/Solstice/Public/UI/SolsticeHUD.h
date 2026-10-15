@@ -1,0 +1,50 @@
+// Solstice - UI layer: the Slate HUD.
+//
+// Plain C++ Slate, no UMG assets, no blueprint: the HUD has to rebuild itself from nothing on a
+// fresh checkout like everything else. Every number on screen is an attribute lambda, so the
+// panel repaints from the kernel each frame and language switching is instant.
+//
+// Only buttons hit-test. Panels and text are HitTestInvisible on purpose, so a left click that
+// is not on a button still lands on the paper.
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "Widgets/SCompoundWidget.h"
+
+class ASolsticePlayerController;
+class USolsticeGameInstance;
+namespace Solstice { class FSimKernel; }
+
+class SSolsticeHUD : public SCompoundWidget
+{
+public:
+	SLATE_BEGIN_ARGS(SSolsticeHUD) {}
+		SLATE_ARGUMENT(TWeakObjectPtr<ASolsticePlayerController>, Controller)
+	SLATE_END_ARGS()
+
+	void Construct(const FArguments& InArgs);
+
+	virtual bool SupportsKeyboardFocus() const override { return false; }
+	virtual FVector2D ComputeDesiredSize(float LayoutScaleMultiplier) const override;
+
+private:
+	ASolsticePlayerController* PC() const { return Controller.Get(); }
+	USolsticeGameInstance* GI() const;
+	Solstice::FSimKernel* Sim() const;
+
+	TSharedRef<SWidget> BuildClockPanel();
+	TSharedRef<SWidget> BuildRealmPanel();
+	TSharedRef<SWidget> BuildEchoPanel();
+	TSharedRef<SWidget> BuildStatusLine();
+	TSharedRef<SWidget> BuildHandBar();
+	TSharedRef<SWidget> BuildActionBar();
+	TSharedRef<SWidget> BuildHelpPanel();
+	TSharedRef<SWidget> BuildPackPanel();
+	TSharedRef<SWidget> BuildChroniclePanel();
+	TSharedRef<SWidget> BuildPoolPanel();
+	TSharedRef<SWidget> BuildCreatorPanel();
+	TSharedRef<SWidget> CardChip(int32 Slot);
+
+	TWeakObjectPtr<ASolsticePlayerController> Controller;
+};

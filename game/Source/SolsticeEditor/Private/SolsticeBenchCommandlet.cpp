@@ -1,0 +1,216 @@
+// Solstice - editor module: the headless M0 regression.
+//
+// Determinism is the one thing the whole architecture rests on and the one thing that is
+// invisible in a screenshot, so it gets its own commandlet. Same seed, same tick count, twice -
+// if the two digests differ, something in Sim/ has picked up a dependency on wall time, on
+// iteration order or on a shared RNG stream, and every save file from here on is suspect.
+
+#include "SolsticeEditor.h"
+
+#include "Core/SolsticeDataLoader.h"
+#include "Sim/SolsticeKernel.h"
+#include "Solstice.h"
+
+namespace
+{
+	/**
+	 * FNV-1a 64 over a quantised structural summary of a realm.
+	 *
+	 * Floats are quantised to 1e-5 before hashing: a divergence we care about is a different
+	 * world, not a different rounding of the same world, and hashing raw float bits would make
+	 * the digest depend on the optimiser.
+	 */
+	struct FRealmDigest
+	{
+		uint64 Hash = 1469598103934665603ULL;
+		int32 Mixed = 0;
+
+		void Mix(uint64 Value)
+		{
+			Hash ^= Value;
+			Hash *= 1099511628211ULL;
+			++Mixed;
+		}
+
+		void MixFloat(float Value)
+		{
+			const int64 Quantised = static_cast<int64>(FMath::RoundToDouble(static_cast<double>(Value) * 100000.0));
+			Mix(static_cast<uint64>(Quantised));
+		}
+	};
+
+	struct FBenchRun
+	{
+		FRealmDigest Digest;
+		int64 WorldMinutes = 0;
+		int32 PopulationTotal = 0;
+		int32 PopulationByKind[static_cast<int32>(Solstice::ESpeciesKind::Count)] = {};
+		int32 Individuals = 0;
+		int32 ChronicleEntries = 0;
+		int32 DeathMarks = 0;
+		float PaintedFraction = 0.0f;
+		int32 Echo = 0;
+		double Seconds = 0.0;
+	};
+
+	/** One full headless run. Nothing outside Sim/ is touched. */
+	FBenchRun RunOnce(const Solstice::FWorldConfig& Config, const Solstice::FCatalog& Catalog, int64 WorldMinutes)
+	{
+		FBenchRun Run;
+
+		Solstice::FSimKernel Kernel;
+		Kernel.Initialize(Config, Catalog);
+
+		// Virtual time, speed index 2 = the 4x preset. Derive the real-seconds-per-world-minute
+		// from the kernel itself rather than hard-coding it, so this keeps working if the pace
+		// tuning (docs/setting/SPECIES.md SS2.1) ever moves.
+		Kernel.SetTimeMode(Solstice::ETimeMode::Virtual);
+		Kernel.SetSpeedIndex(2);
+		Kernel.SetPaused(false);
+
+		const double MinutesPerWorldDay = FMath::Max(0.5, static_cast<double>(Kernel.GetRealMinutesPerWorldDay()));
+		const double Multipliers[4] = { 0.0, 1.0, 4.0, 20.0 };
+		const double WorldMinutesPerRealSecond = (1440.0 / MinutesPerWorldDay / 60.0) * Multipliers[Kernel.GetSpeedIndex()];
+		const double SecondsPerWorldMinute = (WorldMinutesPerRealSecond > 0.0) ? (1.0 / WorldMinutesPerRealSecond) : 0.25;
+
+		const double StartSeconds = FPlatformTime::Seconds();
+		for (int64 Minute = 0; Minute < WorldMinutes; ++Minute)
+		{
+			Kernel.Advance(SecondsPerWorldMinute);
+		}
+		Run.Seconds = FPlatformTime::Seconds() - StartSeconds;
+
+		// ---- digest, in ascending index order (never a TMap, never a pointer) ----
+		Run.Digest.Mix(Config.Seed);
+		Run.Digest.Mix(static_cast<uint64>(Config.Size));
+		Run.Digest.Mix(static_cast<uint64>(Config.Algo));
+
+		for (const Solstice::FTile& Tile : Kernel.GetTiles())
+		{
+			Run.Digest.MixFloat(Tile.Height);
+			Run.Digest.MixFloat(Tile.Vegetation);
+			Run.Digest.MixFloat(Tile.Moisture);
+			Run.Digest.MixFloat(Tile.Fertility);
+			Run.Digest.MixFloat(Tile.Painted);
+			Run.Digest.MixFloat(Tile.Ash);
+			Run.Digest.Mix(Tile.Mat);
+			Run.Digest.Mix(Tile.Biome);
+			Run.Digest.Mix(Tile.WaterBody);
+		}
+
+		for (int32 Kind = 0; Kind < static_cast<int32>(Solstice::ESpeciesKind::Count); ++Kind)
+		{
+			Run.PopulationByKind[Kind] = Kernel.GetPopulation(static_cast<Solstice::ESpeciesKind>(Kind));
+			Run.Digest.Mix(static_cast<uint64>(Run.PopulationByKind[Kind]));
+		}
+
+		Run.WorldMinutes = Kernel.GetWorldMinute();
+		Run.PopulationTotal = Kernel.GetPopulationTotal();
+		Run.Individuals = Kernel.GetIndividualCount();
+		Run.ChronicleEntries = Kernel.GetChronicle().Num();
+		Run.DeathMarks = Kernel.GetDeathMarks().Num();
+		Run.PaintedFraction = Kernel.GetPaintedFraction();
+		Run.Echo = Kernel.GetEcho();
+
+		Run.Digest.Mix(static_cast<uint64>(Run.WorldMinutes));
+		Run.Digest.Mix(static_cast<uint64>(Run.PopulationTotal));
+		Run.Digest.Mix(static_cast<uint64>(Run.Individuals));
+		Run.Digest.Mix(static_cast<uint64>(Run.ChronicleEntries));
+		Run.Digest.Mix(static_cast<uint64>(Run.Echo));
+		Run.Digest.MixFloat(Run.PaintedFraction);
+		Run.Digest.MixFloat(Kernel.GetVegetationMean());
+		Run.Digest.MixFloat(Kernel.GetFertilityMean());
+		Run.Digest.MixFloat(Kernel.GetDiversityIndex());
+
+		return Run;
+	}
+}
+
+USolsticeBenchCommandlet::USolsticeBenchCommandlet()
+{
+	IsClient = false;
+	IsServer = false;
+	IsEditor = true;
+	LogToConsole = true;
+	ShowErrorCount = true;
+}
+
+int32 USolsticeBenchCommandlet::Main(const FString& Params)
+{
+	Solstice::FLoadedContent Content;
+	if (!Solstice::FDataLoader::LoadAll(Content) || Content.Catalog.Cards.Num() == 0)
+	{
+		UE_LOG(LogSolstice, Error, TEXT("bench: content did not load; cannot run"));
+		return 1;
+	}
+
+	int32 Days = 1;
+	int32 SizeOverride = 0;
+	int32 SeedOverride = 0;
+	int32 Life = 1;
+	FParse::Value(*Params, TEXT("Days="), Days);
+	FParse::Value(*Params, TEXT("Size="), SizeOverride);
+	FParse::Value(*Params, TEXT("Seed="), SeedOverride);
+	FParse::Value(*Params, TEXT("Life="), Life);
+
+	Solstice::FWorldConfig Config = Content.DefaultWorld;
+	if (SizeOverride > 0)
+	{
+		Config.Size = SizeOverride;
+		Config.ChunkSize = FMath::Max(8, SizeOverride / 2);
+	}
+	if (SeedOverride > 0)
+	{
+		Config.Seed = static_cast<uint32>(SeedOverride);
+	}
+
+	// Seed life by default. The default preset is deliberately a bare chaos start ("no life,
+	// uncoloured paper"), but a regression that never spawns a creature would pass a digest
+	// comparison while proving nothing about the ecology - and the ecology is the game. Pass
+	// -Life=0 to bench the untouched chaos start instead.
+	Config.bWithLifeSeed = (Life != 0);
+
+	const int64 WorldMinutes = FMath::Max<int64>(1, static_cast<int64>(Days) * 1440);
+	const int32 Tiles = Config.Size * Config.Size;
+
+	UE_LOG(LogSolstice, Display, TEXT("bench: realm %d x %d (%d tiles), seed %u, %lld world minutes, life_seed=%d, 2 runs"),
+		Config.Size, Config.Size, Tiles, Config.Seed, WorldMinutes, Config.bWithLifeSeed ? 1 : 0);
+
+	const FBenchRun A = RunOnce(Config, Content.Catalog, WorldMinutes);
+	const FBenchRun B = RunOnce(Config, Content.Catalog, WorldMinutes);
+
+	const double PerSecond = (A.Seconds > 0.0) ? (static_cast<double>(A.WorldMinutes) / A.Seconds) : 0.0;
+
+	UE_LOG(LogSolstice, Display,
+		TEXT("bench: run A %lld world minutes in %.2fs (%.0f world-min/s), population %d, individuals %d, chronicle %d, deaths %d, painted %.1f%%, echo %d"),
+		A.WorldMinutes, A.Seconds, PerSecond, A.PopulationTotal, A.Individuals,
+		A.ChronicleEntries, A.DeathMarks, A.PaintedFraction * 100.0f, A.Echo);
+	UE_LOG(LogSolstice, Display,
+		TEXT("bench: run B %lld world minutes in %.2fs, population %d, individuals %d, chronicle %d, deaths %d, painted %.1f%%, echo %d"),
+		B.WorldMinutes, B.Seconds, B.PopulationTotal, B.Individuals,
+		B.ChronicleEntries, B.DeathMarks, B.PaintedFraction * 100.0f, B.Echo);
+	UE_LOG(LogSolstice, Display,
+		TEXT("bench: species A moss %d, shrub %d, grazer %d, raptor %d, fish %d"),
+		A.PopulationByKind[0], A.PopulationByKind[1], A.PopulationByKind[2], A.PopulationByKind[3], A.PopulationByKind[4]);
+	UE_LOG(LogSolstice, Display, TEXT("bench: digest A %016llX (%d mixed) / digest B %016llX (%d mixed)"),
+		A.Digest.Hash, A.Digest.Mixed, B.Digest.Hash, B.Digest.Mixed);
+
+	if (A.Digest.Hash != B.Digest.Hash)
+	{
+		UE_LOG(LogSolstice, Error, TEXT("bench: NON-DETERMINISTIC - the two runs diverged"));
+		return 1;
+	}
+
+	// A digest match on a realm where nothing happened would be a vacuous pass, so require the
+	// run to have actually produced a world.
+	if (A.PopulationTotal <= 0 || A.ChronicleEntries <= 0)
+	{
+		UE_LOG(LogSolstice, Error,
+			TEXT("bench: INERT - %lld minutes produced population %d / chronicle %d, so the digest proves nothing"),
+			A.WorldMinutes, A.PopulationTotal, A.ChronicleEntries);
+		return 1;
+	}
+
+	UE_LOG(LogSolstice, Display, TEXT("bench: ok - deterministic and alive"));
+	return 0;
+}

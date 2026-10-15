@@ -1,0 +1,100 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"$id": "https://solstice.local/schema/card.schema.json",
+	"title": "Solstice card contract",
+	"description": "One card = one coordinate: element (7) x tier (0-9, over, ban) x class (3). Truth: docs/setting/CARDS.md SS5-SS7 and docs/setting/CARD-LIST.md SS1. Read at runtime from game/Config/Solstice/Data/cards.*.json.",
+	"type": "object",
+	"required": ["cards"],
+	"properties": {
+		"_comment": { "type": "string" },
+		"_note": { "type": "string" },
+		"element": {
+			"description": "The branch this file carries. Not used at runtime; the per-card field wins.",
+			"$ref": "#/definitions/element"
+		},
+		"cards": {
+			"type": "array",
+			"items": { "$ref": "#/definitions/card" }
+		}
+	},
+	"definitions": {
+		"element": {
+			"type": "string",
+			"enum": ["metal", "wood", "water", "fire", "earth", "light", "dark"],
+			"description": "Seven primal elements, a fixed set (docs/setting/WORLD.md SS1.2)."
+		},
+		"biText": {
+			"description": "Chinese and English travel together; a missing side falls back to the other.",
+			"type": "object",
+			"properties": {
+				"zh": { "type": "string" },
+				"en": { "type": "string" }
+			},
+			"additionalProperties": false
+		},
+		"tier": {
+			"description": "0-9 regular, \"over\" for the over-tier, \"ban\" for the forbidden tier.",
+			"oneOf": [
+				{ "type": "integer", "minimum": 0, "maximum": 9 },
+				{ "type": "string", "enum": ["over", "ban"] }
+			]
+		},
+		"card": {
+			"type": "object",
+			"required": ["id", "name", "element", "tier", "class", "duration", "direction", "scope", "effect"],
+			"properties": {
+				"id": {
+					"type": "string",
+					"pattern": "^card\\.[a-z]+\\.[0-9a-z-]+\\.[a-z]+\\.[a-z0-9-]+$",
+					"description": "card.<element>.<tier>.<class>.<name>, e.g. card.earth.2.matter.hill"
+				},
+				"name": { "$ref": "#/definitions/biText" },
+				"desc": { "$ref": "#/definitions/biText" },
+				"element": { "$ref": "#/definitions/element" },
+				"element_aux": {
+					"description": "Second tag for multi-element cards. Optional in M0.",
+					"$ref": "#/definitions/element"
+				},
+				"tier": { "$ref": "#/definitions/tier" },
+				"class": {
+					"description": "What the card is in the world (docs/setting/CARDS.md SS4).",
+					"type": "string",
+					"enum": ["matter", "rite", "law"]
+				},
+				"duration": {
+					"description": "Persistence (docs/setting/CARDS.md SS6).",
+					"type": "string",
+					"enum": ["instant", "sustain", "permanent", "trigger"]
+				},
+				"direction": {
+					"type": "string",
+					"enum": ["create", "remove", "transform"]
+				},
+				"scope": {
+					"type": "string",
+					"enum": ["global", "area", "single", "brush"]
+				},
+				"effect": {
+					"description": "The concrete simulated effect the kernel runs (EEffect in SolsticeTypes.h).",
+					"type": "string",
+					"enum": [
+						"raise", "lower", "flatten", "ridge", "paint", "ignite",
+						"heat", "chill", "water", "ore", "seed-life", "record",
+						"erode", "weather", "none"
+					]
+				},
+				"provisional": {
+					"description": "True when the slot exists for playability but its effect / params / animation / visible feedback are not yet authored per card (docs/setting/CARD-LIST.md SS3).",
+					"type": "boolean",
+					"default": false
+				},
+				"params": {
+					"description": "Effect parameters. Keys read by the kernel: radius, peak, delta_temp, water_delta, strength, mat, species, count, humidity, cloud, weather.",
+					"type": "object",
+					"additionalProperties": { "type": ["number", "string"] }
+				}
+			},
+			"additionalProperties": false
+		}
+	}
+}

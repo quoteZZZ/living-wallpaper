@@ -1,0 +1,69 @@
+{
+	"_comment": "Solstice paper-diorama style theme. Aligned with docs/art/ART-STYLE.md SS1-SS3. The batch tool assembles prompts from these fields rather than from hand-written strings, so the look stays consistent across every generated asset.",
+	"id": "paper-diorama",
+	"version": 1,
+	"medium": {
+		"zh": "多层剪纸纸雕微缩模型",
+		"en": "layered cut-paper diorama miniature"
+	},
+	"words": [
+		"handmade paper craft",
+		"visible paper fibres",
+		"torn and cut paper edges",
+		"flat matte surface, no specular highlight",
+		"four hard light bands, cel shaded",
+		"soft ambient occlusion between paper layers",
+		"tilt-shift macro photograph of a tabletop model",
+		"studio tabletop lighting from one direction",
+		"muted desaturated palette",
+		"no text, no watermark, no signature"
+	],
+	"negative": [
+		"3d render",
+		"glossy",
+		"plastic",
+		"metal reflection",
+		"photorealistic",
+		"depth of field blur on the subject",
+		"text",
+		"watermark",
+		"signature",
+		"logo",
+		"low contrast",
+		"blurry"
+	],
+	"subjects": {
+		"paper-texture": {
+			"prompt": "seamless tileable paper texture, unbleached kraft and warm off-white cardstock, faint horizontal grain, tiny fibre flecks, evenly lit, top-down flat scan",
+			"size": [512, 512],
+			"tileable": true,
+			"count": 4
+		},
+		"ground-texture": {
+			"prompt": "seamless tileable cut-paper ground surface, layered contour ribbons like a topographic relief map, thin inked level lines, kraft and moss tones, flat top-down view",
+			"size": [512, 512],
+			"tileable": true,
+			"count": 4
+		},
+		"water-texture": {
+			"prompt": "single sheet of pale blue translucent washi paper laid flat, gentle long wrinkles, no reflections, even light",
+			"size": [512, 512],
+			"tileable": true,
+			"count": 2
+		},
+		"card-face": {
+			"prompt": "front face of a small handmade card, portrait 3:4, thick deckled paper edge, an empty framed panel in the centre reserved for a symbol, tiny corner ornaments, warm ivory",
+			"size": [768, 1024],
+			"tileable": false,
+			"count": 3
+		}
+	},
+	"sizing": {
+		"texture": "512x512, seamless",
+		"card": "768x1024, single face",
+		"ui_icon": "128x128, single object on plain paper"
+	},
+	"license": {
+		"note": "All output must be logged in studio/out/manifest.jsonl for the storefront AI-content disclosure."
+	}
+}

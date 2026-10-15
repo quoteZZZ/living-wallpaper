@@ -7,17 +7,35 @@
 
 ---
 
-## 一、当前状态（2026-10-14）
+## 一、当前状态（2026-10-16）
 
 | 项 | 真实情况 |
 |---|---|
 | 设计 | ✅ **立项已定稿**，细化到规格级 —— 唯一真源 [`docs/charter/GDD.md`](docs/charter/GDD.md) v6.1 |
 | 文档体系 | ✅ 已按"一种事务一份文档"重建，入口：[`docs/INDEX.md`](docs/INDEX.md)（含状态矩阵与更新触发矩阵） |
-| 环境脚本 | ✅ `tools/` 9 个 PowerShell + `tools/README.md` |
+| 环境脚本 | ✅ `tools/` 11 个 PowerShell + `tools/README.md` |
 | IDE 配置 | ✅ `.vscode/` 7 份 + `.clang-format` + `.editorconfig` |
 | 项目数据 | ✅ `.codebuddy/agents/`（3 个子代理）与 `.codebuddy/rules/`（核心约束） |
-| **游戏代码** | ❌ **无** —— `game/` 尚未建立（无 `.uproject`、无 `Source/`），见 [`docs/plan/ROADMAP.md`](docs/plan/ROADMAP.md) §5 的 P3 |
-| **可编译性** | ❌ **当前无法编译** —— 虚幻引擎与 VS2022 C++ 生成工具均未安装 |
+| 工具链 | ✅ **虚幻引擎 5.8.3**（`D:\Epic Games\UE_5.8`）+ **VS2022 生成工具**（`D:\VS2022`）+ 补齐的 `.NET Framework 4.6.2 SDK`。见 [`docs/ops/ENV.md`](docs/ops/ENV.md) §1.3 |
+| **游戏代码** | ✅ **M0 骨架已落地并跑通** —— `game/Solstice.uproject` + 主模块 `Solstice`（Core / Sim / Gen / World / God / UI / Render）+ 编辑器模块 `SolsticeEditor` |
+| **可编译性** | ✅ **两个目标编译通过**：`SolsticeEditor`（编辑器）与 `Solstice`（游戏，无编辑器依赖，产出 `Solstice.exe`） |
+| **内容可重建** | ✅ `tools\gen-assets.ps1` → `-run=SolsticeGenAssets` 由代码生成 `/Game/Core/M_Paper` 与 `M_Ink`（新克隆自愈，二进制不入 git） |
+| **无头回归** | ✅ `tools\bench.ps1` → `-run=SolsticeBench`：同种子跑两遍世界内核比对结构摘要，**实测确定性成立且生态是活的** |
+
+**M0 实测证据**（本机，`LogSolstice` 取自 `-abslog` 落盘日志）：
+
+```text
+realm realm.valley ready: 36 cards from 3 file(s), 5 species, 6 preset(s), ok
+reality anchor: 上海, offline=0, weather_from_net=0
+paper: /Game/Core/M_Paper.M_Paper / /Game/Core/M_Ink.M_Ink -> authored
+realm built: 128x128 tiles in 4 chunk mesh(es); paper mode = authored
+bench: run A 2880 world minutes in 0.50s (5773 world-min/s), population 1157, chronicle 294
+bench: species A moss 0, shrub 4, grazer 1043, raptor 110, fish 0
+bench: digest A 19ABB70199419F90 (147473 mixed) / digest B 19ABB70199419F90 (147473 mixed)
+bench: ok - deterministic and alive
+```
+
+> 也就是说：**这个微缩世界现在能自己生成了**——地形长出来、植被把纸面染上色、放牧者和掠食者建立种群，跑一整个世界日只要 0.25 秒机时。画面还是最简的纸板色块，交互只有 HUD 骨架，但那正是 M0 该有的样子。下一步见 [`docs/plan/ROADMAP.md`](docs/plan/ROADMAP.md)。
 
 ---
 
@@ -25,39 +43,35 @@
 
 1. **读文档**：先 [`docs/INDEX.md`](docs/INDEX.md)（3 分钟看懂现状、状态矩阵与硬规则），再 [`docs/charter/GDD.md`](docs/charter/GDD.md) §0–§3。
 2. **看计划**：[`docs/plan/ROADMAP.md`](docs/plan/ROADMAP.md) §1（三阶段切分）+ §5（P0–P5 执行计划）。
-3. **查环境**：`powershell -ExecutionPolicy Bypass -File tools\check-env.ps1`（只读体检，看清缺什么）。
-
----
-
-## 三、环境补齐（需用户主动执行）
+3. **动手跑**：
 
 ```powershell
-# 只读体检
-powershell -ExecutionPolicy Bypass -File tools\check-env.ps1
-
-# 安装 VS2022 生成工具 + "使用 C++ 的桌面开发"
-#   winget 默认装 C 盘；C 盘紧张时用官方 bootstrapper 指定 --installPath D:\VS2022
-powershell -ExecutionPolicy Bypass -File tools\install-vs-buildtools.ps1
-
-# Epic Games Launcher 已安装（无需再跑 install-epic-launcher.ps1）
-```
-
-**引擎现状**：`D:\Epic Games\UE_5.8` 是 15.67 GB **未登记下载残件**（无 `Engine/`、无 `UnrealEditor.exe`，Launcher 清单为空），**建议删除后重装**到 `D:\Epic Games\`。
-**磁盘结论**：**不需要清理 C 盘**（实测需求约 10–15 GB；`check-env.ps1` 的 120 GB 只是保守阈值）。
-**缓存外置**：设环境变量 `UE-LocalDataCachePath=D:\UE-DDC`。
-
-完整步骤与本机实测见 [`docs/ops/ENV.md`](docs/ops/ENV.md)；前置条件与磁盘结论见 [`docs/plan/ROADMAP.md`](docs/plan/ROADMAP.md) §3。
-
-引擎与生成工具就绪后（**前提是工程骨架已存在**）：
-
-```powershell
-powershell -ExecutionPolicy Bypass -File tools\configure-vscode.ps1   # 写入引擎路径到 .vscode
-powershell -ExecutionPolicy Bypass -File tools\gen-projectfiles.ps1   # 生成 Solstice.sln
-powershell -ExecutionPolicy Bypass -File tools\build.ps1              # 编译
-powershell -ExecutionPolicy Bypass -File tools\launch-editor.ps1      # 启动编辑器
+# 新克隆的最小闭环（前三步缺一不可）
+powershell -ExecutionPolicy Bypass -File tools\find-ue.ps1                  # 引擎在不在
+powershell -ExecutionPolicy Bypass -File tools\gen-projectfiles.ps1         # 生成 Solstice.sln
+powershell -ExecutionPolicy Bypass -File tools\build.ps1                    # 编译（编辑器目标）
+powershell -ExecutionPolicy Bypass -File tools\gen-assets.ps1               # 生成两个纸材质
+powershell -ExecutionPolicy Bypass -File tools\bench.ps1 -Days 2            # 无头确定性回归
+powershell -ExecutionPolicy Bypass -File tools\launch-editor.ps1            # 起编辑器
 ```
 
 VSCode 中 `Ctrl+Shift+B` 运行构建任务，`F5` 用 `cppvsdbg` 调试（配置说明见 [`docs/ops/VSCODE.md`](docs/ops/VSCODE.md)）。
+
+---
+
+## 三、环境（本机已就绪）
+
+| 组件 | 位置 | 说明 |
+|---|---|---|
+| 虚幻引擎 | `D:\Epic Games\UE_5.8` | 5.8.3，含引擎源码 |
+| VS2022 生成工具 | `D:\VS2022` | MSVC 14.44.35207 + Windows SDK 10.0.22621.0 |
+| .NET Framework 4.6.2 SDK | `D:\_toolchain\AutoSDK\…` | `SwarmInterface` 的硬要求；**原本缺失**，补法见 [`docs/ops/ENV.md`](docs/ops/ENV.md) §1.3 |
+| 生图（ComfyUI） | `D:\ComfyUI` | `http://127.0.0.1:8188` |
+| 缓存外置 | `UE-LocalDataCachePath=D:\UE-DDC` | 必须设，否则吃 C 盘 |
+
+**本机编译必须加 `-NoUBA`**（UBA 的文件系统 detour 在本机报 access denied，会把 PCH 编译全部打挂），`tools\build.ps1` 之外的直调方式见 [`docs/ops/ENV.md`](docs/ops/ENV.md) §2.4.1。
+
+**磁盘结论**：**不需要清理 C 盘**（实测需求约 10–15 GB；`check-env.ps1` 的 120 GB 只是保守阈值）。
 
 ---
 
@@ -65,16 +79,17 @@ VSCode 中 `Ctrl+Shift+B` 运行构建任务，`F5` 用 `cppvsdbg` 调试（配�
 
 ```text
 solstice/
+├─ game/        ✅ UE 工程（进发行包）——Source/{Solstice,SolsticeEditor} + Config/Solstice/{Data,Localization}
+│                 └─ Content/ 二进制不入 git，由 tools\gen-assets.ps1 重建
+├─ studio/      ✅ 生图线（ComfyUI 工作流 / jobs / 预设 / 驱动脚本）；产物 out/ 不入 git
+├─ shared/      ✅ JSON 契约（schema/：card · species · world）
+├─ tools/       ✅ 环境 / 工程 / 构建 / 内容生成 / 回归脚本（PowerShell，11 个）
 ├─ docs/        ✅ 文档体系（charter / setting / gameplay / art / tech / plan / ops / archive）→ 入口 docs/INDEX.md
-├─ tools/       ✅ 环境与构建脚本（PowerShell）
 ├─ .vscode/     ✅ 构建任务 / 调试 / cpptools / 代码片段
-├─ .codebuddy/  ✅ agents/ 与 rules/（项目数据，勿删）
-├─ game/        🟡 计划中 —— UE 工程（进发行包）
-├─ studio/      🟡 计划中 —— 生图线与资产产物
-└─ shared/      🟡 计划中 —— JSON 契约
+└─ .codebuddy/  ✅ agents/ 与 rules/（项目数据，勿删）
 ```
 
-> 🟡 = **尚未落地**，不要按存在去写代码或脚本。定义与状态列见 [`docs/tech/STRUCTURE.md`](docs/tech/STRUCTURE.md) §0。
+> 定义与状态列见 [`docs/tech/STRUCTURE.md`](docs/tech/STRUCTURE.md) §0（含"新增东西放哪"的归位决策表）。
 
 ---
 

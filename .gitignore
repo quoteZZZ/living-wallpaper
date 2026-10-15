@@ -82,9 +82,14 @@ game/Content/**/*.mp4
 studio/out/**
 !studio/out/.gitkeep
 !studio/out/manifest.jsonl
+# git 无法「重新包含」一个父目录已被排除的文件，所以必须先放行子目录本身，
+# 再放行里面的 .gitkeep。少了 `!studio/out/**/` 这一行，cards/ cutouts/ textures/
+# 三个 .gitkeep 会被静默忽略，空目录骨架就进不了库。
+!studio/out/**/
 !studio/out/**/.gitkeep
 studio/work/**
 !studio/work/.gitkeep
+!studio/work/**/
 !studio/work/**/.gitkeep
 studio/**/__pycache__/
 studio/**/*.pyc

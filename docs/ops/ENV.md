@@ -1,8 +1,8 @@
 ---
 id: ops/ENV
 title: 开发环境搭建
-version: 1.2
-date: 2026-10-14
+version: 2.0
+date: 2026-10-16
 status: active
 truth: nav
 owner: both
@@ -12,11 +12,12 @@ owner: both
 
 > 本文件只描述**环境与工具链**（装什么、装在哪、实测结果），不重复设计规格；规格真源见 [`../charter/GDD.md`](../charter/GDD.md)，前置条件与磁盘结论见 [`../plan/ROADMAP.md`](../plan/ROADMAP.md) §3。
 >
-> **本机已核实事实**：Windows / PowerShell（用户 `Administrator`）· `winget` 可用 · Python 3.12.10 ·
-> GPU NVIDIA RTX 5060 8GB（Blackwell sm_120，驱动 610.74）· D 盘剩余约 370GB ·
+> **本机已核实事实**：Windows 11 (25H2) / PowerShell（用户 `Administrator`）· `winget` 可用 · Python 3.12.10 ·
+> CPU Intel i5-12600KF（10 物理核 / 16 逻辑核）· 内存 32GB · GPU NVIDIA RTX 5060 8GB（Blackwell sm_120，驱动 610.74）· D 盘剩余约 370GB ·
 > 本地生图 ComfyUI 便携版在 `D:\ComfyUI`（torch 2.14.0+cu130，已支持 sm_120）。
 >
-> **安装现状**（2026-10-14 实测）：**Epic Games Launcher ✅ 已安装**；**虚幻引擎 ❌ 未安装**（`D:\Epic Games\UE_5.8` 是 15.67 GB 未登记下载残件，需清除后重装）；**VS2022 C++ 生成工具 ❌ 未安装**。
+> **安装现状**（2026-10-16 实测）：**Epic Games Launcher ✅**；**虚幻引擎 ✅ 5.8.3**（`D:\Epic Games\UE_5.8`，已登记，`UnrealEditor.exe` 与全套引擎源码就位）；**VS2022 生成工具 ✅**（`D:\VS2022`，MSVC 14.44.35207 + Windows SDK 10.0.22621.0）；**.NET Framework 4.6.2 SDK ✅**（原本缺失，已从官方 VS 渠道清单提取并部署到 `D:\_toolchain\AutoSDK\…`，见 §1.3）。
+> **M0 两个目标均已编译通过并实测运行**（`SolsticeEditor` / `Solstice`）。编译时**必须加 `-NoUBA`**，见 §2.4。
 
 ---
 
@@ -26,29 +27,54 @@ owner: both
 |---|---|---|---|---|---|
 | 1 | `tools\install-epic-launcher.ps1` | ~1GB | 几分钟 | 用户执行脚本 | ✅ **已完成，无需再跑** |
 | 2 | 打开 Launcher **登录 Epic 账号** | — | 几分钟 | **必须人工**（不可脚本化） | ✅ 已登录 |
-| 3 | Launcher 内安装**虚幻引擎最新稳定版**（建议 `D:\Epic Games\UE_5.x`） | 30–60GB | 30–90 分钟 | **必须 GUI** | ❌ 待做（先清残件） |
-| 4 | `tools\install-vs-buildtools.ps1`（VS2022 生成工具 + C++ 负载） | 15–20GB | 20–60 分钟 | **用户执行脚本** | ❌ 待做 |
-| 5 | `tools\check-env.ps1` 复检 | — | 秒级 | AI / 用户 | — |
-| 6 | `tools\configure-vscode.ps1` 写入引擎路径 | — | 秒级 | AI / 用户 | — |
-| 7 | `tools\gen-projectfiles.ps1` 生成工程文件 | — | 1–3 分钟 | AI / 用户 | — |
-| 8 | VSCode 打开 `.vscode\solstice.code-workspace` | — | — | 用户 | — |
+| 3 | Launcher 内安装**虚幻引擎**（实际落在 `D:\Epic Games\UE_5.8`） | 30–60GB | 30–90 分钟 | **必须 GUI** | ✅ **5.8.3 已装** |
+| 4 | `tools\install-vs-buildtools.ps1`（VS2022 生成工具 + C++ 负载，实际在 `D:\VS2022`） | 15–20GB | 20–60 分钟 | **用户执行脚本** | ✅ **已装**（MSVC 14.44.35207 + SDK 10.0.22621.0） |
+| 4b | **.NET Framework 4.6.2 SDK**（`SwarmInterface.Build.cs` 硬要求） | ~5MB | 秒级 | AI（见 §1.3） | ✅ **已补齐** |
+| 5 | `tools\check-env.ps1` 复检 | — | 秒级 | AI / 用户 | ✅ |
+| 6 | `tools\configure-vscode.ps1` 写入引擎路径 | — | 秒级 | AI / 用户 | ✅ |
+| 7 | `tools\gen-projectfiles.ps1` 生成工程文件 | — | 1–3 分钟 | AI / 用户 | ✅ |
+| 8 | `tools\build.ps1` 编译 | — | 1–10 分钟 | AI / 用户 | ✅ 两个目标均通过 |
+| 9 | `tools\gen-assets.ps1` 生成内容（新克隆必跑） | — | 约 10 秒 | AI / 用户 | ✅ |
+| 10 | `tools\bench.ps1` 无头确定性回归 | — | 约 10 秒 | AI / 用户 | ✅ |
+| 11 | VSCode 打开 `.vscode\solstice.code-workspace` | — | — | 用户 | — |
 
-### 1.1 本机实测（`tools\check-env.ps1`，2026-10-13 首测 / 2026-10-14 复核）
+### 1.1 本机实测（`tools\check-env.ps1`，2026-10-13 首测 / 2026-10-14 复核 / 2026-10-16 工具链复核）
 
 | 项 | 状态 | 实测值 |
 |---|---|---|
 | winget | ✅ | v1.29.380 |
 | Git | ✅ | 2.53.0.windows.1 |
 | Python | ✅ | 3.12.10 |
+| CPU / 内存 | ✅ | i5-12600KF（10 物理核 / 16 逻辑核）/ 31.84 GB |
 | GPU（NVIDIA） | ✅ | RTX 5060，8151 MiB，驱动 610.74 |
-| 磁盘 D: | ✅ | 剩余 354.3 GB —— **不需要清理 C 盘** |
+| 磁盘 D: | ✅ | 剩余充足 —— **不需要清理 C 盘** |
 | 磁盘 C: | ⚠ | 剩余 77.4 GB；实际需求约 10–15 GB（`check-env.ps1` 的 120 GB 是保守阈值） |
 | ComfyUI | ✅ | `D:\ComfyUI` 就绪，FLUX.2 Klein 4B FP8 已装 |
 | Epic Games Launcher | ✅ | 已安装 |
-| 虚幻引擎 UE5 | ❌ | 未找到 `UnrealEditor.exe`；`D:\Epic Games\UE_5.8` 是 15.67 GB **未登记残件**（只有 `.egstore`，无 `Engine/`、无 `Manifests`），需清除重装 |
-| VS2022 生成工具（C++） | ❌ | 未找到 `vswhere.exe` |
+| 虚幻引擎 UE5 | ✅ | **5.8.3**（CL 58210709），`D:\Epic Games\UE_5.8`，`UnrealEditor.exe` 就位 |
+| VS2022 生成工具（C++） | ✅ | `D:\VS2022`，MSVC 14.44.35207 + Windows SDK 10.0.22621.0 |
+| .NET Framework 4.6.2 SDK | ✅ | 见 §1.3（原本缺失，是 UBT 的唯一硬阻塞） |
+| 平台 SDK（引擎侧） | ⚠ | 仅 Win64 有效；`-Mode=ValidatePlatforms` 报 Mac / IOS / Android / Linux / TVOS / VisionOS 缺失——**M0 只发行 Windows，可忽略** |
 
 **磁盘预算**：UE(60GB) + VS(20GB) + 工程 `Intermediate`/`DerivedDataCache`(20–40GB) ≈ **100–120GB**；D 盘充足。
+
+### 1.3 `.NET Framework 4.6.2 SDK`（**必须补，否则编不过**）
+
+`SwarmInterface.Build.cs` 无条件要求 `NetFxSdkDir`，它会去找 `Include/um/metahost.h` 与 `Lib/um/x64/mscoree.lib`。
+本机原本**三处都没有**（`Program Files (x86)`、`Program Files`、`D:\VS2022`），注册表 `HKLM\SOFTWARE\Microsoft\Microsoft SDKs\NETFXSDK` 也不存在 —— 于是 UBT 直接抛
+`Unable to instantiate module 'SwarmInterface': Could not find NetFxSDK install dir`。**这和 C++ 工作负载装没装无关。**
+
+补法（无需管理员、无需重装 VS）：
+
+1. 从**本机已有的 VS 渠道清单**取下载地址：`C:\ProgramData\Microsoft\VisualStudio\Packages\_Instances\<id>\catalog.json`（一万九千余条，含每个包的 URL 与 SHA256）。
+2. 取 `Microsoft.Net.Component.4.6.2.SDK` → 其 chained 包 `Microsoft.Net.4.6.2.SDK`（一个 `.msi` + 一个 `.cab`），**校验大小与 SHA256 与清单逐字节一致**。
+3. `msiexec /a` 解包到 `D:\_toolchain\netfx\extract`，把 `NETFXSDK/4.6.2` 部署到 `D:\_toolchain\AutoSDK\HostWin64\Win64\Windows Kits\NETFXSDK\4.6.2`。
+4. 注册 `KitsInstallationFolder` 指向它 —— 写 `HKLM:\SOFTWARE\WOW6432Node\Microsoft\Microsoft SDKs\NETFXSDK\4.6.2`（另加 `HKCU` 一份更保险）。
+   `MicrosoftPlatformSDK.TryReadDirRegistryKey`（`MicrosoftPlatformSDK.cs:477`）**只读字符串、不校验目录是否存在**，所以只要能读出路径即可。
+
+> 也可让 `MicrosoftPlatformSDK` 走 `UE_SDKS_ROOT` 分支（`AutoSDK\Host<Platform>\Win64\Windows Kits\NETFXSDK\<ver>`）——两种方式本机都验证过，AutoSDK 那份即第 3 步落地的目录。
+>
+> `reg.exe` 若被安全策略拦截，用 PowerShell 的 `New-ItemProperty`（注册表）替代。
 
 ### 1.2 AI 能做 / 用户必须做
 
@@ -90,6 +116,32 @@ UE 内置 **`VSCodeSourceCodeAccess`** 插件。启用后，在编辑器里双�
 | 只改 `.cpp` 内部实现 | **Live Coding**（编辑器内 `Ctrl+Alt+F11`）热补丁 |
 | 改头文件接口 / `UCLASS`·`USTRUCT`·`UENUM` 反射宏 / 增删类或成员 | **必须关编辑器**，走 `tools\build.ps1` 全量重编 |
 | 新增模块 / 改 `.Build.cs` / 改 Target | 关编辑器 → 重跑 `gen-projectfiles.ps1` → `build.ps1` |
+| 改 `.uproject` 的模块 `LoadingPhase` | 重跑 `build.ps1`（重建 target receipt），否则运行时仍按旧清单加载 |
+
+#### 2.4.1 本机必须加 `-NoUBA`（否则编不过）
+
+**本机 UBA（Unreal Build Accelerator，UE5.6+ 默认开启）会失败**，症状是每个临时文件改名/删除都报：
+
+```text
+SetFileInformationByHandle (FileDispositionInfo) failed on <pid> ... (Access is denied.)
+fatal error C1083: 无法打开预编译头文件 "...h.pch": 拒绝访问
+```
+
+**已在沙箱内外各复现一次**，说明不是 agent 策略；Windows Defender 实时防护开着，无第三方杀软，目录 ACL 也是 FullControl —— 就是 UBA 的文件系统 detour 在本机环境下的问题。
+
+**绕过**：给 UnrealBuildTool 加 `-NoUBA`。这是 UBT 的正式开关（`BuildConfiguration.cs:54`
+`[CommandLine("-NoUBA", Value = "false")] bAllowUBAExecutor`），加上之后每个编译动作都以 `[NoUba]` 执行，access-denied 一次性消失（实测从 25+ 个降到 0）。
+`tools\build.ps1` 若在**本机**跑不通，用下面的直调方式（注意 `-NoUBA`）：
+
+```bash
+"<引擎>\Engine\Binaries\ThirdParty\DotNet\10.0\win-x64\dotnet.exe" \
+  "<引擎>\Engine\Binaries\DotNET\UnrealBuildTool\UnrealBuildTool.dll" \
+  SolsticeEditor Win64 Development -Project="<仓库>\game\Solstice.uproject" -NoUBA -WaitMutex
+```
+
+**注意不要直接跑 `UnrealBuildTool.exe`**：本机只装了 .NET 8/9，而 UBT 要 .NET 10，直接执行会以 `EXIT=150` 退出。用引擎自带的那份 `dotnet.exe`（上例）才正常。
+
+> 网络受限时记得清掉代理变量（`HTTPS_PROXY` 等）——直调 dotnet 不走代理，但引擎的下载器会读。本机若用 `curl` 走 https 还需 `--ssl-no-revoke`（schannel 吊销检查在本机失败）。
 
 ### 2.5 推荐 VSCode 扩展
 
@@ -111,6 +163,13 @@ UE 内置 **`VSCodeSourceCodeAccess`** 插件。启用后，在编辑器里双�
 4. **缺 VS 组件**：参照引擎文档要求的组件列表，用 VS 安装器补齐（`.vsconfig`）。
 5. **cpptools 与 clangd 冲突**：见 §2.2。
 6. **PowerShell 5.1 中文乱码**：脚本以 **UTF-8 with BOM** 保存，用 `-ExecutionPolicy Bypass` 运行。
+7. **`Unable to build while Live Coding is active`**：有残留的 `UnrealEditor.exe`（有时只是停在项目浏览器、没开工程）+ `LiveCodingConsole.exe` 占着互斥锁。先 `CloseMainWindow()` 优雅退出，再 `Stop-Process` 收掉 `LiveCodingConsole` / `UnrealTraceServer`。命令行编译前**一律先确认没有编辑器进程**。
+8. **`Couldn't find target rules file for target 'SolsticeEditor' in rules assembly 'UE5Rules'`**：`.Target.cs` 放错位置。UE 5.8 的 `ProjectRulesAssembly` 只 glob `Source/*.Target.cs`，**放在工程根目录无效**。
+9. **`-run=XxxCommandlet` 报 `looked like a commandlet, but we could not find the class`**：命令行类解析（`LaunchEngineLoop.cpp:3931`）发生在 `PostEngineInit` 阶段模块加载（同文件 `4861`）**之前**。所以承载 Commandlet 的模块 `LoadingPhase` 必须是 `Default`（在 `3896` 加载）。见 [`../tech/STRUCTURE.md`](../tech/STRUCTURE.md) §3。
+10. **编辑器模块链接期 `LNK2019`（跨 DLL 符号未导出）**：`UnrealEditor-Solstice.dll` 与 `UnrealEditor-SolsticeEditor.dll` 是两个 DLL。运行模块里**凡是被编辑器模块引用的公共类型都要标 `SOLSTICE_API`**，否则 `.obj` 里有符号、`.lib` 里没有。M0 踩过两次（`FPaperMaterials`、`FSimKernel`/`FDataLoader`）。排查用 `dumpbin -symbols`（Git Bash 下必须用**短横线** `-symbols`，用 `/symbols` 会被路径转换吃掉）。
+11. **无头日志里看不到自己的 `UE_LOG`**：`LogTemp` 会被过滤掉；且只加 `-stdout` 会丢尾部。正确做法是**定义项目自己的日志类别**（`SOLSTICE_API DECLARE_LOG_CATEGORY_EXTERN(LogSolstice, Log, All)` + `DEFINE_LOG_CATEGORY`）并同时用 `-abslog=<路径>` 落盘——`LogSolstice` 的行只在 abslog 文件里。
+12. **静态变量持有 UObject 导致崩溃**：`FPaperMaterials` 这类普通 `static` 结构对 GC 是不可见的，里面缓存的 `UMaterialInstanceDynamic*` 会在下一次关卡加载时被回收，之后解引用就是 `EXCEPTION_ACCESS_VIOLATION reading 0xffffffffffffffff`（首次成功运行即踩到）。凡是交给外部的 UObject 都要 `AddToRoot()`。
+13. **一个 UBT 未报的坑：编译期内存**。16 线程并行编 PCH + 31.84 GB 内存时出现过 `Killed process ... - Low on memory (44.2gb/45.1gb)`，重跑即通过。若反复出现，减少并行度。
 
 ---
 
@@ -151,13 +210,26 @@ powershell -ExecutionPolicy Bypass -File tools\vscode-extensions.ps1 -RemoveUnwa
 ## 5 速查命令
 
 ```powershell
+# 体检与环境
 powershell -ExecutionPolicy Bypass -File tools\check-env.ps1
 powershell -ExecutionPolicy Bypass -File tools\find-ue.ps1 -All
 powershell -ExecutionPolicy Bypass -File tools\configure-vscode.ps1
+
+# 工程与构建
 powershell -ExecutionPolicy Bypass -File tools\gen-projectfiles.ps1 -Mode Solution
 powershell -ExecutionPolicy Bypass -File tools\build.ps1
+powershell -ExecutionPolicy Bypass -File tools\build.ps1 -Target Solstice
+
+# 内容与回归（新克隆后按顺序各跑一次）
+powershell -ExecutionPolicy Bypass -File tools\gen-assets.ps1
+powershell -ExecutionPolicy Bypass -File tools\bench.ps1 -Days 2
+
+# 起编辑器
 powershell -ExecutionPolicy Bypass -File tools\launch-editor.ps1
 ```
+
+**新克隆的最小闭环**：`find-ue` → `gen-projectfiles` → `build` → `gen-assets` → `bench`。
+前两步没有就编不过，第三步没有就跑不到「纸材质已生成」的状态（会退化到引擎自带的 unlit 调试材质，界面仍能起，但纸雕配色不对）。
 
 ---
 
@@ -179,3 +251,4 @@ powershell -ExecutionPolicy Bypass -File tools\launch-editor.ps1
 | 1.0 | 2026-10-14 | 补统一文档头；真源指针从已作废的 `DESIGN.md` 改为 `charter/GDD.md`；Epic Launcher 状态更正为已安装 |
 | 1.1 | 2026-10-14 | 迁入 `docs/ops/`；修正链接与 §3.1 层级错误（改为 §4）；生图调用说明移交 `art/ASSETS.md` |
 | 1.2 | 2026-10-14 | 补 §1.1 本机实测表（从 `README.md` 迁入，含 C/D 盘与残件结论）；§1.2 分工小节补编号 |
+| 2.0 | 2026-10-16 | 工具链落地：引擎 ✅ 5.8.3 / VS2022 ✅ / **新增 §1.3 `.NET Framework 4.6.2 SDK` 补法**；§1 / §1.1 状态据实改写；**新增 §2.4.1 `-NoUBA` 必加**与 `UnrealBuildTool.exe` 直调会 `EXIT=150` 的说明；§2.6 常见坑扩充至 13 条（Live Coding 互斥、`.Target.cs` 位置、`LoadingPhase` 与 `-run=` 顺序、`SOLSTICE_API` 跨 DLL、`LogTemp` 被过滤、静态持有 UObject 的 GC 崩溃）；§5 补内容生成与回归命令 |

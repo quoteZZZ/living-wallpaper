@@ -1,8 +1,8 @@
 ---
 id: INDEX
 title: 文档索引与状态矩阵
-version: 2.18
-date: 2026-10-15
+version: 2.19
+date: 2026-10-16
 status: active
 truth: nav
 owner: ai
@@ -57,9 +57,9 @@ owner: ai
 | [`art/ART-STYLE.md`](art/ART-STYLE.md) | 美术与资产 | 2.4 | active | subsystem | 渲染配方、色板、素材规格、**卡面区域级版式 + 花纹系统 + 统一牌背 + 字体（§4）**、QC、风格验收流程 |
 | [`art/ASSETS.md`](art/ASSETS.md) | 美术与资产 | 1.0 | active | subsystem | 资产去向、生产线、规模预算、manifest 登记、合规 |
 | [`tech/ARCHITECTURE.md`](tech/ARCHITECTURE.md) | 技术与架构 | 1.0 | active | subsystem | 性能预算、模块划分与硬约束 |
-| [`tech/STRUCTURE.md`](tech/STRUCTURE.md) | 技术与架构 | 2.4 | active | subsystem | 目录与命名（含 🟡/✅ 状态列与归位决策表） |
-| [`plan/ROADMAP.md`](plan/ROADMAP.md) | 计划 | 1.3 | active | subsystem | 三阶段切分（混沌初态 / 音频挂 M1 / 逐卡制作口径）、M0 验收、前置条件、风险、执行计划 |
-| [`ops/ENV.md`](ops/ENV.md) | 环境与工具链 | 1.2 | active | nav | 环境安装步骤与本机实测 |
+| [`tech/STRUCTURE.md`](tech/STRUCTURE.md) | 技术与架构 | 3.0 | active | subsystem | 目录与命名（含 🟡/✅ 状态列与归位决策表）；M0 已落地 |
+| [`plan/ROADMAP.md`](plan/ROADMAP.md) | 计划 | 1.4 | active | subsystem | 三阶段切分（混沌初态 / 音频挂 M1 / 逐卡制作口径）、M0 验收（**已达成**）、前置条件、风险、执行计划 |
+| [`ops/ENV.md`](ops/ENV.md) | 环境与工具链 | 2.0 | active | nav | 环境安装步骤与本机实测；含 `-NoUBA` 与 `.NET Framework 4.6.2 SDK` 补法 |
 | [`ops/VSCODE.md`](ops/VSCODE.md) | 环境与工具链 | 1.1 | active | nav | VSCode 工作区配置（真源是 `.vscode/` 实文件） |
 | [`ops/WORKFLOW.md`](ops/WORKFLOW.md) | 协作与流程 | 1.0 | active | nav | 分工、文档纪律、提交规范、评审闸门、AI 进入清单 |
 | [`ops/SYNC.md`](ops/SYNC.md) | 协作与流程 | 1.1 | active | nav | 双机 git 同步约定 |
@@ -146,7 +146,10 @@ charter/GDD.md  (truth: owner) —— 立项书 + 文档地图
 - **文档骨架**：正文首节写"本文件管什么 / 不管什么"，末节写"更新触发"与"沿革"。
 - **作废文档**：`git mv` 进 `archive/`，改名带版本（`XXX-v1.md`），在 `archive/README.md` 记时点与可继承项。
 - **拆分超长文档**：同时承载 ≥2 类事务、或超过约 600 行时按 §0 的事务域拆分，并在双方加"相关文档"指针（范例：`CARDS` ⟷ `CARD-LIST` 的**规则 vs 内容**；`INTERVENTION` ⟷ `ECONOMY` 的**规则 vs 数值**）。
-- **提交前自检**：跑一遍链接校验（`tmp/check-links.py`，把所有相对链接解析一遍），**0 断链**才提交。
+- **提交前自检**（两条，都在 `tmp/`，不入库）：
+  1. 链接校验 `python tmp/check-links.py` —— 把所有相对链接解析一遍，**0 断链**才提交；
+  2. 契约校验 `python tmp/validate-contracts.py` —— 把 `shared/schema/` 与 `game/Config/Solstice/Data/` 逐对校验（需 `jsonschema`）。
+  两条都跑通再提交。**2026-10-16 实测：38 份文档 0 断链；5 对契约全部通过。**
 
 ---
 
@@ -182,3 +185,4 @@ charter/GDD.md  (truth: owner) —— 立项书 + 文档地图
 | 2.16 | 2026-10-15 | **第 42 轮：删除「类别」维度**——卡 =「元素 × 环级 × 卡类 × 卡型」四项描述；GDD 7.2、CARDS 3.6（§5 作废）、CARD-LIST 1.5（功能位池平铺）、WORLD 3.7、UI-UX 2.4、SCREENS 1.2、INTERVENTION 2.6、ART-STYLE 2.3、STRUCTURE（schema 注记）；OPEN-QUESTIONS 2.2（#42 关闭）、DECISIONS 2.4 |
 | 2.17 | 2026-10-15 | **第 43 轮：删除「卡型」维度**——持续性改为枚举字段（瞬时 / 持续 / 永久 / 触发）；合契 / 仪轨降为可选参数；触发 = 律类 + 持续性取值（TRIGGERS / 地脉包不变）；卡面身份行只剩回收价值；GDD 7.3、CARDS 3.7（§6 作废）、CARD-LIST 1.6、WORLD 3.8、UI-UX 2.5、SCREENS 1.3、INTERVENTION 2.7、ART-STYLE 2.4、STRUCTURE 2.4、ROADMAP 1.3、TRIGGERS 1.1；OPEN-QUESTIONS 2.3（#19 关闭）、DECISIONS 2.5 |
 | 2.18 | 2026-10-15 | **第 44 轮**：CARDS 3.8（**§7.1 卡的组成模板 + 三张示例卡**：物·丘 / 术·火种 / 律·霜线）、CARD-LIST 1.7（**M0 首批 10 张候选**）、WORLD 3.9（**混沌 = 未上色的纸**：画面定义与上色机制）；DECISIONS 2.6 |
+| 2.19 | 2026-10-16 | **M0 工程落地（首次有可运行代码）**：工具链补齐（引擎 5.8.3 / VS2022 / `.NET Framework 4.6.2 SDK`）；`game/` 落地 `.uproject` + 2 个 Target + 主模块 `Solstice`（Core/Sim/Gen/World/God/UI/Render）+ 编辑器模块 `SolsticeEditor`，**两个目标编译通过**；内容改为代码生成（`SolsticeGenAssets`）、新增无头确定性回归（`SolsticeBench`）与 `tools/gen-assets.ps1` `tools/bench.ps1`；STRUCTURE 3.0（三个目录转 ✅ + `Source/` 结构按实测修正 + `SOLSTICE_API`/`LoadingPhase` 规则）、ENV 2.0（§1.3 + §2.4.1 + 常见坑扩至 13 条）、ROADMAP 1.4、README §一–§四 |
