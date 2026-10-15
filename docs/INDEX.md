@@ -1,7 +1,7 @@
 ---
 id: INDEX
 title: 文档索引与状态矩阵
-version: 2.12
+version: 2.13
 date: 2026-10-15
 status: active
 truth: nav
@@ -51,6 +51,7 @@ owner: ai
 | [`gameplay/INTERVENTION.md`](gameplay/INTERVENTION.md) | 玩法 | 2.5 | active | subsystem | **手牌 / 实体池（含开局池）/ 释放与回收（无撤销 + 3 秒未干期）**、余响规则、扰动值、卡包（禁物不进包）、接管、倒带 |
 | [`gameplay/ECONOMY.md`](gameplay/ECONOMY.md) | 玩法 | 2.2 | active | subsystem | **全部经济数值**：三源产出（含 **offset 测量公式**、**势能三因子定义**）、价值与回收返还、包价、掉落权重、六条红线验算 |
 | [`gameplay/TRIGGERS.md`](gameplay/TRIGGERS.md) | 玩法 | 1.0 | active | subsystem | **触发规则语法（WHEN-THEN 有限词表 DSL）**：条件 / 动作词表、12 条上限、后写覆盖 |
+| [`gameplay/SCREENS.md`](gameplay/SCREENS.md) | 玩法 | 1.0 | active | subsystem | **屏幕清单与线框原型（界面蓝图）**：九屏、导航流（S1 唯一根屏）、释放三态、实现注记 |
 | [`gameplay/CUSTOMIZE.md`](gameplay/CUSTOMIZE.md) | 玩法 | 1.3 | active | subsystem | **首次启动流程（穹顶开场 + 首启问卷 + 直入）**、界创建向导 9 步、出厂预设、创世面板、存档与导入导出 |
 | [`gameplay/UI-UX.md`](gameplay/UI-UX.md) | 玩法 | 2.3 | active | subsystem | 界面区域、**手牌区与拖拽手势**、键位、**相机（上半球环绕 + 4 预设机位）**、极简原则 |
 | [`art/ART-STYLE.md`](art/ART-STYLE.md) | 美术与资产 | 2.1 | active | subsystem | 渲染配方、色板、素材规格、**卡面版式与字体（§4.1/§4.2）**、QC、风格验收流程 |
@@ -175,3 +176,4 @@ charter/GDD.md  (truth: owner) —— 立项书 + 文档地图
 | 2.10 | 2026-10-15 | **第 37 轮**：**元素与世界模拟分层**（第一原则，PHYSICS 1.1 翻译表 / WORLD 3.5 层次澄清；**暗 = 纯效果**）、CUSTOMIZE 1.3（**首启流程**：穹顶开场 + ≤5 问问卷 + 直入；界名生成器；设置页最小集）、INTERVENTION 2.4（**开局实体池** + **无撤销 + 3 秒未干期**）、LOOP 1.1（个体不可控红线）、ECONOMY 2.1（**offset 公式 + 势能三因子**初值提案）、WORLD 3.5（**天气转移概率初值表**） |
 | 2.11 | 2026-10-15 | **第 38 轮设定七件**：PHYSICS 1.2（**材质表 15 材质**，UE/PBR 调研后丰富）、WORLD 3.6（**混沌初态** / **山的解剖** / 穹顶形态语言）、SPECIES 2.2（物种数值改**模板初值** + 五物种初值表 + 种子雨）、**新建 `gameplay/TRIGGERS.md` 1.0**（WHEN-THEN 有限词表 DSL）、CARDS 3.5（禁物逐件自由设计）、ART-STYLE 2.1（**卡面版式 + 字体**思源黑/宋） |
 | 2.12 | 2026-10-15 | **日志清理**：DECISIONS 2.0（改写为摘要式日志，删对话原文，第 1–26 轮压缩并标注存废）、OPEN-QUESTIONS 2.0（只留 6 项真开放 + 已裁决一行索引）；修矛盾：**元素包含禁物 vs 禁物不随机出**（ECONOMY 2.2 / INTERVENTION 2.5 → 池 = 0–9 环 30 卡种）、INTERVENTION 三处过期"待裁决 / 待定"、ROADMAP 1.2（"卡库直取"旧口径 → 只读 + 免费补池；补混沌初态与逐卡口径） |
+| 2.13 | 2026-10-15 | **原型设计启动（第 39 轮）**：新建 `gameplay/SCREENS.md`（九屏清单 / 导航流 / 逐屏线框 / 释放三态 / 实现注记）；三张概念参考图存 `tmp/ui-concepts/`（不入库）；DECISIONS 2.1 |

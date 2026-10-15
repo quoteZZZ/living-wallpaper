@@ -1,7 +1,7 @@
 ---
 id: charter/DECISIONS
 title: 裁决沿革（摘要式日志）
-version: 2.0
+version: 2.1
 date: 2026-10-15
 status: active
 truth: history
