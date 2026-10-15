@@ -1,8 +1,8 @@
 ---
 id: gameplay/CUSTOMIZE
 title: 用户自定义 · 界创建向导与创世面板
-version: 1.1
-date: 2026-10-14
+version: 1.2
+date: 2026-10-15
 status: active
 truth: subsystem
 owner: both
@@ -68,7 +68,7 @@ owner: both
 - 存档版本化键：`solstice.save.v<n>`，**每界一份**（[`../tech/STRUCTURE.md`](../tech/STRUCTURE.md) §6）。
 - 导出位置：`%USERPROFILE%\Documents\Solstice\Exports\<realmId>.solstice`。
 - **多界并存**与"只推演激活界"见 [`../setting/WORLD.md`](../setting/WORLD.md) §2.3。
-- **待细化**：导出文件是否携带"世界故事"摘要（[`../setting/WORLD.md`](../setting/WORLD.md) §11 #1）。
+- **导出携带"世界故事"摘要（✅2026-10-15 定案）**：界名 + 出生日期（双时间戳）+ 年表精华（条数与挑选规则 P1 定稿，[`../setting/WORLD.md`](../setting/WORLD.md) §11）。
 
 ---
 
@@ -88,3 +88,4 @@ owner: both
 | 版本 | 日期 | 变更 |
 |---|---|---|
 | 1.0 | 2026-10-14 | 新建：由 `charter/GDD.md` §12 拆出（9 步向导、8 预设、创世面板、存档与导入导出）；补"生效规则清单"待补项 |
+| 1.2 | 2026-10-15 | 导出**携带世界故事摘要**定案（第 33 轮）；格式细节 P1 定稿 |
