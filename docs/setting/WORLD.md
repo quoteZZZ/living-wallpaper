@@ -1,7 +1,7 @@
 ---
 id: setting/WORLD
 title: 世界设定集
-version: 3.6
+version: 3.7
 date: 2026-10-15
 status: active
 truth: subsystem
@@ -391,7 +391,7 @@ owner: both
 | 水体类型 | Water Body | `none`/`lake`/`river`/`sea`/`wetland` | 见 §3.1 |
 | 生态域 | Biome | `biome.` | 四轴阈值判定的区域类型（§2.2） |
 | 余响 | Echo | — | 干涉世界产出的唯一积累物（[`../gameplay/INTERVENTION.md`](../gameplay/INTERVENTION.md) §2） |
-| 卡类 / 类别 / 卡型 | Class / Category / Form | `matter`·`rite`·`law` / `cat.` / `form.` | [`CARDS.md`](CARDS.md) §4–§6 |
+| 卡类 / 卡型 | Class / Form | `matter`·`rite`·`law` / `form.` | [`CARDS.md`](CARDS.md) §4 / §6 |
 | 扰动值 | Disturbance | — | 世界的状态读数（[`../gameplay/INTERVENTION.md`](../gameplay/INTERVENTION.md) §3） |
 | 年表 | Chronicle | — | 世界史记录，双时间戳（§4） |
 | 世界钟 | World Clock | — | 双模式时间系统（[`../gameplay/TIME.md`](../gameplay/TIME.md) §1） |
@@ -491,3 +491,4 @@ owner: both
 | 3.4 | 2026-10-15 | **§1.1 界壁定案**（第 36 轮）：**上半球穹顶罩**（天空 / 星象 / 天气在罩内侧，太阳沿罩内面爬行，天顶渐隐供卫星视角）；§3.2 太阳行补视觉来源；物理属性系统另见 [`PHYSICS.md`](PHYSICS.md) |
 | 3.5 | 2026-10-15 | §1.2 补**层次澄清**（第 37 轮：原质是叙事语言，模拟层只认物理量）；§3.2 补**天气状态机转移概率初值表**（提案值可调） |
 | 3.6 | 2026-10-15 | **混沌初态**（第 38 轮）：生成流程第⑤步默认跳过——世界初始无生命，生命由向导第 8 步或生命类卡引入；§3.1 新增**山的解剖**（外壳 / 岩芯 / 矿脉）；§1.1 穹顶补**形态语言**（分瓣纸壳 / 蜡封印记 / 界名基座） |
+| 3.7 | 2026-10-15 | §6.1 术语表随「类别」维度删除（第 42 轮）：去 Category / `cat.` |

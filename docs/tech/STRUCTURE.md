@@ -135,7 +135,7 @@ shared/
 ├─ README.md
 └─ schema/
    ├─ species.schema.json   物种模板（[`../setting/SPECIES.md`](../setting/SPECIES.md) §1）
-   ├─ card.schema.json      干涉卡（元素 / 级 / 卡类 / 类别 / 卡型 / 作用域 / 参数）
+   ├─ card.schema.json      干涉卡（元素 / 级 / 卡类 / 卡型 / 作用域 / 参数）
    ├─ world.schema.json     界：尺寸 / 地形算法与种子 / 生态域 / 水体 / 大气 / 法则
    ├─ style.schema.json     风格主题参数（调色板 / 着色 / 后期 / 几何处理）
    └─ save.schema.json      存档：元数据 + 快照 + 卡池历史 + 年表
