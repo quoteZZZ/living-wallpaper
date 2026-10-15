@@ -1,7 +1,7 @@
 ---
 id: INDEX
 title: 文档索引与状态矩阵
-version: 2.14
+version: 2.15
 date: 2026-10-15
 status: active
 truth: nav
@@ -38,8 +38,8 @@ owner: ai
 | 路径 | 事务域 | 版本 | 状态 | truth | 一句话职责 |
 |---|---|---|---|---|---|
 | [`charter/GDD.md`](charter/GDD.md) | 立项 | 7.1 | active | **owner** | 立项决策、定位与卖点、非目标、体验支柱 + 文档地图 + 旧章节号对照 |
-| [`charter/DECISIONS.md`](charter/DECISIONS.md) | 立项 | 2.0 | active | history | 裁决沿革**摘要式日志**（38 轮，含存废标注；不保留对话原文） |
-| [`charter/OPEN-QUESTIONS.md`](charter/OPEN-QUESTIONS.md) | 立项 | 2.0 | active | subsystem | **开放清单（6 项真待裁决）+ 已裁决一行索引** |
+| [`charter/DECISIONS.md`](charter/DECISIONS.md) | 立项 | 2.3 | active | history | 裁决沿革**摘要式日志**（41 轮，含存废标注；不保留对话原文） |
+| [`charter/OPEN-QUESTIONS.md`](charter/OPEN-QUESTIONS.md) | 立项 | 2.1 | active | subsystem | **开放清单（7 项待裁决，含 #42 十二类存废）+ 已裁决一行索引** |
 | [`setting/WORLD.md`](setting/WORLD.md) | 设定集 | 3.6 | active | subsystem | 界 / **界壁（穹顶罩 + 形态语言）** / 界外 / 七原质（叙事层）/ 环级（含超环）与禁物 / 规模 / 世界模型（**五轴** / 天气转移矩阵 / **山的解剖** / **混沌初态**）/ 年表 / 叙事与命名 |
 | [`setting/CARDS.md`](setting/CARDS.md) | 设定集 | 3.5 | active | subsystem | 卡片**规则**：三轴、252 卡池矩阵、卡类与卡型、生克（物理涌现）、字段（模拟效果 = 逐卡逻辑）、命名；禁物逐件自由设计 |
 | [`setting/CARD-LIST.md`](setting/CARD-LIST.md) | 设定集 | 1.4 | active | subsystem | 卡片**内容**：M0 36 格（范围框架，**逐卡制作**）、价值表、240 功能位池、超环（21 张） |
@@ -178,3 +178,4 @@ charter/GDD.md  (truth: owner) —— 立项书 + 文档地图
 | 2.12 | 2026-10-15 | **日志清理**：DECISIONS 2.0（改写为摘要式日志，删对话原文，第 1–26 轮压缩并标注存废）、OPEN-QUESTIONS 2.0（只留 6 项真开放 + 已裁决一行索引）；修矛盾：**元素包含禁物 vs 禁物不随机出**（ECONOMY 2.2 / INTERVENTION 2.5 → 池 = 0–9 环 30 卡种）、INTERVENTION 三处过期"待裁决 / 待定"、ROADMAP 1.2（"卡库直取"旧口径 → 只读 + 免费补池；补混沌初态与逐卡口径） |
 | 2.13 | 2026-10-15 | **原型设计启动（第 39 轮）**：新建 `gameplay/SCREENS.md`（九屏清单 / 导航流 / 逐屏线框 / 释放三态 / 实现注记）；三张概念参考图存 `tmp/ui-concepts/`（不入库）；DECISIONS 2.1 |
 | 2.14 | 2026-10-15 | **原型第二轮（第 40 轮）**：ART-STYLE 2.2（**卡面区域级版式 + 花纹系统（物回纹/术云水纹/律封印菱纹）+ 统一牌背**；字体移 §4.5）、SCREENS 1.1（穹顶可见性 / 混沌空态 / 开包五帧分镜）；新增四张概念图（穹顶卫星视角 / 卡面 v2 / 牌背 / 三卡类花纹对比）；DECISIONS 2.2 |
+| 2.15 | 2026-10-15 | **原型第三轮（第 41 轮）**：四张概念图（**超环卡面**金框缠枝 / **禁物卡面**撕裂黑框 / **S3 卡库** / **S2 创世面板**蜡球滑轨）；登记 **#42 十二类存废**质询（待裁决）；DECISIONS 2.3 / OPEN-QUESTIONS 2.1 |
