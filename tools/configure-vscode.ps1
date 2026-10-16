@@ -55,7 +55,9 @@ Write-Host ("✓ 引擎根：{0}" -f $EngineRoot) -ForegroundColor Green
 foreach ($f in $targets) {
     $p = Join-Path $vscodeDir $f
     if (-not (Test-Path -LiteralPath $p)) { Write-Host ("  - 跳过（不存在）：{0}" -f $f) -ForegroundColor DarkGray; continue }
-    $raw = Get-Content -LiteralPath $p -Raw
+    # 必须显式按 UTF-8 读取：Windows PowerShell 5.1 的 Get-Content 默认按 ANSI 解析无 BOM 的 UTF-8，
+    # 会把文件中的中文注释读成乱码再写回（曾把 .vscode 三份配置写坏）。
+    $raw = [System.IO.File]::ReadAllText($p, (New-Object System.Text.UTF8Encoding($false)))
     $new = $raw -replace [regex]::Escape($Token), $forward
     if ($new -ne $raw) {
         Write-Utf8NoBom -Path $p -Text $new

@@ -1,8 +1,8 @@
 ---
 id: tech/STRUCTURE
 title: 目录与命名唯一真源
-version: 3.4
-date: 2026-10-16
+version: 3.5
+date: 2026-10-17
 status: active
 truth: subsystem
 owner: ai
@@ -234,7 +234,7 @@ shared/
 
 **入 git**：`game/Source`、`game/Config`、`game/Solstice.uproject`、`game/Content/README.md` 与 `.gitkeep`、`shared/`、`studio/{workflows,jobs,presets,tools,README.md}`、`studio/out/manifest.jsonl`、`tools/`、`docs/`、`.vscode/`、`.github/`、`.codebuddy/`、`.workbuddy/`、`.gitattributes`。
 
-**不入 git**：`game/{Binaries,Intermediate,Saved,DerivedDataCache}`、`game/Content/**` 的二进制（含生成的 `M_Paper.uasset` / `M_Ink.uasset`）、`studio/out/**`（除 manifest）、`studio/work/**`、`.vs/`、`*.sln`、`tmp/`。
+**不入 git**：`game/{Binaries,Intermediate,Saved,DerivedDataCache}`、`game/Content/**` 的二进制（含生成的 `M_Paper.uasset` / `M_Ink.uasset`）、`studio/out/**`（除 manifest）、`studio/work/**`、`.vs/`、`*.sln`、`*.slnx`、`.vsconfig`、`tmp/`。
 
 **可重建性的保证**（对单机开发、重装系统、更换机器同样成立）：Content 不入 git ⇒ **同一套"种子 + 生成器 + 契约 + manifest"**可完整重建产物。因此：
 1. 生成器与契约的改动必须与产物**同一次提交**；
@@ -284,3 +284,4 @@ shared/
 | 3.2 | 2026-10-16 | 自检自动执行两道闸门：`tools/hooks/pre-commit` + `tools/install-hooks.ps1`（本地，`core.hooksPath`）、`.github/workflows/checks.yml`（CI，无需引擎）；validate-contracts 扩展 Localization 双语言 key 对齐 + 占位符校验；新增 `.gitattributes`（钩子 LF 锁定） |
 | 3.3 | 2026-10-16 | 修复 cards 数据 `mat`→`material` 键名（6 处；`ReadParams` 只认 `material`，原值被 `Atof` 解析成 0 = Paper 材质）；`card.schema.json` params 收紧为 key 白名单 + material / weather 枚举（堵静默漂移）；新增 `save.schema.json` 信封骨架 + `shared/fixtures/save.sample.json`；validate-contracts 扩为 6 对契约（PAIRS 携带各自数据目录） |
 | 3.4 | 2026-10-16 | 双机协作废止、回归单机开发：§9 改写为「git 与 Content 重建」（单机 / 重装 / 换机均可重建）；`ops/SYNC.md` 归档 `archive/SYNC-v1.1.md`；§11 触发行改指 WORKFLOW §5；frontmatter 版本号对齐沿革（3.3 曾漏记） |
+| 3.5 | 2026-10-17 | §9「不入 git」补 `*.slnx`（VS2026 起 UBT 亦生成）与 `.vsconfig`（UBT 生成的 VS 组件清单），`.gitignore` 同步；同批修复 `tools/configure-vscode.ps1` 把 `.vscode` 三份配置中文写成乱码的 UTF-8 读取缺陷 |

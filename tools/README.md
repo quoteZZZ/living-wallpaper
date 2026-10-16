@@ -13,7 +13,7 @@
 | `install-epic-launcher.ps1` | winget 安装 Epic Games Launcher | winget；**用户主动执行** | `... -File tools\install-epic-launcher.ps1 -DryRun` |
 | `install-vs-buildtools.ps1` | winget 安装 VS2022 生成工具 + C++ 负载（约 15–20GB） | winget；**用户主动执行** | `... -File tools\install-vs-buildtools.ps1 -DryRun` |
 | `configure-vscode.ps1` | 把引擎真实路径写入 `.vscode/*.json`（替换 `__UE_ENGINE_ROOT__`） | 已装引擎（否则降级） | `... -File tools\configure-vscode.ps1` |
-| `gen-projectfiles.ps1` | 生成 `Solstice.sln`（cpptools）或 `compile_commands.json`（clangd） | 已装引擎 | `... -File tools\gen-projectfiles.ps1 -Mode Solution` |
+| `gen-projectfiles.ps1` | 生成 `Solstice.sln`（cpptools）或 `compile_commands.json`（clangd）；**自动改用引擎自带 dotnet 运行 `UnrealBuildTool.dll`**（直接跑 `UnrealBuildTool.exe` 会因本机只装 .NET 8/9 而失败，见 [`../docs/ops/ENV.md`](../docs/ops/ENV.md) §2.4.1） | 已装引擎 | `... -File tools\gen-projectfiles.ps1 -Mode Solution` |
 | `build.ps1` | 调用 `Build.bat` 编译目标，透传退出码 | 引擎 + VS2022 生成工具 | `... -File tools\build.ps1 -Target SolsticeEditor` |
 | `gen-assets.ps1` | **生成内容**：跑 `-run=SolsticeGenAssets` 写出 `/Game/Core/M_Paper` 与 `M_Ink`。幂等，已存在则跳过 | 已编译 `SolsticeEditor` | `... -File tools\gen-assets.ps1` |
 | `bench.ps1` | **无头确定性回归**：跑 `-run=SolsticeBench`，同种子跑两遍比对世界摘要；不一致即退出码 1 | 已编译 `SolsticeEditor` | `... -File tools\bench.ps1 -Days 2` |

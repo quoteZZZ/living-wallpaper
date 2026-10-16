@@ -1,8 +1,8 @@
 ---
 id: INDEX
 title: 文档索引与状态矩阵
-version: 2.28
-date: 2026-10-16
+version: 2.29
+date: 2026-10-17
 status: active
 truth: nav
 owner: ai
@@ -57,9 +57,9 @@ owner: ai
 | [`art/ART-STYLE.md`](art/ART-STYLE.md) | 美术与资产 | 2.7 | active | subsystem | 渲染配方（含**天气纸痕**）、色板、素材规格（**卡面 2048 + 纸层 3 层视差**）、**卡面区域级版式 + 花纹系统（含档内华丽度梯度）+ 三档牌背 + 字体（§4）**、QC（**色盲核验**）、风格验收流程 |
 | [`art/ASSETS.md`](art/ASSETS.md) | 美术与资产 | 1.1 | active | subsystem | 资产去向、生产线、规模预算（**单主题**）、manifest 登记、合规 |
 | [`tech/ARCHITECTURE.md`](tech/ARCHITECTURE.md) | 技术与架构 | 1.0 | active | subsystem | 性能预算、模块划分与硬约束 |
-| [`tech/STRUCTURE.md`](tech/STRUCTURE.md) | 技术与架构 | 3.4 | active | subsystem | 目录与命名（含 🟡/✅ 状态列与归位决策表）+ git 与 Content 重建；M0 已落地 |
+| [`tech/STRUCTURE.md`](tech/STRUCTURE.md) | 技术与架构 | 3.5 | active | subsystem | 目录与命名（含 🟡/✅ 状态列与归位决策表）+ git 与 Content 重建（不入库清单含 `*.slnx` / `.vsconfig`）；M0 已落地 |
 | [`plan/ROADMAP.md`](plan/ROADMAP.md) | 计划 | 1.8 | active | subsystem | 三阶段切分（混沌初态 / 音频挂 M1 / 逐卡制作口径）、M0 验收 + **进度实测表**、前置条件、风险、执行计划（含性能浮层 / bench 长跑 / 摆件模式挂账） |
-| [`ops/ENV.md`](ops/ENV.md) | 环境与工具链 | 2.1 | active | nav | 环境安装步骤与本机实测；含 `-NoUBA`、`.NET Framework 4.6.2 SDK` 补法与提交钩子安装 |
+| [`ops/ENV.md`](ops/ENV.md) | 环境与工具链 | 2.2 | active | nav | 环境安装步骤与本机实测；含 `-NoUBA`、`.NET Framework 4.6.2 SDK` 补法、UBT 的 dotnet 运行方式（引擎自带 dotnet + DLL）与提交钩子安装 |
 | [`ops/VSCODE.md`](ops/VSCODE.md) | 环境与工具链 | 1.2 | active | nav | VSCode 工作区配置（真源是 `.vscode/` 实文件） |
 | [`ops/WORKFLOW.md`](ops/WORKFLOW.md) | 协作与流程 | 1.1 | active | nav | 分工、文档纪律、提交规范、评审闸门、AI 进入清单、git 约定（单机） |
 | [`INDEX.md`](INDEX.md) | 导航 | 2.28 | active | nav | 本文件 |
@@ -194,3 +194,4 @@ charter/GDD.md  (truth: owner) —— 立项书 + 文档地图
 | 2.26 | 2026-10-16 | **第 47 轮：商业化族裁决**——OPEN-QUESTIONS 2.7（**#3 / #4 / #9 否决**：无付费 / 无剪影解锁 / 无主题扩展；**#46 关闭**：开局余响 = 0；§1 剩 2 项）；INTERVENTION 2.9（开局余响 + 去风格包 / 剪影）、ECONOMY 2.3（去风格包、年度预算 32,850→31,250）、ROADMAP 1.7（M1 / M2 去风格包与剪影）、STYLE 1.1（**只 T1**）、ASSETS 1.1（单主题预算）、SCREENS 1.5（卡库无剪影）、DECISIONS 2.9 同步 |
 | 2.27 | 2026-10-16 | **批量提案 + 状态矩阵体检**：OPEN-QUESTIONS 2.8（新增 **#47–#60** 14 项提案：拆卡动画分级 / 拆包前摇 / 光敏安全 / 卡面高清与鉴赏 / 纸层视差闪卡 / 拖卡手感 / POP-UP 入场 / 天气纸痕 / 截图模式 / 存档安全网 / 性能浮层 / 长跑自动化 / 0 起步引导 / 色盲安全——§1 共 16 项待裁决）；本表 §1 状态矩阵版本列滞后修正（STRUCTURE 3.3、ENV 2.1、INDEX 2.27） |
 | 2.28 | 2026-10-16 | **第 48 轮批量裁决 + 双机协作废止**：① **#47–#60 全部采纳关闭**——SCREENS 1.6（前摇 / 拆卡分级 / 鉴赏 / 手感 / POP-UP 入场 / 0 起步引导 / 动画三档 + 减弱闪光）、ART-STYLE 2.7（2048 高清 / 纸层 3 层 / 天气纸痕 / 色盲核验）、UI-UX 2.6（`P` 摆件模式）、ROADMAP 1.8（安全网 M1 / bench 长跑 / 性能浮层 / 摆件挂账）、OPEN-QUESTIONS 2.9（§1 剩 2 项）、DECISIONS 2.10；② **回归单机开发**——`ops/SYNC.md` 归档（`archive/SYNC-v1.1.md`），WORKFLOW 1.1（§5 改单机 git 约定）、STRUCTURE 3.4（§9 改 Content 重建）、GDD 7.4 / VSCODE 1.2 / README / tasks.json（删 Git 同步任务）同步，§0 / §1 / §4 / §5 去双机引用 |
+| 2.29 | 2026-10-17 | **工具链修复 + 本机闭环复测**：① `tools/gen-projectfiles.ps1` 改走**引擎自带 dotnet + `UnrealBuildTool.dll`**（原直调 `UnrealBuildTool.exe` 在本机因只装 .NET 8/9 而必然失败），工作目录对齐 `Build.bat`（`Engine\Source`），保留 `.exe` 回退；② 修复 `tools/configure-vscode.ps1` 的 **UTF-8 读取缺陷**——PS 5.1 的 `Get-Content -Raw` 按 ANSI 解析无 BOM 的 UTF-8，会把 `.vscode` 三份配置的中文注释整篇写成乱码（已 `git checkout` 还原，改用 `[System.IO.File]::ReadAllText`）；③ `.gitignore` 补 `*.slnx` / `*.vsconfig`（UBT 派生物，与 `*.sln` 同列），STRUCTURE 3.5 / ENV 2.2 / `tools/README.md` 同步。**本机闭环复测全过**：pre-commit 钩子安装（575 链接 0 断链 / 6 对契约 41 id / 本地化 162 key）、20 项推荐扩展齐备、引擎路径写入 `.vscode`（中文完好）、`Solstice.sln` 生成、`build.ps1` 编译成功、纸材质生成、`bench -Days 2` 确定性成立 |

@@ -1,8 +1,8 @@
 ---
 id: ops/ENV
 title: 开发环境搭建
-version: 2.1
-date: 2026-10-16
+version: 2.2
+date: 2026-10-17
 status: active
 truth: nav
 owner: both
@@ -141,6 +141,8 @@ fatal error C1083: 无法打开预编译头文件 "...h.pch": 拒绝访问
 
 **注意不要直接跑 `UnrealBuildTool.exe`**：本机只装了 .NET 8/9，而 UBT 要 .NET 10，直接执行会以 `EXIT=150` 退出。用引擎自带的那份 `dotnet.exe`（上例）才正常。
 
+> `tools\gen-projectfiles.ps1` 已内置该逻辑：自动探测 `Engine\Binaries\ThirdParty\DotNet\<ver>\win-x64\dotnet.exe`（版本目录倒序取最高）并用它运行 `UnrealBuildTool.dll`，工作目录设为 `Engine\Source`（与 `Build.bat` 一致）；探测不到才回退 `.exe` 直调。故**生成工程文件无需手动直调**（2026-10-17 实测：`-Mode Solution` 正常产出 `game\Solstice.sln`）。`tools\build.ps1` 走 `Build.bat`，后者内部已 `call GetDotnetPath.bat` 设置自带 dotnet，不受此问题影响。
+
 > 网络受限时记得清掉代理变量（`HTTPS_PROXY` 等）——直调 dotnet 不走代理，但引擎的下载器会读。本机若用 `curl` 走 https 还需 `--ssl-no-revoke`（schannel 吊销检查在本机失败）。
 
 ### 2.5 推荐 VSCode 扩展
@@ -256,3 +258,4 @@ powershell -ExecutionPolicy Bypass -File tools\launch-editor.ps1
 | 1.2 | 2026-10-14 | 补 §1.1 本机实测表（从 `README.md` 迁入，含 C/D 盘与残件结论）；§1.2 分工小节补编号 |
 | 2.0 | 2026-10-16 | 工具链落地：引擎 ✅ 5.8.3 / VS2022 ✅ / **新增 §1.3 `.NET Framework 4.6.2 SDK` 补法**；§1 / §1.1 状态据实改写；**新增 §2.4.1 `-NoUBA` 必加**与 `UnrealBuildTool.exe` 直调会 `EXIT=150` 的说明；§2.6 常见坑扩充至 13 条（Live Coding 互斥、`.Target.cs` 位置、`LoadingPhase` 与 `-run=` 顺序、`SOLSTICE_API` 跨 DLL、`LogTemp` 被过滤、静态持有 UObject 的 GC 崩溃）；§5 补内容生成与回归命令 |
 | 2.1 | 2026-10-16 | §5 补提交钩子安装命令 `install-hooks.ps1`（自检自动执行的本地闸门，另见 `tools/README.md`） |
+| 2.2 | 2026-10-17 | §2.4.1 补：`tools\gen-projectfiles.ps1` 已自动改用引擎自带 dotnet 运行 `UnrealBuildTool.dll`（修复直调 `.exe` 在本机必然失败的问题，2026-10-17 实测通过）；`tools/README.md` 同步 |

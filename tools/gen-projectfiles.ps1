@@ -5,7 +5,9 @@
 .DESCRIPTION
   -Mode Solution  → 生成 Solstice.sln（供 ms-vscode.cpptools）
   -Mode ClangDb   → 生成 compile_commands.json（供 vscode-clangd）
-  自动在 Engine\Binaries\DotNET\UnrealBuildTool\ 与 Engine\Binaries\Win64\ 两处寻找 UnrealBuildTool.exe。
+  优先用引擎自带 dotnet（Engine\Binaries\ThirdParty\DotNet\<ver>\win-x64\dotnet.exe）运行 UnrealBuildTool.dll，
+  与引擎 Build.bat 的做法一致；找不到该组合时才回退到 UnrealBuildTool.exe 直调。
+  （本机只装 .NET 8/9，而 UBT 需要 .NET 10，直调 .exe 必然失败 —— 见 docs/ops/ENV.md §2.4.1。）
   幂等；失败时透传退出码。
 
 .EXAMPLE
@@ -44,28 +46,60 @@ if ([string]::IsNullOrWhiteSpace($Project) -or -not (Test-Path -LiteralPath $Pro
     exit 1
 }
 
+
+$ubtDll = Join-Path $EngineRoot 'Engine\Binaries\DotNET\UnrealBuildTool\UnrealBuildTool.dll'
+
+# 引擎自带 dotnet（版本目录倒序，取最高）
+$dotnetCandidates = @()
+$dotnetRoot = Join-Path $EngineRoot 'Engine\Binaries\ThirdParty\DotNet'
+if (Test-Path -LiteralPath $dotnetRoot) {
+    $dotnetCandidates = @(
+        Get-ChildItem -LiteralPath $dotnetRoot -Directory -ErrorAction SilentlyContinue |
+            Sort-Object -Property @{ Expression = { try { [version]$_.Name } catch { [version]'0.0' } } } -Descending |
+            ForEach-Object { Join-Path $_.FullName 'win-x64\dotnet.exe' }
+    )
+}
+$dotnet = $dotnetCandidates | Where-Object { Test-Path -LiteralPath $_ } | Select-Object -First 1
+
 $ubtCandidates = @(
     (Join-Path $EngineRoot 'Engine\Binaries\DotNET\UnrealBuildTool\UnrealBuildTool.exe'),
     (Join-Path $EngineRoot 'Engine\Binaries\Win64\UnrealBuildTool.exe'),
     (Join-Path $EngineRoot 'Engine\Binaries\DotNET\UnrealBuildTool.exe')
 )
 $ubt = $ubtCandidates | Where-Object { Test-Path -LiteralPath $_ } | Select-Object -First 1
-if (-not $ubt) {
-    Write-Host '✗ 未找到 UnrealBuildTool.exe。请确认引擎完整安装（含 DotNET 目录）。' -ForegroundColor Red
-    Write-Host ("  已尝试：`n    " + ($ubtCandidates -join "`n    ")) -ForegroundColor DarkGray
+
+$useBundledDotnet = [bool]($dotnet -and (Test-Path -LiteralPath $ubtDll))
+if (-not $useBundledDotnet -and -not $ubt) {
+    Write-Host '✗ 未找到可用的 UnrealBuildTool（既无「引擎自带 dotnet + UnrealBuildTool.dll」，也无 UnrealBuildTool.exe）。' -ForegroundColor Red
+    $triedDotnet = if ($dotnetCandidates.Count -gt 0) { $dotnetCandidates -join "`n    " } else { '(未发现 ThirdParty\DotNet 目录)' }
+    Write-Host ("  已尝试 dotnet：`n    " + $triedDotnet) -ForegroundColor DarkGray
+    Write-Host ("  已尝试 exe   ：`n    " + ($ubtCandidates -join "`n    ")) -ForegroundColor DarkGray
     exit 1
 }
 
 Write-Host ("引擎：{0}" -f $EngineRoot) -ForegroundColor Cyan
 Write-Host ("工程：{0}" -f $Project) -ForegroundColor Cyan
-Write-Host ("UBT ：{0}" -f $ubt) -ForegroundColor Cyan
 
 if ($Mode -eq 'Solution') {
-    Write-Host '生成 Solstice.sln（cpptools）…' -ForegroundColor Green
-    & $ubt '-projectfiles' "-project=$Project" '-game' '-rocket' '-progress'
+    $ubtArgs = @('-projectfiles', "-project=$Project", '-game', '-rocket', '-progress')
+    $label   = '生成 Solstice.sln（cpptools）…'
 } else {
-    Write-Host '生成 compile_commands.json（clangd）…' -ForegroundColor Green
-    & $ubt '-Mode=GenerateClangDatabase' "-project=$Project" '-game'
+    $ubtArgs = @('-Mode=GenerateClangDatabase', "-project=$Project", '-game')
+    $label   = '生成 compile_commands.json（clangd）…'
+}
+
+if ($useBundledDotnet) {
+    Write-Host ("UBT ：{0}" -f $dotnet) -ForegroundColor Cyan
+    Write-Host ("      {0}" -f $ubtDll) -ForegroundColor DarkGray
+    Write-Host $label -ForegroundColor Green
+    # 与引擎 Build.bat 一致：以 Engine\Source 为工作目录运行 UBT
+    Push-Location (Join-Path $EngineRoot 'Engine\Source')
+    try { & $dotnet $ubtDll @ubtArgs } finally { Pop-Location }
+} else {
+    Write-Host ("UBT ：{0}" -f $ubt) -ForegroundColor Cyan
+    Write-Host '⚠ 未发现引擎自带 dotnet，回退为直调 UnrealBuildTool.exe（要求本机 .NET 运行时 ≥ 10）。' -ForegroundColor Yellow
+    Write-Host $label -ForegroundColor Green
+    & $ubt @ubtArgs
 }
 $code = $LASTEXITCODE
 

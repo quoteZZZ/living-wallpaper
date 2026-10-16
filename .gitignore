@@ -19,6 +19,9 @@
 
 # .uproject 生成的解决方案 / 工程文件。
 *.sln
+# VS2026 起 UBT 也会写 .slnx（同 .sln，均属派生物）；.vsconfig 是 UBT 生成的 VS 组件清单。
+*.slnx
+*.vsconfig
 *.suo
 *.opensdf
 *.sdf
