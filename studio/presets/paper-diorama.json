@@ -32,35 +32,102 @@
 		"low contrast",
 		"blurry"
 	],
+	"pipeline": {
+		"_comment": "Installed model triple on this machine (see docs/ops/ENV.md SS3). comfy_batch.py substitutes these into the workflow and uses unet as the default model when --model is omitted.",
+		"unet": "flux-2-klein-4b-fp8.safetensors",
+		"clip": "qwen_3_4b.safetensors",
+		"vae": "flux2-vae.safetensors",
+		"sampler": "euler",
+		"baseline": "steps=4, cfg=1.0, euler, Flux2Scheduler (docs/art/ASSETS.md SS3)"
+	},
 	"subjects": {
 		"paper-texture": {
-			"prompt": "seamless tileable paper texture, unbleached kraft and warm off-white cardstock, faint horizontal grain, tiny fibre flecks, evenly lit, top-down flat scan",
+			"prompt": "full-frame overhead flat scan of handmade paper that fills the entire frame edge to edge, unbleached kraft and warm off-white cardstock, faint horizontal grain, tiny fibre flecks, fully even diffuse light, seamless repeatable surface",
+			"words": [
+				"handmade paper craft",
+				"visible paper fibres",
+				"flat matte surface, no specular highlight",
+				"muted desaturated palette",
+				"no text, no watermark, no signature"
+			],
+			"negative": [
+				"single sheet photographed on a background",
+				"visible sheet edge",
+				"drop shadow",
+				"perspective",
+				"vignette",
+				"directional light",
+				"studio tabletop",
+				"tilt-shift",
+				"depth of field",
+				"bokeh",
+				"folded sheet",
+				"paper stack"
+			],
 			"size": [512, 512],
 			"tileable": true,
 			"count": 4
 		},
 		"ground-texture": {
-			"prompt": "seamless tileable cut-paper ground surface, layered contour ribbons like a topographic relief map, thin inked level lines, kraft and moss tones, flat top-down view",
+			"prompt": "full-frame overhead flat scan of a cut-paper terrain surface that fills the entire frame edge to edge, flat contour ribbons of paper like a topographic map, thin inked level lines, kraft and moss tones, no relief, no cast shadows, fully even diffuse light, seamless repeatable surface",
+			"words": [
+				"handmade paper craft",
+				"visible paper fibres",
+				"flat matte surface, no specular highlight",
+				"muted desaturated palette",
+				"no text, no watermark, no signature"
+			],
+			"negative": [
+				"photographed model on a table",
+				"perspective",
+				"vignette",
+				"directional light",
+				"cast shadow",
+				"embossed relief",
+				"depth of field",
+				"bokeh",
+				"glossy",
+				"3d render"
+			],
 			"size": [512, 512],
 			"tileable": true,
 			"count": 4
 		},
 		"water-texture": {
-			"prompt": "single sheet of pale blue translucent washi paper laid flat, gentle long wrinkles, no reflections, even light",
+			"prompt": "full-frame overhead flat scan of a single sheet of pale blue translucent washi paper that fills the entire frame edge to edge, gentle long wrinkles, no reflections, fully even diffuse light, seamless repeatable surface",
+			"words": [
+				"handmade paper craft",
+				"visible paper fibres",
+				"flat matte surface, no specular highlight",
+				"muted desaturated palette",
+				"no text, no watermark, no signature"
+			],
+			"negative": [
+				"photograph of real water",
+				"reflection",
+				"specular highlight",
+				"visible sheet edge",
+				"perspective",
+				"vignette",
+				"directional light",
+				"depth of field",
+				"bokeh",
+				"glossy"
+			],
 			"size": [512, 512],
 			"tileable": true,
 			"count": 2
 		},
 		"card-face": {
 			"prompt": "front face of a small handmade card, portrait 3:4, thick deckled paper edge, an empty framed panel in the centre reserved for a symbol, tiny corner ornaments, warm ivory",
-			"size": [768, 1024],
+			"size": [2048, 2732],
 			"tileable": false,
 			"count": 3
 		}
 	},
 	"sizing": {
 		"texture": "512x512, seamless",
-		"card": "768x1024, single face",
+		"card": "2048x2732, artwork only - frame, ornaments and text are drawn by UMG (docs/art/ART-STYLE.md SS4)",
 		"ui_icon": "128x128, single object on plain paper"
 	},
 	"license": {

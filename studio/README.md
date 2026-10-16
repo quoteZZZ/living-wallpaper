@@ -30,20 +30,27 @@ studio/
 ## 用法
 
 ```bash
-# 1. 起 ComfyUI（本机在 D:\ComfyUI）
+# 1. 起 ComfyUI（便携版自带；本机在 D:\ComfyUI）
 D:\ComfyUI\run_nvidia_gpu.bat
+# 本机另有一份隐藏窗口启动脚本（日志转 studio/out/，可反复执行）：
+#   powershell -ExecutionPolicy Bypass -File studio\scripts\start-comfy.ps1
+#   ⚠ 该脚本目前未入库 —— studio/scripts/ 不在 docs/tech/STRUCTURE.md §4 的目录表里，归位待定
 
 # 2. 检查模型与连通性
 python studio/tools/comfy_batch.py --check
 
-# 3. 跑纸纹任务
-python studio/tools/comfy_batch.py --jobs studio/jobs/paper-textures.jsonl \
-    --workflow studio/workflows/paper-texture.json
+# 3. 跑任务（默认工作流 studio/workflows/paper-texture.json）
+python studio/tools/comfy_batch.py --jobs studio/jobs/paper-textures.jsonl
+
+# 4. 只跑其中一类（纸纹 / 地表 / 水纹 / 卡面按 subject 分开出图）
+python studio/tools/comfy_batch.py --jobs studio/jobs/paper-textures.jsonl --only-subject paper-texture
 ```
 
-产物落在 `D:\ComfyUI\output\solstice\`，脚本会按 job 的 `out` 名字拷进 `studio/out/<子目录>/`
-并往 `studio/out/manifest.jsonl` 追加一行（含 prompt / seed / 模型 / 哈希），这是
-**AI 生成内容的合规留档**，必须入库。
+产物由脚本从 ComfyUI 的 `/view` 接口取回（不依赖输出目录布局），按 job 的 `out` 名字落进
+`studio/out/<子目录>/`，并往 `studio/out/manifest.jsonl` 追加一行（字段见
+[`../docs/art/ASSETS.md`](../docs/art/ASSETS.md) §2：id / kind / style / model / prompt 引用 /
+seed / 尺寸 / 日期 / source），这是 **AI 生成内容的合规留档**，必须入库。
+模型三元组与采样基线写在 `presets/paper-diorama.json` 的 `pipeline` 块里，脚本不硬编码模型名。
 
 ## 风格锚
 

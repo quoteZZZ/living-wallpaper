@@ -1,16 +1,21 @@
-// Solstice studio job list - paper and ground textures.
+// Solstice studio job list - paper, ground, water and card-face assets.
 // One JSON object per line. Read by studio/tools/comfy_batch.py.
 // seed is pinned: every asset must be reproducible from this file plus the preset.
-{"subject": "paper-texture", "out": "paper_raw_00", "subdir": "textures", "seed": 10211, "steps": 28, "cfg": 6.5, "size": [512, 512], "extra": ["unbleached raw paper, cool white"]}
-{"subject": "paper-texture", "out": "paper_raw_01", "subdir": "textures", "seed": 10212, "steps": 28, "cfg": 6.5, "size": [512, 512], "extra": ["warm ivory cardstock, very fine grain"]}
-{"subject": "paper-texture", "out": "paper_kraft_00", "subdir": "textures", "seed": 10213, "steps": 28, "cfg": 6.5, "size": [512, 512], "extra": ["kraft board, bold fibre flecks"]}
-{"subject": "paper-texture", "out": "paper_kraft_01", "subdir": "textures", "seed": 10214, "steps": 28, "cfg": 6.5, "size": [512, 512], "extra": ["recycled grey board, slightly mottled"]}
-{"subject": "ground-texture", "out": "ground_grass_00", "subdir": "textures", "seed": 20301, "steps": 30, "cfg": 6.5, "size": [512, 512], "extra": ["moss green contour bands, dense level lines"]}
-{"subject": "ground-texture", "out": "ground_woodland_00", "subdir": "textures", "seed": 20302, "steps": 30, "cfg": 6.5, "size": [512, 512], "extra": ["deep green contour bands, wider level lines"]}
-{"subject": "ground-texture", "out": "ground_rock_00", "subdir": "textures", "seed": 20303, "steps": 30, "cfg": 6.5, "size": [512, 512], "extra": ["cool grey stone contour bands, tight level lines"]}
-{"subject": "ground-texture", "out": "ground_sand_00", "subdir": "textures", "seed": 20304, "steps": 30, "cfg": 6.5, "size": [512, 512], "extra": ["pale sand contour bands, sparse level lines"]}
-{"subject": "water-texture", "out": "water_sheet_00", "subdir": "textures", "seed": 30401, "steps": 26, "cfg": 6.0, "size": [512, 512], "extra": ["pale blue washi, long soft wrinkles"]}
-{"subject": "water-texture", "out": "water_sheet_01", "subdir": "textures", "seed": 30402, "steps": 26, "cfg": 6.0, "size": [512, 512], "extra": ["deeper teal washi, short tight wrinkles"]}
-{"subject": "card-face", "out": "card_earth_00", "subdir": "cards", "seed": 40501, "steps": 32, "cfg": 7.0, "size": [768, 1024], "extra": ["earthy ochre ornament band along the bottom edge"]}
-{"subject": "card-face", "out": "card_fire_00", "subdir": "cards", "seed": 40502, "steps": 32, "cfg": 7.0, "size": [768, 1024], "extra": ["burnt orange ornament band along the bottom edge"]}
-{"subject": "card-face", "out": "card_metal_00", "subdir": "cards", "seed": 40503, "steps": 32, "cfg": 7.0, "size": [768, 1024], "extra": ["cold slate ornament band along the bottom edge"]}
+// Sampling follows the documented baseline (steps=4 / cfg=1.0 / euler / Flux2Scheduler,
+// docs/art/ASSETS.md SS3) because the installed model is FLUX.2 Klein 4B fp8 (distilled).
+// Card-face lines are sized to the current spec (2048x2732, docs/art/ART-STYLE.md SS4) and are
+// NOT part of the texture batch - run them with --only-subject card-face once the per-card
+// artwork briefs (M0 first cards) and the style calibration are settled.
+{"subject": "paper-texture", "out": "paper_raw_00", "subdir": "textures", "seed": 10211, "steps": 4, "cfg": 1.0, "size": [512, 512], "extra": ["unbleached raw paper, cool white"]}
+{"subject": "paper-texture", "out": "paper_raw_01", "subdir": "textures", "seed": 10212, "steps": 4, "cfg": 1.0, "size": [512, 512], "extra": ["warm ivory cardstock, very fine grain"]}
+{"subject": "paper-texture", "out": "paper_kraft_00", "subdir": "textures", "seed": 10213, "steps": 4, "cfg": 1.0, "size": [512, 512], "extra": ["kraft board, bold fibre flecks"]}
+{"subject": "paper-texture", "out": "paper_kraft_01", "subdir": "textures", "seed": 10214, "steps": 4, "cfg": 1.0, "size": [512, 512], "extra": ["recycled board, cool mid grey, visible speckle, slightly mottled"], "extra_negative": ["warm ivory", "cream", "beige", "yellow tint"]}
+{"subject": "ground-texture", "out": "ground_grass_00", "subdir": "textures", "seed": 20301, "steps": 4, "cfg": 1.0, "size": [512, 512], "extra": ["moss green contour bands, dense level lines"]}
+{"subject": "ground-texture", "out": "ground_woodland_00", "subdir": "textures", "seed": 20302, "steps": 4, "cfg": 1.0, "size": [512, 512], "extra": ["deep green contour bands, wider level lines"]}
+{"subject": "ground-texture", "out": "ground_rock_00", "subdir": "textures", "seed": 20303, "steps": 4, "cfg": 1.0, "size": [512, 512], "extra": ["cool grey stone contour bands, tight level lines"]}
+{"subject": "ground-texture", "out": "ground_sand_00", "subdir": "textures", "seed": 20304, "steps": 4, "cfg": 1.0, "size": [512, 512], "extra": ["pale sand contour bands, sparse level lines"]}
+{"subject": "water-texture", "out": "water_sheet_00", "subdir": "textures", "seed": 30401, "steps": 4, "cfg": 1.0, "size": [512, 512], "extra": ["pale blue washi, long soft wrinkles"]}
+{"subject": "water-texture", "out": "water_sheet_01", "subdir": "textures", "seed": 30402, "steps": 4, "cfg": 1.0, "size": [512, 512], "extra": ["deeper grey-teal washi, short tight wrinkles, muted and desaturated"], "extra_negative": ["saturated cyan", "vivid turquoise", "neon"]}
+{"subject": "card-face", "out": "card_earth_00", "subdir": "cards", "seed": 40501, "steps": 4, "cfg": 1.0, "size": [2048, 2732], "extra": ["earthy ochre ornament band along the bottom edge"], "note": "candidate only - awaiting per-card artwork brief and user pick"}
+{"subject": "card-face", "out": "card_fire_00", "subdir": "cards", "seed": 40502, "steps": 4, "cfg": 1.0, "size": [2048, 2732], "extra": ["burnt orange ornament band along the bottom edge"], "note": "candidate only - awaiting per-card artwork brief and user pick"}
+{"subject": "card-face", "out": "card_metal_00", "subdir": "cards", "seed": 40503, "steps": 4, "cfg": 1.0, "size": [2048, 2732], "extra": ["cold slate ornament band along the bottom edge"], "note": "candidate only - awaiting per-card artwork brief and user pick"}
