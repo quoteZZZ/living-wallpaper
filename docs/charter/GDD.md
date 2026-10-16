@@ -1,8 +1,8 @@
 ---
 id: charter/GDD
 title: 立项需求与设计真源
-version: 7.3
-date: 2026-10-15
+version: 7.4
+date: 2026-10-16
 status: active
 truth: owner
 owner: both
@@ -100,7 +100,7 @@ owner: both
 | **美术与资产**<br>`art/` | [`ART-STYLE.md`](../art/ART-STYLE.md) · [`ASSETS.md`](../art/ASSETS.md) | 渲染配方 / 色板 / 素材规格 / 验收 ‖ 资产生产、登记、QC、合规 |
 | **开发**<br>`tech/` | [`ARCHITECTURE.md`](../tech/ARCHITECTURE.md) · [`STRUCTURE.md`](../tech/STRUCTURE.md) | 模块与硬约束 / 性能预算 ‖ 目录与命名（含归位表） |
 | **计划**<br>`plan/` | [`ROADMAP.md`](../plan/ROADMAP.md) | 三阶段切分、M0 验收、风险、执行计划 P0–P5 |
-| **流程与环境**<br>`ops/` | [`WORKFLOW.md`](../ops/WORKFLOW.md) · [`SYNC.md`](../ops/SYNC.md) · [`ENV.md`](../ops/ENV.md) · [`VSCODE.md`](../ops/VSCODE.md) | 分工与评审闸门 / 双机同步 / 环境安装 / 编辑器配置 |
+| **流程与环境**<br>`ops/` | [`WORKFLOW.md`](../ops/WORKFLOW.md) · [`ENV.md`](../ops/ENV.md) · [`VSCODE.md`](../ops/VSCODE.md) | 分工与评审闸门、提交规范 / 环境安装 / 编辑器配置 |
 | **归档** | [`../archive/README.md`](../archive/README.md) | 作废稿清单与可继承项（**无约束力**） |
 
 ### 4.1 旧章节号对照（6.x 及更早版本的引用如何解读）
@@ -159,3 +159,4 @@ owner: both
 | 7.1 | 2026-10-15 | §0 世界形态补**界壁 = 上半球穹顶罩**与**万物有物理属性**（第 36 轮）；§4 文档地图新增 `setting/PHYSICS.md` |
 | 7.2 | 2026-10-15 | **删除「类别」维度**（第 42 轮）：§0 干涉体系与 §3 支柱③去"四组十二类 / 十二类"表述；卡种 = 元素 × 环级 × 卡类（+ 卡型 / 作用方向 / 作用域字段） |
 | 7.3 | 2026-10-15 | **删除「卡型」维度**（第 43 轮）：§0 干涉体系改"三卡类 + 持续性字段"；触发机制由律类 + 持续性 = 触发承载（TRIGGERS 不变） |
+| 7.4 | 2026-10-16 | §4 文档地图移除 `ops/SYNC.md`（双机协作废止，SYNC-v1.1 归档；git 约定并入 [`WORKFLOW.md`](../ops/WORKFLOW.md) §5） |

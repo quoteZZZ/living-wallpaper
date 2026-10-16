@@ -1,8 +1,8 @@
 ---
 id: archive/README
 title: 归档说明
-version: 1.1
-date: 2026-10-14
+version: 1.2
+date: 2026-10-16
 status: active
 truth: nav
 owner: ai
@@ -26,8 +26,9 @@ owner: ai
 | [`DESIGN-v3.md`](DESIGN-v3.md) | `docs/DESIGN.md` | v3.0 / 2026-10-13 | 描述《至日·岁局》单机肉鸽自走棋卡牌（2.5D 固定斜俯视、`shared/` 契约、`studio/` 生图线），形态已被否决，整体降级为参考 |
 | [`STORY-v1.md`](STORY-v1.md) | `docs/STORY.md` | v1.0 / 2026-10-13 | 是 DESIGN v3.0 §3 的展开（父源已作废），四时界叙事设定不再适用于「界 / 界外 / 七原质」世界观 |
 | [`ART-STYLE-v1.md`](ART-STYLE-v1.md) | `docs/ART-STYLE.md` | v1.0 / 2026-10-13 | 卡面与卡牌版式规范全部作废；八系属性语言（含日/月/灵）与现行七元素不符；§5 为 2.5D 相机规范 |
+| [`SYNC-v1.1.md`](SYNC-v1.1.md) | `docs/ops/SYNC.md` | v1.1 / 2026-10-14 | 双机 git 同步约定——2026-10-16 起**双机协作模式废止，回归单机开发**；定时同步计划任务与"未 push 视为未落地"口径不再适用，git 约定改见 [`../ops/WORKFLOW.md`](../ops/WORKFLOW.md) §5 |
 
-**作废宣布时间**：2026-10-14（随 `README.md` 与本文档一并落档）。
+**作废宣布时间**：2026-10-14（随 `README.md` 与本文档一并落档）；2026-10-16 增补 `SYNC-v1.1.md`（双机协作废止）。
 
 ---
 
@@ -40,6 +41,7 @@ owner: ai
 | `ART-STYLE-v1.md` | 生图 Prompt 串、批次一致性、QC 清单、"避免人脸特写" | [`../art/ASSETS.md`](../art/ASSETS.md) §3 / §4 + [`../art/ART-STYLE.md`](../art/ART-STYLE.md) §5 | ✅ 已迁入 |
 | `STORY-v1.md` | 叙事设计原则（不写小说 / 不解释机制 / 真相靠拼接 / 原创零借名） | [`../setting/WORLD.md`](../setting/WORLD.md) §1 | ✅ 已迁入 |
 | `STORY-v1.md` | 语料与命名规范、对话写作规范 | [`../setting/WORLD.md`](../setting/WORLD.md) §2 / §3 | ✅ 已迁入并改写 |
+| `SYNC-v1.1.md` | Content 大资产不入 git、由"种子 + 生成器 + 契约 + manifest"重建的思路 | [`../tech/STRUCTURE.md`](../tech/STRUCTURE.md) §9 | ✅ 早已迁入（与双机无关，单机下继续有效） |
 
 ---
 
@@ -67,3 +69,4 @@ owner: ai
 |---|---|---|
 | 1.0 | 2026-10-14 | 建立归档说明：三份作废稿的清单、可继承项与引用禁令 |
 | 1.1 | 2026-10-14 | 可继承项已全部落地（P3）；补"更新触发"章节与统一骨架 |
+| 1.2 | 2026-10-16 | 归档 `SYNC-v1.1.md`（双机协作废止，回归单机开发；可继承项 = Content 重建思路，已在 STRUCTURE §9 承载） |

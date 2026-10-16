@@ -11,7 +11,7 @@ owner: both
 # 双机 git 同步（SYNC）
 
 > 约定：**git 是唯一真源**（远端仓库 `origin`）+ 计划任务定时 `pull` / `push`。大二进制资产不进 git（见 §4）。
-> 提交规范与文档纪律见 [`WORKFLOW.md`](WORKFLOW.md) §2 / §3。
+> 提交规范与文档纪律见 [`WORKFLOW.md`](../ops/WORKFLOW.md) §2 / §3。
 > **路径约定**：下文示例用变量 `$repo` 表示**本机仓库根**——两台机器各自填自己的路径（本机为 `E:\solstice`，另一台按实际填写），**不要照抄别的机器的绝对路径**。
 
 ---

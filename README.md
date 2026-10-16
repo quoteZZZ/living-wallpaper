@@ -101,7 +101,7 @@ solstice/
 - **文档纪律**：文档先行；任何文档增删改必须同次更新 [`docs/INDEX.md`](docs/INDEX.md)。
 - **分工**：AI ≈ 85%（代码 / 脚本 / 文档 / 数据 / 生图调度）；用户 ≈ 15%（安装、GUI 操作、审美裁决）。
 - **逻辑在 C++、表现层在蓝图**：确定性内核（模拟 / 时间 / 存档）不得依赖蓝图。
-- **双机同步**：git 是唯一真源，未 push 视为未落地（见 [`docs/ops/SYNC.md`](docs/ops/SYNC.md)）。
+- **git 版本管理（单机）**：未提交视为未落地；`origin`（GitHub）仅作异地备份与 CI 自检（见 [`docs/ops/WORKFLOW.md`](docs/ops/WORKFLOW.md) §5）。
 - **素材合规**：AI 生成素材逐张留档（模型 / prompt / seed / 日期），满足 Steam AI 披露（见 [`docs/art/ASSETS.md`](docs/art/ASSETS.md) §2、§5）。
 
 ---

@@ -1,7 +1,7 @@
 ---
 id: tech/STRUCTURE
 title: 目录与命名唯一真源
-version: 3.2
+version: 3.4
 date: 2026-10-16
 status: active
 truth: subsystem
@@ -15,6 +15,7 @@ owner: ai
 > 版本 3.1（2026-10-16）：提交前自检脚本入库 `tools/checks/`（INDEX §5 命令同步）；`Content/` 子目录树对齐实际；§3 依赖清单按 Build.cs 瘦身修正；登记 §10.7 打包 stage 待办。
 > 版本 3.2（2026-10-16）：自检自动执行两道闸门入库——`tools/hooks/` pre-commit + `tools/install-hooks.ps1`（本地）、`.github/workflows/checks.yml`（CI，无需引擎）；validate-contracts 扩展本地化 key 对齐校验。
 > 版本 3.3（2026-10-16）：修复 cards 数据 `mat`→`material` 键名（DataLoader `ReadParams` 只认 `material`，原字符串被 `Atof` 解析成 0 = Paper 材质）；`card.schema.json` params 收紧为 key 白名单 + material/weather 枚举；新增 `save.schema.json` 信封骨架 + `shared/fixtures/save.sample.json`，validate-contracts 扩为 6 对契约。
+> 版本 3.4（2026-10-16）：双机协作废止、回归单机开发——§9 改写为「git 与 Content 重建」（可重建性保证对单机 / 重装 / 换机同样成立）；`ops/SYNC.md` 归档（`archive/SYNC-v1.1.md`），§11 更新触发同步；头部版本号与沿革对齐（3.3 曾漏记）。
 > 旧稿（v1.0）的 `app/` `studio/` `shared/` 三分法已作废——`app/` 随旧形态删除。
 
 ---
@@ -229,18 +230,18 @@ shared/
 
 ---
 
-## 9 git 与双机同步
+## 9 git 与 Content 重建
 
 **入 git**：`game/Source`、`game/Config`、`game/Solstice.uproject`、`game/Content/README.md` 与 `.gitkeep`、`shared/`、`studio/{workflows,jobs,presets,tools,README.md}`、`studio/out/manifest.jsonl`、`tools/`、`docs/`、`.vscode/`、`.github/`、`.codebuddy/`、`.workbuddy/`、`.gitattributes`。
 
 **不入 git**：`game/{Binaries,Intermediate,Saved,DerivedDataCache}`、`game/Content/**` 的二进制（含生成的 `M_Paper.uasset` / `M_Ink.uasset`）、`studio/out/**`（除 manifest）、`studio/work/**`、`.vs/`、`*.sln`、`tmp/`。
 
-**双机一致性的保证**：Content 不入 git ⇒ 两台机器用**同一套"种子 + 生成器 + 契约 + manifest"**独立重建。因此：
+**可重建性的保证**（对单机开发、重装系统、更换机器同样成立）：Content 不入 git ⇒ **同一套"种子 + 生成器 + 契约 + manifest"**可完整重建产物。因此：
 1. 生成器与契约的改动必须与产物**同一次提交**；
 2. manifest 是产物的"身份证明"，缺 manifest 的素材视为**不可复现**，不得进游戏；
 3. 卡面 / 立绘类素材**单独提交**，先过用户裁决。
 
-> **操作细节已移交**：[`../ops/SYNC.md`](../ops/SYNC.md)（定时同步、冲突处理、LFS 选项）与 [`../ops/WORKFLOW.md`](../ops/WORKFLOW.md) §3（提交规范）。本节只定义**哪些目录入 git**。
+> **操作细节**：提交规范见 [`../ops/WORKFLOW.md`](../ops/WORKFLOW.md) §3 / §5。本节只定义**哪些目录入 git**。旧的双机同步约定（`SYNC` v1.1）已随双机协作废止而归档。
 
 ---
 
@@ -262,7 +263,7 @@ shared/
 |---|---|
 | 新增 / 移动目录、改命名 | 本文件对应章节（含 §8 归位表）+ `.gitignore` 注释 + [`../INDEX.md`](../INDEX.md) |
 | 目录从"计划"变为"现状" | 本文件所有 🟡 状态列 + 相关文档的存在性描述 |
-| 入 git 策略变化 | 本文件 §9 + [`../ops/SYNC.md`](../ops/SYNC.md) §3 / §4 |
+| 入 git 策略变化 | 本文件 §9 + [`../ops/WORKFLOW.md`](../ops/WORKFLOW.md) §5 |
 | 模块 / Target / Commandlet 增删 | 本文件 §2 / §3 + [`../ops/ENV.md`](../ops/ENV.md) §2.6 |
 | 命名规范变化 | 本文件 §7 + [`../setting/WORLD.md`](../setting/WORLD.md) §2（如涉及文案用词） |
 
@@ -282,3 +283,4 @@ shared/
 | 3.1 | 2026-10-16 | 提交前自检脚本入库 `tools/checks/`（check-links / validate-contracts，标准库实现）；`Content/` 子目录树对齐实际（6 子目录）；§3 依赖清单按 Build.cs 实测瘦身（去 UMG / JsonUtilities / RenderCore / RHI）；§6/§10.7 登记运行时 JSON 打包 stage 待办（P5 前必须） |
 | 3.2 | 2026-10-16 | 自检自动执行两道闸门：`tools/hooks/pre-commit` + `tools/install-hooks.ps1`（本地，`core.hooksPath`）、`.github/workflows/checks.yml`（CI，无需引擎）；validate-contracts 扩展 Localization 双语言 key 对齐 + 占位符校验；新增 `.gitattributes`（钩子 LF 锁定） |
 | 3.3 | 2026-10-16 | 修复 cards 数据 `mat`→`material` 键名（6 处；`ReadParams` 只认 `material`，原值被 `Atof` 解析成 0 = Paper 材质）；`card.schema.json` params 收紧为 key 白名单 + material / weather 枚举（堵静默漂移）；新增 `save.schema.json` 信封骨架 + `shared/fixtures/save.sample.json`；validate-contracts 扩为 6 对契约（PAIRS 携带各自数据目录） |
+| 3.4 | 2026-10-16 | 双机协作废止、回归单机开发：§9 改写为「git 与 Content 重建」（单机 / 重装 / 换机均可重建）；`ops/SYNC.md` 归档 `archive/SYNC-v1.1.md`；§11 触发行改指 WORKFLOW §5；frontmatter 版本号对齐沿革（3.3 曾漏记） |

@@ -1,8 +1,8 @@
 ---
 id: ops/WORKFLOW
 title: 协作与流程
-version: 1.0
-date: 2026-10-14
+version: 1.1
+date: 2026-10-16
 status: active
 truth: nav
 owner: both
@@ -13,7 +13,7 @@ owner: both
 ## 0 本文件管什么 / 不管什么
 
 - **管**：AI 与用户的分工、文档纪律（谁先谁后）、提交规范、评审闸门（哪些事必须用户裁决）、**新会话的进入方式与禁止事项**。
-- **不管**：双机 git 同步的具体操作（见 [`SYNC.md`](SYNC.md)）；环境安装（见 [`ENV.md`](ENV.md)）；设计与规格本身（见 [`../charter/GDD.md`](../charter/GDD.md)）。
+- **不管**：环境安装（见 [`ENV.md`](ENV.md)）；设计与规格本身（见 [`../charter/GDD.md`](../charter/GDD.md)）。
 
 ---
 
@@ -49,7 +49,7 @@ owner: both
 | 文档与代码 | 同一次改动产生的文档与代码**同一次提交**（"文档先行"不等于"分开提交"） |
 | 素材 | 卡面 / 立牌 / 风格图**单独提交**（便于回溯与回退） |
 | 派生文件 | `Intermediate/`、`Binaries/`、`*.sln`、`compile_commands.json`、`Content/**` 二进制**不入库** |
-| 不 force push | 共享分支禁止强推（见 [`SYNC.md`](SYNC.md) §3） |
+| 不 force push | `main` 禁止强推（`origin` 是异地备份，强推会毁备份） |
 
 ---
 
@@ -67,9 +67,14 @@ owner: both
 
 ---
 
-## 5 双机同步
+## 5 git 约定（单机开发）
 
-见 [`SYNC.md`](SYNC.md)。要点：**git 是唯一真源**（未 push 视为未落地）、定时 `pull --rebase --autostash` + `push`、同一时间只允许一台机器改同一文件。
+**单机开发**（2026-10-16 起；旧双机协作模式已废止，归档见 [`../archive/SYNC-v1.1.md`](../archive/SYNC-v1.1.md)）：
+
+- git 只承担**版本管理与历史回溯**；`origin`（GitHub）作为**异地备份**并触发 CI 自检。
+- **未提交视为未落地**；小步提交，素材类改动单独提交（§3）。push 不再有时效义务，按里程碑 / 阶段推送即可。
+- `main` 禁止 force push；不使用定时同步计划任务。
+- Content 大资产不入 git、可由"种子 + 生成器 + 契约 + manifest"重建——见 [`../tech/STRUCTURE.md`](../tech/STRUCTURE.md) §9。
 
 ---
 
@@ -102,7 +107,7 @@ owner: both
 | 分工比例 / 用户职责变化 | 本文件 §1 + [`../charter/GDD.md`](../charter/GDD.md) §0 |
 | 提交规范变化 | 本文件 §3 + `README.md` §六 |
 | 新增评审闸门 | 本文件 §4 + 对应文档（ART-STYLE / ASSETS / ROADMAP） |
-| 协作方式变化 | 本文件 + [`SYNC.md`](SYNC.md)（如涉及双机） |
+| 协作方式变化 | 本文件 |
 
 ---
 
@@ -111,3 +116,4 @@ owner: both
 | 版本 | 日期 | 变更 |
 |---|---|---|
 | 1.0 | 2026-10-14 | 新建；汇总 `README.md` §六 协作约定、旧 `.codebuddy/rules`（已删）中仍有效的纪律、以及各文档的评审闸门 |
+| 1.1 | 2026-10-16 | **双机协作废止，改单机开发**：§5 改为单机 git 约定（git = 版本管理 + 备份 + CI，不再定时同步）；`SYNC.md` 归档（`archive/SYNC-v1.1.md`）；§0 / §3 / §7 同步去引用 |

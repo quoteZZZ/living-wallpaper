@@ -244,15 +244,6 @@
 
     // ==================== 版本控制 ====================
     {
-      "label": "Git: 同步（pull --rebase + push）",
-      "type": "shell",
-      "command": "git",
-      "args": ["pull", "--rebase", "--autostash"],
-      "options": { "cwd": "${workspaceFolder}" },
-      "problemMatcher": [],
-      "presentation": { "reveal": "always", "panel": "shared" }
-    },
-    {
       "label": "Git: 提交全部改动",
       "detail": "提交信息请用英文简短祈使句（仓库约定）。",
       "type": "shell",

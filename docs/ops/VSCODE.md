@@ -1,8 +1,8 @@
 ---
 id: ops/VSCODE
 title: VSCode 工作区配置说明
-version: 1.1
-date: 2026-10-14
+version: 1.2
+date: 2026-10-16
 status: active
 truth: nav
 owner: ai
@@ -21,7 +21,7 @@ owner: ai
 |---|---|---|
 | `.vscode/settings.json` | **主配置**：编码、缩进、排除规则、C++、PowerShell、终端、扩展调优 | 占位符 `__UE_ENGINE_ROOT__` 由脚本替换 |
 | `.vscode/extensions.json` | **扩展清单唯一真源**：recommendations / unwantedRecommendations | 改这里即改推荐清单 |
-| `.vscode/tasks.json` | 任务：构建、工程文件、环境体检、契约校验、生图、Git 同步 | `Ctrl+Shift+B` = 默认构建 |
+| `.vscode/tasks.json` | 任务：构建、工程文件、环境体检、契约校验、生图、Git 提交 | `Ctrl+Shift+B` = 默认构建 |
 | `.vscode/launch.json` | 调试：`cppvsdbg` attach/launch、PowerShell 脚本调试 | 需 VS2022 生成工具 |
 | `.vscode/c_cpp_properties.json` | IntelliSense：includePath、宏定义、compileCommands | 同上有占位符 |
 | `.vscode/solstice.code-workspace` | 工作区文件（单根 = 仓库根） | 见 §5；**不再重复声明 extensions**，见 §3.1 |
@@ -36,7 +36,7 @@ owner: ai
 
 **推荐**：`文件 → 打开工作区 → .vscode\solstice.code-workspace`
 
-或直接打开**本机仓库根文件夹**（本机为 `E:\solstice`，另一台按实际填写；`.vscode/settings.json` 同样生效，效果一致）。
+或直接打开**本机仓库根文件夹**（本机为 `E:\solstice`；`.vscode/settings.json` 同样生效，效果一致）。
 
 首次打开后建议按顺序执行（`Ctrl+Shift+P → Tasks: Run Task`）：
 
@@ -85,7 +85,7 @@ owner: ai
 | | `streetsidesoftware.code-spell-checker` | 中英拼写检查（已配 `cSpell.words`） |
 | | `christian-kohler.path-intellisense` | 路径补全 |
 | | `sleistner.vscode-fileutils` | 文件操作增强 |
-| 版本控制 | `eamodio.gitlens` | git blame / 历史（双机同步场景有用） |
+| 版本控制 | `eamodio.gitlens` | git blame / 历史（查改动出处） |
 | | `mhutchie.git-graph` | 图形化 git 历史 |
 | 素材 / 二进制 | `jock.svg` | SVG 预览 |
 | | `ms-vscode.hexeditor` | 十六进制查看 `.uasset` 头部 |
@@ -153,7 +153,7 @@ powershell -ExecutionPolicy Bypass -File tools\vscode-extensions.ps1 -RemoveUnwa
 
 | 扩展 | 安装量 | 判断 |
 |---|---|---|
-| `eamodio.gitlens` | — | 2026-10-14 补装；提交历史 / blame，双机同步场景有用 |
+| `eamodio.gitlens` | — | 2026-10-14 补装；提交历史 / blame |
 | `jeff-hykin.better-cpp-syntax` | 12.78M | 纯语法高亮，零风险；UE 反射宏密集的代码可读性明显更好 |
 
 **③ 条件性候选（暂不安装）**
@@ -319,3 +319,4 @@ powershell -ExecutionPolicy Bypass -File tools\vscode-extensions.ps1 -RemoveUnwa
 |---|---|---|
 | 1.0 | 2026-10-14 | 补统一文档头；改去《至日 · 岁局》旧形态表述 |
 | 1.1 | 2026-10-14 | 迁入 `docs/ops/`；去掉他人机器的硬编码路径；§3.5 的 34 个扩展明细精简为摘要（明细见 `extensions.json` 与 git `c58bc89`）；把 `docs\STRUCTURE.md` 引用改为 `docs\tech\STRUCTURE.md` |
+| 1.2 | 2026-10-16 | 双机协作废止（单机开发）：§1 tasks.json 去“Git 同步”任务行、§2 / §3.3 / §3.8 去双机措辞 |
