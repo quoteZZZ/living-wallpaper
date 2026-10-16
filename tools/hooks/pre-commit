@@ -1,0 +1,9 @@
+#!/bin/sh
+# Solstice pre-commit hook: run the two Python self-checks (stdlib-only).
+# Install once per clone:  powershell -ExecutionPolicy Bypass -File tools\install-hooks.ps1
+# Uninstall:               git config --unset core.hooksPath
+echo '[solstice] check-links ...'
+python tools/checks/check-links.py || exit 1
+echo '[solstice] validate-contracts ...'
+python tools/checks/validate-contracts.py || exit 1
+exit 0

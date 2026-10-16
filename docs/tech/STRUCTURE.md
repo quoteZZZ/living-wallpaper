@@ -1,7 +1,7 @@
 ---
 id: tech/STRUCTURE
 title: 目录与命名唯一真源
-version: 3.0
+version: 3.2
 date: 2026-10-16
 status: active
 truth: subsystem
@@ -12,6 +12,9 @@ owner: ai
 
 > **本文档是"新文件放哪、叫什么"的唯一真源。** 与 [`../charter/GDD.md`](../charter/GDD.md) 冲突时以 GDD 为准，并在同一次改动内同步修正本文。
 > 版本 3.0（2026-10-16）：M0 工程落地，`game/` `studio/` `shared/` 三个目录由"计划中"转为"现状"，**全文状态列据实改写**；`Source/` 结构按实际编译通过的工程修正（`.Target.cs` 在 `Source/` 下，不在工程根）。
+> 版本 3.1（2026-10-16）：提交前自检脚本入库 `tools/checks/`（INDEX §5 命令同步）；`Content/` 子目录树对齐实际；§3 依赖清单按 Build.cs 瘦身修正；登记 §10.7 打包 stage 待办。
+> 版本 3.2（2026-10-16）：自检自动执行两道闸门入库——`tools/hooks/` pre-commit + `tools/install-hooks.ps1`（本地）、`.github/workflows/checks.yml`（CI，无需引擎）；validate-contracts 扩展本地化 key 对齐校验。
+> 版本 3.3（2026-10-16）：修复 cards 数据 `mat`→`material` 键名（DataLoader `ReadParams` 只认 `material`，原字符串被 `Atof` 解析成 0 = Paper 材质）；`card.schema.json` params 收紧为 key 白名单 + material/weather 枚举；新增 `save.schema.json` 信封骨架 + `shared/fixtures/save.sample.json`，validate-contracts 扩为 6 对契约。
 > 旧稿（v1.0）的 `app/` `studio/` `shared/` 三分法已作废——`app/` 随旧形态删除。
 
 ---
@@ -22,9 +25,10 @@ owner: ai
 |---|---|---|---|
 | `game/` | **进发行包**：UE 工程、源码、配置 | 源码 / 配置 **入**；二进制资产 **不入** | ✅ **现状**（`.uproject` + 2 个 Target + 主模块 `Solstice` + 编辑器模块 `SolsticeEditor`；M0 目标已编译通过并实测运行） |
 | `studio/` | **产出素材**：ComfyUI 生图线、生成产物、风格锚与预设 | 工作流 / 任务 / 预设 / manifest **入**；产物 **不入** | ✅ **现状**（工作流 / jobs / 预设 / 驱动脚本已落地；`out/` 产物尚未生成，`manifest.jsonl` 仅表头） |
-| `shared/` | **双方共读的契约**：JSON Schema | **入** | ✅ **现状**（`schema/` 3 个：`card` / `species` / `world`；`style` 与 `save` 待 M1） |
-| `tools/` | **开发期脚本**：环境、工程生成、构建、内容生成、基准 | **入** | ✅ **现状**（11 个 PowerShell + README） |
+| `shared/` | **双方共读的契约**：JSON Schema | **入** | ✅ **现状**（`schema/` 4 个：`card` / `species` / `world` / `save`（信封骨架）+ `fixtures/` 1 个；`style` 待 M1） |
+| `tools/` | **开发期脚本**：环境、工程生成、构建、内容生成、基准、提交前自检、提交钩子 | **入** | ✅ **现状**（12 个 PowerShell + `checks/` 2 个 Python + `hooks/` pre-commit + README） |
 | `docs/` | 设计与约定文档 | **入** | ✅ **现状**（结构见 [`../INDEX.md`](../INDEX.md)） |
+| `.github/` | **CI**：GitHub Actions 跑 `tools/checks/` 两条自检（无需引擎） | **入** | ✅ **现状**（`workflows/checks.yml`） |
 | `.vscode/` `.codebuddy/` `.workbuddy/` | IDE 与项目数据配置 | **入** | ✅ **现状** |
 
 **核心不变量**：`game/Content/` 的二进制资产**不入 git**，因此必须**可由"种子 + 生成器 + 契约 + manifest"完整重建**。这是全部目录设计的出发点。
@@ -40,8 +44,9 @@ solstice/
 ├─ game/          ✅ 现状  —— 虚幻引擎工程（进发行包）
 ├─ studio/        ✅ 现状  —— 本地生图线 + 程序化资产产物
 ├─ shared/        ✅ 现状  —— 契约：JSON Schema（引擎与生图线共读）
-├─ tools/         ✅ 现状  —— 开发期脚本：环境 / 工程生成 / 构建 / 内容生成 / 基准
+├─ tools/         ✅ 现状  —— 开发期脚本：环境 / 工程生成 / 构建 / 内容生成 / 基准 / 自检（checks/）/ 提交钩子（hooks/）
 ├─ docs/          ✅ 现状  —— 见 ../INDEX.md（charter / setting / gameplay / art / tech / plan / ops / archive）
+├─ .github/       ✅ 现状  —— CI：GitHub Actions 跑 checks/ 两条自检（无需引擎）
 ├─ .vscode/       ✅ 现状  —— 构建任务 / 调试 / cpptools / 代码片段
 ├─ .codebuddy/    ✅ 现状  —— agents/ 与 rules/（项目数据，勿删）
 ├─ .workbuddy/    ✅ 现状  —— memory/：工作日志与长期项目笔记（项目数据，勿删）
@@ -65,8 +70,9 @@ game/
 │  └─ Solstice/
 │     ├─ Data/                  ★ 运行时契约 JSON（cards.earth / cards.fire / cards.metal / species / world）
 │     └─ Localization/          ★ 中英双语文本（zh-Hans.json / en.json）
-├─ Content/                     ⚠ 二进制资产，不入 git（可由管线重建）
-│  └─ Core/                     两个纸材质主材质：M_Paper.uasset / M_Ink.uasset（由 gen-assets.ps1 生成）
+├─ Content/                     ⚠ 二进制资产不入 git；目录骨架（每子目录 .gitkeep）入 git
+│  ├─ Core/                     M_Paper.uasset / M_Ink.uasset（由 gen-assets.ps1 生成）
+│  └─ World/ Cards/ UI/ Data/ Levels/   目前均为占位；用途与生成方见 game/Content/README.md
 ├─ Source/
 │  ├─ Solstice.Target.cs            游戏目标（无编辑器依赖，产出 Solstice.exe）
 │  ├─ SolsticeEditor.Target.cs      编辑器目标（产出 UnrealEditor-SolsticeEditor.dll）
@@ -91,7 +97,7 @@ game/
 
 | 模块 | 依赖 | 说明 |
 |---|---|---|
-| `Solstice` | `Core` `CoreUObject` `Engine` `ProceduralMeshComponent` `HTTP` `Json`（**无** UMG / Niagara / Lumen / Nanite） | 主模块。`Sim/` 子目录**禁止** include 渲染 / 输入 / UObject 头 |
+| `Solstice` | 公共 `Core` `CoreUObject` `Engine` `InputCore` `Json` `ProceduralMeshComponent`；私有 `Slate` `SlateCore` `HTTP`（**无** UMG / JsonUtilities / RenderCore / RHI / Niagara / Lumen / Nanite） | 主模块。`Sim/` 子目录**禁止** include 渲染 / 输入 / UObject 头 |
 | `SolsticeEditor` | `Solstice` + `UnrealEd` `MaterialEditor` `AssetTools` `AssetRegistry` `RenderCore` `RHI` | 类型 `Editor`，`LoadingPhase: Default`。两个 Commandlet：`SolsticeGenAssets`（生成主材质）、`SolsticeBench`（无头确定性回归） |
 
 **主材质是靠代码建图生成的**：`UnrealEd` 只在编辑器模块里，而运行模块不能链接它，所以运行模块把"怎么生成"这件事抽象成一个 `TFunction`（`Solstice::GBuildPaperMaterials`），编辑器模块在 `StartupModule` 里把它的实现塞进去。运行模块在 `/Game/Core/M_Paper` 缺失时才调它一次——这就是新克隆自愈的机制。
@@ -131,13 +137,16 @@ studio/
 ```text
 shared/
 ├─ README.md
+├─ fixtures/
+│  └─ save.sample.json     存档信封样例（validate-contracts 第 6 对契约的校验对象；M1 实装的真值参考）
 └─ schema/
    ├─ species.schema.json   物种模板（[`../setting/SPECIES.md`](../setting/SPECIES.md) §1）
-   ├─ card.schema.json      干涉卡（元素 / 级 / 卡型 / 持续性 / 作用域 / 参数）
-   └─ world.schema.json     界：尺寸 / 地形算法与种子 / 生态域 / 水体 / 大气 / 法则
+   ├─ card.schema.json      干涉卡（元素 / 级 / 卡型 / 持续性 / 作用域 / 参数白名单）
+   ├─ world.schema.json     界：尺寸 / 地形算法与种子 / 生态域 / 水体 / 大气 / 法则
+   └─ save.schema.json      存档信封：版本 + 元数据 + 快照 / 卡池历史 / 年表容器（载荷 M1 收紧）
 ```
 
-**待 M1**：`style.schema.json`（风格主题参数）、`save.schema.json`（存档：元数据 + 快照 + 卡池历史 + 年表）。
+**待 M1**：`style.schema.json`（风格主题参数）；`save.schema.json` 已落**信封骨架**（版本 + 元数据 + 三个载荷容器），snapshot / card_history / chronicle 的内部结构 M1 收紧（规划：元数据 + 快照 + 卡池历史 + 年表）。
 
 契约是 `game/Config/Solstice/Data/` 与 `studio/presets/` 的**共同校验源**：改契约必须同步改两边数据。
 
@@ -147,8 +156,8 @@ shared/
 
 | 内容 | 位置 | 备注 |
 |---|---|---|
-| 契约数据 | `game/Config/Solstice/Data/*.json` | 随包发布，运行时直接读 |
-| 本地化 | `game/Config/Solstice/Localization/` | 中英双语（文案规范见 [`../setting/WORLD.md`](../setting/WORLD.md) §3） |
+| 契约数据 | `game/Config/Solstice/Data/*.json` | 运行时读 `FPaths::ProjectConfigDir()`；⚠ **打包 stage 未配置**（UAT 不带 Config 下非 ini 文件，见 §10.7） |
+| 本地化 | `game/Config/Solstice/Localization/` | 中英双语（文案规范见 [`../setting/WORLD.md`](../setting/WORLD.md) §3）；打包同 §10.7 |
 | 存档（每界一份） | `%LOCALAPPDATA%\Solstice\Saved\SaveGames\<realmId>.sav` | 键前缀 `solstice.save.v<n>` |
 | 导出的界 | `%USERPROFILE%\Documents\Solstice\Exports\<realmId>.solstice` | 导入 / 导出用 |
 | 日志 / 崩溃 | `Saved/Logs`、`Saved/Crashes` | 不入 git |
@@ -212,6 +221,8 @@ shared/
 | 新控件 | C++ 优先（`Source/Solstice/UI/` Slate）；可视化打磨放 `Content/UI/` | ✅ / ❌ | ✅ |
 | 新的无头检查 / 批处理 | `Source/SolsticeEditor/` 增 Commandlet，并在 `tools/` 加同名薄包装脚本 | ✅ | ✅ |
 | 环境或构建脚本 | `tools/` | ✅ | ✅ |
+| 文档 / 契约自检脚本 | `tools/checks/`（Python，标准库） | ✅ | ✅ |
+| 提交钩子 / CI 工作流 | `tools/hooks/` + `.github/workflows/`（只包 checks/ 现有两条，不新增逻辑） | ✅ | ✅ |
 | 设计文档 | `docs/`（先读 [`../INDEX.md`](../INDEX.md) 的事务域表） | ✅ | ✅ |
 | 存档 / 日志 / 缓存 | `Saved/`、`D:\UE-DDC` | ❌ | ✅ |
 | 临时试验 | `studio/work/`（已忽略）或仓库根 `tmp/`（已忽略） | ❌ | ✅ |
@@ -220,7 +231,7 @@ shared/
 
 ## 9 git 与双机同步
 
-**入 git**：`game/Source`、`game/Config`、`game/Solstice.uproject`、`game/Content/README.md` 与 `.gitkeep`、`shared/`、`studio/{workflows,jobs,presets,tools,README.md}`、`studio/out/manifest.jsonl`、`tools/`、`docs/`、`.vscode/`、`.codebuddy/`、`.workbuddy/`。
+**入 git**：`game/Source`、`game/Config`、`game/Solstice.uproject`、`game/Content/README.md` 与 `.gitkeep`、`shared/`、`studio/{workflows,jobs,presets,tools,README.md}`、`studio/out/manifest.jsonl`、`tools/`、`docs/`、`.vscode/`、`.github/`、`.codebuddy/`、`.workbuddy/`、`.gitattributes`。
 
 **不入 git**：`game/{Binaries,Intermediate,Saved,DerivedDataCache}`、`game/Content/**` 的二进制（含生成的 `M_Paper.uasset` / `M_Ink.uasset`）、`studio/out/**`（除 manifest）、`studio/work/**`、`.vs/`、`*.sln`、`tmp/`。
 
@@ -236,11 +247,12 @@ shared/
 ## 10 由本文带来的待办
 
 1. ~~重建 `studio/`~~ ✅ 已落地（工作流 / jobs / 预设 / 驱动脚本）。
-2. ~~重建 `shared/schema/`~~ ✅ 已落地 3 个；`style` 与 `save` 待 M1。
+2. ~~重建 `shared/schema/`~~ ✅ 已落地 4 个（`save` 为信封骨架）；`style` 待 M1。
 3. ~~`game/` 工程骨架~~ ✅ 已落地（`.uproject` + 2 个 Target + 2 个模块，编译并运行通过）。
 4. ~~`tools/` 新增 headless 基准脚本入口~~ ✅ `tools/bench.ps1`；另加 `tools/gen-assets.ps1`。
 5. ~~落地后回来改状态列~~ ✅ 本文 v3.0 已改。
-6. **待 M1**：`studio/refs/`（风格锚图）、`shared/schema/{style,save}.schema.json`、独立零依赖 Sim 模块。
+6. **待 M1**：`studio/refs/`（风格锚图）、`shared/schema/style.schema.json`、`save.schema.json` 载荷收紧（信封已落地）、独立零依赖 Sim 模块。
+7. **待 P5**：**运行时 JSON 打包 stage**——`game/Config/Solstice/{Data,Localization}/*.json` 走 `FPaths::ProjectConfigDir()`，UAT 默认只 stage `Default*.ini`，打包版读不到。方案：迁 `game/Content/Solstice/` + `DefaultGame.ini` 加 `+DirectoriesToAlwaysStageAsUFS`，同步改 `FDataLoader` 路径与本文 §2/§6，并实测一次打包。
 
 ---
 
@@ -267,3 +279,6 @@ shared/
 | 2.3 | 2026-10-15 | `card.schema.json` 注记去「类别」（第 42 轮：类别维度删除） |
 | 2.4 | 2026-10-15 | `card.schema.json` 注记「卡型」改「持续性」（第 43 轮） |
 | 3.0 | 2026-10-16 | M0 落地：`game/` `studio/` `shared/` 转 ✅；`Source/` 结构按实测修正（`.Target.cs` 在 `Source/` 下）；`SolsticeSim` 模块与目标取消，无头回归改 `SolsticeBench` Commandlet；补 `SOLSTICE_API` 跨 DLL 导出规则与 `LoadingPhase: Default` 的成因；`.workbuddy/`（工具侧项目数据）按 `.codebuddy/` 同一约定入库 |
+| 3.1 | 2026-10-16 | 提交前自检脚本入库 `tools/checks/`（check-links / validate-contracts，标准库实现）；`Content/` 子目录树对齐实际（6 子目录）；§3 依赖清单按 Build.cs 实测瘦身（去 UMG / JsonUtilities / RenderCore / RHI）；§6/§10.7 登记运行时 JSON 打包 stage 待办（P5 前必须） |
+| 3.2 | 2026-10-16 | 自检自动执行两道闸门：`tools/hooks/pre-commit` + `tools/install-hooks.ps1`（本地，`core.hooksPath`）、`.github/workflows/checks.yml`（CI，无需引擎）；validate-contracts 扩展 Localization 双语言 key 对齐 + 占位符校验；新增 `.gitattributes`（钩子 LF 锁定） |
+| 3.3 | 2026-10-16 | 修复 cards 数据 `mat`→`material` 键名（6 处；`ReadParams` 只认 `material`，原值被 `Atof` 解析成 0 = Paper 材质）；`card.schema.json` params 收紧为 key 白名单 + material / weather 枚举（堵静默漂移）；新增 `save.schema.json` 信封骨架 + `shared/fixtures/save.sample.json`；validate-contracts 扩为 6 对契约（PAIRS 携带各自数据目录） |

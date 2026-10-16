@@ -3,7 +3,7 @@
 // Layering enforced by convention inside this module (docs/tech/ARCHITECTURE.md SS2.1):
 //   Render -> World -> Sim
 // Sim/ must stay free of UObject / Tick / render / input dependencies so it can be driven
-// headless. See Public/Sim/README.md.
+// headless. Dependencies kept minimal: Slate/HTTP private, no UMG/RenderCore/RHI.
 
 using UnrealBuildTool;
 
@@ -26,11 +26,8 @@ public class Solstice : ModuleRules
 
 		PrivateDependencyModuleNames.AddRange(new string[]
 		{
-			"RenderCore",
-			"RHI",
 			"Slate",
 			"SlateCore",
-			"UMG",
 			"HTTP"
 		});
 

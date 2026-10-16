@@ -1,7 +1,7 @@
 ---
 id: ops/ENV
 title: 开发环境搭建
-version: 2.0
+version: 2.1
 date: 2026-10-16
 status: active
 truth: nav
@@ -224,6 +224,9 @@ powershell -ExecutionPolicy Bypass -File tools\build.ps1 -Target Solstice
 powershell -ExecutionPolicy Bypass -File tools\gen-assets.ps1
 powershell -ExecutionPolicy Bypass -File tools\bench.ps1 -Days 2
 
+# 提交钩子（每个克隆装一次；提交时自动跑 checks/ 两条自检）
+powershell -ExecutionPolicy Bypass -File tools\install-hooks.ps1
+
 # 起编辑器
 powershell -ExecutionPolicy Bypass -File tools\launch-editor.ps1
 ```
@@ -252,3 +255,4 @@ powershell -ExecutionPolicy Bypass -File tools\launch-editor.ps1
 | 1.1 | 2026-10-14 | 迁入 `docs/ops/`；修正链接与 §3.1 层级错误（改为 §4）；生图调用说明移交 `art/ASSETS.md` |
 | 1.2 | 2026-10-14 | 补 §1.1 本机实测表（从 `README.md` 迁入，含 C/D 盘与残件结论）；§1.2 分工小节补编号 |
 | 2.0 | 2026-10-16 | 工具链落地：引擎 ✅ 5.8.3 / VS2022 ✅ / **新增 §1.3 `.NET Framework 4.6.2 SDK` 补法**；§1 / §1.1 状态据实改写；**新增 §2.4.1 `-NoUBA` 必加**与 `UnrealBuildTool.exe` 直调会 `EXIT=150` 的说明；§2.6 常见坑扩充至 13 条（Live Coding 互斥、`.Target.cs` 位置、`LoadingPhase` 与 `-run=` 顺序、`SOLSTICE_API` 跨 DLL、`LogTemp` 被过滤、静态持有 UObject 的 GC 崩溃）；§5 补内容生成与回归命令 |
+| 2.1 | 2026-10-16 | §5 补提交钩子安装命令 `install-hooks.ps1`（自检自动执行的本地闸门，另见 `tools/README.md`） |

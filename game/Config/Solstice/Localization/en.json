@@ -182,5 +182,6 @@
 	"help.z": "Z: undo a landing (within 3 s)",
 	"help.r": "R: reroll the hand",
 	"help.g": "G: creator panel",
+	"help.h": "H: help panel",
 	"help.esc": "Esc: quit"
 }

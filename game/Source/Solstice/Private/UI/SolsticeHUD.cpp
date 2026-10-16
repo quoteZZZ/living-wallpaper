@@ -3,6 +3,7 @@
 #include "UI/SolsticeHUD.h"
 
 #include "Brushes/SlateColorBrush.h"
+#include "Brushes/SlateRoundedBoxBrush.h"
 #include "Core/SolsticeGameInstance.h"
 #include "Core/SolsticeLocalization.h"
 #include "God/SolsticePlayerController.h"
@@ -37,23 +38,27 @@ namespace
 		return &Brush;
 	}
 
+	// Chips float on coloured surfaces (hand cards), so they stay translucent white and only
+	// gain a hairline ink outline. Hover darkens the outline, not the fill.
 	const FButtonStyle& ChipStyle()
 	{
 		static const FButtonStyle Style = FButtonStyle()
-			.SetNormal(FSlateColorBrush(FLinearColor(1.0f, 1.0f, 1.0f, 0.35f)))
-			.SetHovered(FSlateColorBrush(FLinearColor(1.0f, 1.0f, 1.0f, 0.75f)))
-			.SetPressed(FSlateColorBrush(FLinearColor(1.0f, 1.0f, 1.0f, 0.95f)))
+			.SetNormal(FSlateRoundedBoxBrush(FLinearColor(1.0f, 1.0f, 1.0f, 0.35f), 3.0f, FLinearColor(0.44f, 0.39f, 0.32f, 0.30f), 1.0f))
+			.SetHovered(FSlateRoundedBoxBrush(FLinearColor(1.0f, 1.0f, 1.0f, 0.75f), 3.0f, FLinearColor(0.44f, 0.39f, 0.32f, 0.70f), 1.0f))
+			.SetPressed(FSlateRoundedBoxBrush(FLinearColor(1.0f, 1.0f, 1.0f, 0.95f), 3.0f, FLinearColor(0.44f, 0.39f, 0.32f, 0.90f), 1.0f))
 			.SetNormalPadding(FMargin(1.0f))
 			.SetPressedPadding(FMargin(1.0f));
 		return Style;
 	}
 
+	// Action buttons are cut-paper tiles: solid warm fill, brown edge, hover lifts toward full
+	// paper white, press sinks to the deep panel tone with an ochre edge.
 	const FButtonStyle& ActionStyle()
 	{
 		static const FButtonStyle Style = FButtonStyle()
-			.SetNormal(FSlateColorBrush(FLinearColor(1.0f, 1.0f, 1.0f, 0.55f)))
-			.SetHovered(FSlateColorBrush(FLinearColor(1.0f, 1.0f, 1.0f, 0.90f)))
-			.SetPressed(FSlateColorBrush(FLinearColor(1.0f, 1.0f, 1.0f, 1.0f)))
+			.SetNormal(FSlateRoundedBoxBrush(PanelBg, 3.0f, FLinearColor(0.44f, 0.39f, 0.32f, 0.80f), 1.0f))
+			.SetHovered(FSlateRoundedBoxBrush(FLinearColor(0.990f, 0.975f, 0.945f, 1.0f), 3.0f, FLinearColor(0.44f, 0.39f, 0.32f, 1.0f), 1.0f))
+			.SetPressed(FSlateRoundedBoxBrush(PanelBgDeep, 3.0f, FLinearColor(0.780f, 0.360f, 0.120f, 1.0f), 1.0f))
 			.SetNormalPadding(FMargin(11.0f, 5.0f))
 			.SetPressedPadding(FMargin(11.0f, 6.0f));
 		return Style;
@@ -69,7 +74,7 @@ namespace
 	FText Dec1(float In) { return FText::FromString(FString::Printf(TEXT("%.1f"), In)); }
 	FText Percent(float In) { return FText::FromString(FString::Printf(TEXT("%d%%"), FMath::RoundToInt(In * 100.0f))); }
 
-	TSharedRef<STextBlock> Txt(const FText& Text, int32 Size = 11, const FLinearColor& Colour = Ink, bool bBold = false)
+	TSharedRef<STextBlock> Txt(const FText& Text, int32 Size = 12, const FLinearColor& Colour = Ink, bool bBold = false)
 	{
 		return SNew(STextBlock)
 			.Text(Text)
@@ -78,7 +83,7 @@ namespace
 			.Visibility(EVisibility::HitTestInvisible);
 	}
 
-	TSharedRef<STextBlock> TxtL(TAttribute<FText> Text, int32 Size = 11, const FLinearColor& Colour = Ink, bool bBold = false)
+	TSharedRef<STextBlock> TxtL(TAttribute<FText> Text, int32 Size = 12, const FLinearColor& Colour = Ink, bool bBold = false)
 	{
 		return SNew(STextBlock)
 			.Text(Text)
@@ -93,7 +98,7 @@ namespace
 		return SNew(SHorizontalBox)
 			+ SHorizontalBox::Slot().AutoWidth().VAlign(VAlign_Center).Padding(0.0f, 1.0f)
 			[
-				Txt(Tx(Loc(Key)), 11, InkSoft)
+				Txt(Tx(Loc(Key)), 12, InkSoft)
 			]
 			+ SHorizontalBox::Slot().FillWidth(1.0f)
 			[
@@ -101,7 +106,7 @@ namespace
 			]
 			+ SHorizontalBox::Slot().AutoWidth().VAlign(VAlign_Center).Padding(10.0f, 1.0f)
 			[
-				TxtL(Value, 11, Ink, true)
+				TxtL(Value, 12, Ink, true)
 			];
 	}
 
@@ -137,7 +142,7 @@ namespace
 			.OnClicked(OnClicked)
 			.ContentPadding(FMargin(2.0f))
 			[
-				Txt(Label, 11, Ink, true)
+				Txt(Label, 12, Ink, true)
 			];
 	}
 
@@ -148,7 +153,7 @@ namespace
 			.OnClicked(OnClicked)
 			.ContentPadding(FMargin(2.0f))
 			[
-				Txt(Label, 10, Ink, false)
+				Txt(Label, 11, Ink, false)
 			];
 	}
 }
@@ -177,7 +182,13 @@ void SSolsticeHUD::Construct(const FArguments& InArgs)
 	ChildSlot
 	[
 		SNew(SOverlay)
-		.Visibility(EVisibility::SelfHitTestInvisible)
+		// The whole HUD collapses when the controller has hidden the UI (Tab), so screenshots
+		// and inspection see the bare paper world.
+		.Visibility(TAttribute<EVisibility>::CreateLambda([this]()
+		{
+			ASolsticePlayerController* PlayerCtl = PC();
+			return (!PlayerCtl || PlayerCtl->IsUIOpen()) ? EVisibility::SelfHitTestInvisible : EVisibility::Collapsed;
+		}))
 
 		// ---- top left: clock -------------------------------------------------
 		+ SOverlay::Slot().HAlign(HAlign_Left).VAlign(VAlign_Top).Padding(FMargin(14.0f))
@@ -414,7 +425,7 @@ TSharedRef<SWidget> SSolsticeHUD::BuildEchoPanel()
 		]
 		+ SHorizontalBox::Slot().AutoWidth().VAlign(VAlign_Bottom).Padding(8.0f, 0.0f, 0.0f, 3.0f)
 		[
-			Txt(Tx(Solstice::Loc(TEXT("echo.balance"))), 11, InkSoft)
+			Txt(Tx(Solstice::Loc(TEXT("echo.balance"))), 12, InkSoft)
 		]
 	];
 
@@ -469,7 +480,7 @@ TSharedRef<SWidget> SSolsticeHUD::BuildEchoPanel()
 				return FText::GetEmpty();
 			}
 			return Tx(Solstice::Loc(TEXT("echo.disturbance_high")));
-		}), 10, Accent)
+		}), 11, Accent)
 	];
 
 	// Calming is the only echo sink besides packs, so it lives next to the meter it drains.
@@ -639,7 +650,7 @@ TSharedRef<SWidget> SSolsticeHUD::BuildHandBar()
 							*FString::FromInt(Controller->GetSelectedSlot() + 1),
 							*Mode,
 							*Solstice::Loc(TEXT("hand.undo_window"))));
-					}), 10, InkSoft)
+					}), 11, InkSoft)
 				]
 				+ SHorizontalBox::Slot().FillWidth(1.0f)[ SNullWidget::NullWidget ]
 			]
@@ -809,7 +820,7 @@ TSharedRef<SWidget> SSolsticeHUD::BuildPackPanel()
 				Built += FString::Printf(TEXT("\n%s (+%d)"), *Solstice::Loc(TEXT("pack.converted")), Result.ConvertedEcho);
 			}
 			return Tx(Built);
-		}), 10, Ink)
+		}), 11, Ink)
 	];
 
 	Body->AddSlot().AutoHeight()
@@ -819,7 +830,7 @@ TSharedRef<SWidget> SSolsticeHUD::BuildPackPanel()
 			FSimKernel* Kernel = Sim();
 			if (!Kernel || Kernel->AreSpecialPacksAvailable()) { return FText::GetEmpty(); }
 			return Tx(Solstice::Loc(TEXT("pack.special_locked")));
-		}), 9, InkSoft)
+		}), 10, InkSoft)
 	];
 
 	return SNew(SBox)
@@ -952,7 +963,7 @@ TSharedRef<SWidget> SSolsticeHUD::BuildCreatorPanel()
 
 	Body->AddSlot().AutoHeight()
 	[
-		Txt(Tx(Solstice::Loc(TEXT("creator.stub"))), 10, InkSoft)
+		Txt(Tx(Solstice::Loc(TEXT("creator.stub"))), 11, InkSoft)
 	];
 
 	// Creator step 8: sow the life seed. Chaos has no life at all (WORLD SS3.3 step 5), so this
@@ -970,7 +981,7 @@ TSharedRef<SWidget> SSolsticeHUD::BuildCreatorPanel()
 	// algorithms are reachable without leaving the game.
 	Body->AddSlot().AutoHeight().Padding(0.0f, 6.0f, 0.0f, 2.0f)
 	[
-		Txt(Tx(Solstice::Loc(TEXT("creator.reshape"))), 10, InkSoft)
+		Txt(Tx(Solstice::Loc(TEXT("creator.reshape"))), 11, InkSoft)
 	];
 
 	Body->AddSlot().AutoHeight()
@@ -988,7 +999,7 @@ TSharedRef<SWidget> SSolsticeHUD::BuildCreatorPanel()
 				if ((Index + 1) % 2 == 0) { Built += TEXT("\n"); }
 			}
 			return Tx(Built);
-		}), 10, Ink)
+		}), 11, Ink)
 	];
 
 	Body->AddSlot().AutoHeight().Padding(0.0f, 4.0f, 0.0f, 0.0f)
@@ -1026,7 +1037,7 @@ TSharedRef<SWidget> SSolsticeHUD::BuildHelpPanel()
 {
 	auto Line = [](const FString& Key) -> TSharedRef<SWidget>
 	{
-		return Txt(Tx(Solstice::Loc(Key)), 10, InkSoft);
+		return Txt(Tx(Solstice::Loc(Key)), 11, InkSoft);
 	};
 
 	TSharedRef<SVerticalBox> Body = SNew(SVerticalBox);
@@ -1040,6 +1051,7 @@ TSharedRef<SWidget> SSolsticeHUD::BuildHelpPanel()
 	Body->AddSlot().AutoHeight()[ Line(TEXT("help.p")) ];
 	Body->AddSlot().AutoHeight()[ Line(TEXT("help.b")) ];
 	Body->AddSlot().AutoHeight()[ Line(TEXT("help.g")) ];
+	Body->AddSlot().AutoHeight()[ Line(TEXT("help.h")) ];
 	Body->AddSlot().AutoHeight()[ Line(TEXT("help.f1")) ];
 	Body->AddSlot().AutoHeight()[ Line(TEXT("help.f2")) ];
 	Body->AddSlot().AutoHeight()[ Line(TEXT("help.f3")) ];

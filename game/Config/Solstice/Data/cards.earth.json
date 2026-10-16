@@ -15,7 +15,7 @@
 			"scope": "single",
 			"effect": "paint",
 			"provisional": false,
-			"params": { "radius": 1.6, "mat": "soil" }
+			"params": { "radius": 1.6, "material": "soil" }
 		},
 		{
 			"id": "card.earth.0.rite.dust-sift",
@@ -29,7 +29,7 @@
 			"scope": "area",
 			"effect": "paint",
 			"provisional": true,
-			"params": { "radius": 2.2, "mat": "sand" }
+			"params": { "radius": 2.2, "material": "sand" }
 		},
 		{
 			"id": "card.earth.0.law.firm-ground",

@@ -1,0 +1,22 @@
+# Self-checks only: both scripts are stdlib-only Python, no engine needed.
+# Engine build stays on the dev machine (see docs/ops/ENV.md).
+name: checks
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  self-checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - name: check-links
+        run: python tools/checks/check-links.py
+      - name: validate-contracts
+        run: python tools/checks/validate-contracts.py

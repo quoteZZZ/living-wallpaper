@@ -11,9 +11,9 @@
 
 | 项 | 真实情况 |
 |---|---|
-| 设计 | ✅ **立项已定稿**，细化到规格级 —— 唯一真源 [`docs/charter/GDD.md`](docs/charter/GDD.md) v6.1 |
+| 设计 | ✅ **立项已定稿**，细化到规格级 —— 唯一真源 [`docs/charter/GDD.md`](docs/charter/GDD.md)（版本号见 [`docs/INDEX.md`](docs/INDEX.md) §1 状态矩阵） |
 | 文档体系 | ✅ 已按"一种事务一份文档"重建，入口：[`docs/INDEX.md`](docs/INDEX.md)（含状态矩阵与更新触发矩阵） |
-| 环境脚本 | ✅ `tools/` 11 个 PowerShell + `tools/README.md` |
+| 环境脚本 | ✅ `tools/` 12 个 PowerShell + `tools/checks/` 2 个 Python 自检 + `tools/hooks/` 提交钩子 + `.github/` CI —— 自检自动执行 |
 | IDE 配置 | ✅ `.vscode/` 7 份 + `.clang-format` + `.editorconfig` |
 | 项目数据 | ✅ `.codebuddy/agents/`（3 个子代理）与 `.codebuddy/rules/`（核心约束） |
 | 工具链 | ✅ **虚幻引擎 5.8.3**（`D:\Epic Games\UE_5.8`）+ **VS2022 生成工具**（`D:\VS2022`）+ 补齐的 `.NET Framework 4.6.2 SDK`。见 [`docs/ops/ENV.md`](docs/ops/ENV.md) §1.3 |
@@ -83,8 +83,9 @@ solstice/
 │                 └─ Content/ 二进制不入 git，由 tools\gen-assets.ps1 重建
 ├─ studio/      ✅ 生图线（ComfyUI 工作流 / jobs / 预设 / 驱动脚本）；产物 out/ 不入 git
 ├─ shared/      ✅ JSON 契约（schema/：card · species · world）
-├─ tools/       ✅ 环境 / 工程 / 构建 / 内容生成 / 回归脚本（PowerShell，11 个）
+├─ tools/       ✅ 环境 / 工程 / 构建 / 内容生成 / 回归脚本（PowerShell 12 个，含 install-hooks）+ checks/ 自检（Python 2 个）+ hooks/ 提交钩子
 ├─ docs/        ✅ 文档体系（charter / setting / gameplay / art / tech / plan / ops / archive）→ 入口 docs/INDEX.md
+├─ .github/     ✅ CI 自检（checks/ 两条，push / PR 自动跑，无需引擎）
 ├─ .vscode/     ✅ 构建任务 / 调试 / cpptools / 代码片段
 ├─ .codebuddy/  ✅ agents/ 与 rules/（项目数据，勿删）
 └─ .workbuddy/  ✅ memory/（工作日志与长期项目笔记；项目数据，勿删）

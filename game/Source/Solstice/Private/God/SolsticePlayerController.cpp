@@ -482,7 +482,6 @@ void ASolsticePlayerController::PollInput(float DeltaSeconds)
 	if (WasInputKeyJustPressed(EKeys::B)) { TogglePacks(); }
 	if (WasInputKeyJustPressed(EKeys::G)) { ToggleCreator(); }
 	if (WasInputKeyJustPressed(EKeys::H)) { ToggleHelp(); }
-	if (WasInputKeyJustPressed(EKeys::Tab)) { ToggleUI(); }
 
 	if (WasInputKeyJustPressed(EKeys::F1)) { ToggleTimeMode(); }
 	if (WasInputKeyJustPressed(EKeys::F2)) { TogglePause(); }
@@ -505,6 +504,10 @@ void ASolsticePlayerController::Tick(float DeltaSeconds)
 	Super::Tick(DeltaSeconds);
 
 	StatusAge += DeltaSeconds;
+
+	// Tab lives outside the bShowUI gate: a hidden HUD must still be able to unhide itself.
+	if (WasInputKeyJustPressed(EKeys::Tab)) { ToggleUI(); }
+
 	if (bShowUI)
 	{
 		PollInput(DeltaSeconds);

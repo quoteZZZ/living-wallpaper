@@ -89,9 +89,31 @@
 					"default": false
 				},
 				"params": {
-					"description": "Effect parameters. Keys read by the kernel: radius, peak, delta_temp, water_delta, strength, mat, species, count, humidity, cloud, weather.",
+					"description": "Effect parameters, written in data-side names. SolsticeDataLoader.cpp ReadParams translates material / species / weather to kernel indices; the kernel reads 'mat', which is the translated index - never write 'mat' in data. Numeric keys: radius, peak, delta_temp, water_delta, strength, count, humidity, cloud. Names: material (ParseMaterial), species (ParseSpeciesKind, first used at M1), weather (ParseWeather names).",
 					"type": "object",
-					"additionalProperties": { "type": ["number", "string"] }
+					"properties": {
+						"radius": { "type": "number" },
+						"peak": { "type": "number" },
+						"delta_temp": { "type": "number" },
+						"water_delta": { "type": "number" },
+						"strength": { "type": "number" },
+						"count": { "type": "integer", "minimum": 1 },
+						"humidity": { "type": "number" },
+						"cloud": { "type": "number" },
+						"material": {
+							"type": "string",
+							"enum": ["soil", "clay", "mud", "stone", "ore", "deadwood", "plant", "water", "magma", "ice", "snow", "sand", "ash", "tissue"]
+						},
+						"species": {
+							"description": "Species kind name (ParseSpeciesKind in SolsticeDataLoader.cpp).",
+							"type": "string"
+						},
+						"weather": {
+							"type": "string",
+							"enum": ["clear", "cloudy", "rain", "storm", "fog"]
+						}
+					},
+					"additionalProperties": false
 				}
 			},
 			"additionalProperties": false

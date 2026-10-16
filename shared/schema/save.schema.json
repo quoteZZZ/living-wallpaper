@@ -1,0 +1,41 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"$id": "https://solstice.local/schema/save.schema.json",
+	"title": "Solstice save contract",
+	"description": "Save file envelope. Truth: docs/tech/ARCHITECTURE.md SS2.2 (versioning) and docs/gameplay/CUSTOMIZE.md SS4 (import/export). The envelope is authoritative now; snapshot / card_history / chronicle payloads tighten at M1 (docs/tech/STRUCTURE.md SS5). Sample: shared/fixtures/save.sample.json.",
+	"type": "object",
+	"required": ["version"],
+	"properties": {
+		"_comment": { "type": "string" },
+		"_note": { "type": "string" },
+		"version": {
+			"description": "Save format version. Bump on any breaking payload change; a loader migrates older versions upward (docs/tech/ARCHITECTURE.md SS2.2).",
+			"type": "integer",
+			"minimum": 1
+		},
+		"meta": {
+			"description": "Envelope metadata. realm_id must name a preset from world.json (default or presets).",
+			"type": "object",
+			"required": ["realm_id", "saved_at_day", "saved_at_hour"],
+			"properties": {
+				"realm_id": { "type": "string", "pattern": "^realm\\.[a-z-]+$" },
+				"saved_at_day": { "type": "integer", "minimum": 0 },
+				"saved_at_hour": { "type": "number", "minimum": 0, "maximum": 24 }
+			},
+			"additionalProperties": false
+		},
+		"snapshot": {
+			"description": "World state payload (terrain / water / life). Shape is settled at M1; the envelope only fixes the container.",
+			"type": "object"
+		},
+		"card_history": {
+			"description": "Cards played on this realm, in play order (M1).",
+			"type": "array"
+		},
+		"chronicle": {
+			"description": "Chronicle entries of realm milestones (M1).",
+			"type": "array"
+		}
+	},
+	"additionalProperties": false
+}

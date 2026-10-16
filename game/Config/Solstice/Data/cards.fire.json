@@ -141,7 +141,7 @@
 			"scope": "single",
 			"effect": "paint",
 			"provisional": true,
-			"params": { "radius": 2.0, "mat": "magma" }
+			"params": { "radius": 2.0, "material": "magma" }
 		},
 		{
 			"id": "card.fire.3.rite.conflagration",
@@ -169,7 +169,7 @@
 			"scope": "global",
 			"effect": "paint",
 			"provisional": true,
-			"params": { "radius": 22.0, "mat": "ash" }
+			"params": { "radius": 22.0, "material": "ash" }
 		}
 	]
 }

@@ -32,14 +32,14 @@ alwaysApply: true
 3. **逻辑在 C++，表现层在蓝图**；游戏逻辑**不使用 Python**（编辑器资产批处理可用官方 ScriptPlugin）。
 4. **写入前先查归位**：`docs/tech/STRUCTURE.md` §8 归位决策表 + §0 状态列（🟡 = 计划中、**尚未落地**，不要按存在去写代码或脚本）。
 5. **内容数据驱动**：物种 / 卡池 / 法则 / 预设全 JSON，运行时读取。
-6. **默认中英双语**；文案规范见 `docs/content/WORLD.md` §3。
+6. **默认中英双语**；文案规范见 `docs/setting/WORLD.md` §3。
 7. **提交与文档纪律**：提交信息英文、简短祈使句；文档与代码**同次提交**；任何文档增删改（含版本、状态）必须**同次更新 `docs/INDEX.md`**。
 
 ## 3. 禁止事项（历史踩坑清单）
 
-- **不要把已作废形态带回**方案或文档：**Tauri / WebGL / Vite / TypeScript / 2.5D / 自走棋 / 卡牌收集**；`app/` 与旧 `studio/`、旧 `shared/` 已删除或为计划中。
+- **不要把已作废形态带回**方案或文档：**Tauri / WebGL / Vite / TypeScript / 2.5D / 自走棋 / 卡牌收集**；`app/` 已删除（现行 `studio/`、`shared/` 与旧形态无关）。
 - **不要把 `docs/archive/**` 当依据**——归档稿无约束力（见 `docs/archive/README.md`）。
-- **不要把计划中的目录当已存在**（`game/`、`studio/`、`shared/` 目前为 🟡）。
+- **不要把计划中的目录当已存在**（以 `docs/tech/STRUCTURE.md` §0 状态列为准：M0 起 `game/` `studio/` `shared/` 已 ✅，🟡 仅剩个别子项）。
 - **不要凭印象写规格或数字**——一切以 `docs/charter/GDD.md` 为准，数字必须可核对。
 - **不在运行期调用 AI**、不做服务端 / 账号 / 云同步、不做 macOS / Linux（明确非目标，GDD §2）。
 
