@@ -111,6 +111,34 @@ def check(host: str) -> int:
     return 0
 
 
+ARCHIVED_SUBDIRS = ("jobs", "presets", "workflows")
+
+
+def require_archived(path: str, label: str) -> None:
+    """
+    R-25: a manifest line is a compliance record, so everything it names has to live in the repo.
+
+    `prompt_ref` and `preset` point at a job line and a preset file; if those sit under
+    studio/work/ or studio/out/ they are gitignored, and the record ends up pointing at a file
+    nobody else can fetch - which defeats per-image traceability. Refuse to run from there rather
+    than write a record that cannot be audited.
+    """
+    if not path:
+        return
+    full = os.path.abspath(path)
+    studio = os.path.join(REPO_ROOT, "studio")
+    for sub in ARCHIVED_SUBDIRS:
+        archived = os.path.join(studio, sub)
+        if os.path.commonpath([full, archived]) == archived:
+            return
+    raise SystemExit(
+        "[solstice] %s -> %s is not inside studio/jobs, studio/presets or studio/workflows; "
+        "work/ and out/ are gitignored, so a manifest entry pointing there could never be "
+        "reproduced. Move the file into an archived folder first (REVIEW R-25)."
+        % (label, os.path.relpath(full, REPO_ROOT))
+    )
+
+
 def load_preset(path: str) -> dict:
     with open(path, "r", encoding="utf-8") as handle:
         return json.load(handle)
@@ -132,7 +160,10 @@ def build_prompt(preset: dict, job: dict) -> tuple[str, str]:
     # "photograph of a tabletop model" wording that a standee or card face wants.
     words = subject.get("words", preset["words"])
     negative = preset["negative"] + subject.get("negative", []) + job.get("extra_negative", [])
-    positive = ", ".join([subject["prompt"]] + words + job.get("extra", []))
+    # A preset may pin one shared clause (e.g. the exact world geometry) that every subject of
+    # that preset must repeat; it goes first so the form is stated before the subject matter.
+    lead = preset.get("base_prompt")
+    positive = ", ".join(([lead] if lead else []) + [subject["prompt"]] + words + job.get("extra", []))
     return positive, ", ".join(negative)
 
 
@@ -275,6 +306,12 @@ def main() -> int:
 
     if args.check or not args.jobs:
         return check(args.host)
+
+    # R-25: refuse to run from a gitignored folder, because the manifest would then record a
+    # prompt/preset reference that no other checkout can resolve.
+    require_archived(args.jobs, '--jobs')
+    require_archived(args.preset, '--preset')
+    require_archived(args.workflow, '--workflow')
 
     preset = load_preset(args.preset)
     with open(args.workflow, "r", encoding="utf-8") as handle:
